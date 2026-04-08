@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Micro-Polirritmias C++</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+</head>
+<body>
+    <div class="panel">
+        <h1>Generador Euclidiano</h1>
+        <canvas id="ritmoCanvas" width="600" height="150"></canvas>
+        
+        <div class="control-group">
+            <label>BPM: <input type="range" id="inputBpm" min="40" max="220" value="100"> 
+            <span id="valBpm">100</span></label>
+        </div>
+    
+        <div id="controlesVoces">
+            <div class="v-input-wrapper">V1 <input type="number" class="v-input" value="4" min="0" max="16"></div>
+            <div class="v-input-wrapper">V2 <input type="number" class="v-input" value="3" min="0" max="16"></div>
+            <div class="v-input-wrapper">V3 <input type="number" class="v-input" value="0" min="0" max="16"></div>
+            <div class="v-input-wrapper">V4 <input type="number" class="v-input" value="0" min="0" max="16"></div>
+            <div class="v-input-wrapper">V5 <input type="number" class="v-input" value="0" min="0" max="16"></div>
+            <div class="v-input-wrapper">V6 <input type="number" class="v-input" value="0" min="0" max="16"></div>
+            <div class="v-input-wrapper">V7 <input type="number" class="v-input" value="0" min="0" max="16"></div>
+            <div class="v-input-wrapper">V8 <input type="number" class="v-input" value="0" min="0" max="16"></div>
+        </div>
+
+        <div class="buttons-container">
+            <button id="btnPlay">PLAY</button>
+            <button id="btnStop">STOP</button>
+        </div>
+    </div>
+
+    <script src="js/visual.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
