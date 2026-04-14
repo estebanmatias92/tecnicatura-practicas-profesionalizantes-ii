@@ -1,0 +1,17 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: samplevault-db-test
+    environment:
+      MYSQL_ROOT_PASSWORD: testpassword
+      MYSQL_DATABASE: samplevault_test
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpassword
+
+  backend:
+    environment:
+      - DB_HOST=db
+      - DB_USER=testuser
+      - DB_PASS=testpassword
+      - DB_NAME=samplevault_test
+      - NODE_ENV=test
