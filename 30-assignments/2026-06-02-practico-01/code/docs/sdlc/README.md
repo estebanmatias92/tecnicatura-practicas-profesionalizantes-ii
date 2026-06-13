@@ -52,6 +52,6 @@ stateDiagram-v2
 
 ### Referencias
 
-- [[04-projects/prj-tecnicatura-superior-sistemas/year/02/practicas-profesionalizantes-ii/30-assignments/2026-06-02-practico-01/code/docs/requirements/README|Requirements Engineering strategy]]
-- [[validations-backlog|Validations backlog]]
-- [[RE-brownfield-reference|RE Brownfield - Referencia Rapida]] (nota metodológica general en Ingeniería de Software I)
+- [Requirements Engineering strategy](../requirements/README.md)
+- [Validations backlog](../requirements/validations-backlog.md)
+- [Brownfield (software development) — Wikipedia](https://en.wikipedia.org/wiki/Brownfield_(software_development)) — nota metodológica general sobre desarrollo brownfield
