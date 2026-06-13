@@ -1,42 +1,44 @@
 #!/bin/bash
 
-# 1. Actualizar e instalar MariaDB de forma no interactiva
-sudo apt-get update
-sudo apt-get install -y mariadb-server
+echo "Starting project setup..."
 
-# 2. Iniciar el servicio de base de datos
-sudo service mariadb start
+# 1. Esperar a que MariaDB esté listo (la feature lo inicia automáticamente)
+until mysqladmin ping -h "localhost" --silent; do
+    echo "Waiting for MariaDB..."
+    sleep 2
+done
 
-# 3. Configurar permisos básicos (reemplaza a mysql_secure_installation en automatización)
-# Permitimos que el root entre sin password localmente para el script inicial
-sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket;"
-
-# 4. Importar la base de datos (usando la ruta correcta desde la raíz)
-# Asumiendo que el script está en la raíz o en backend/config/
+# 2. Importar la base de datos
 if [ -f "backend/config/init.sql" ]; then
     sudo mysql -u root < backend/config/init.sql
-    echo "✅ Base de datos inicializada."
+    echo "✅ Database initialized."
 else
-    echo "⚠️ No se encontró init.sql en backend/config/"
+    echo "⚠️ Warning: init.sql not found at backend/config/"
 fi
 
-# 5. Configurar Node.js (La imagen base ya trae nvm, instalamos v24)
+# 3. Configurar Node.js v24
 nvm install 24
 nvm use 24
 
-# 6. Moverse a backend, instalar dependencias y crear .env
-cd backend
-npm install
+# 4. Instalación de dependencias en backend
+if [ -d "backend" ]; then
+    cd backend
+    npm install
 
-echo "Creando archivo .env..."
-cat <<EOF > .env
+    # 5. Crear el archivo .env dinámicamente
+    echo "Creating .env file..."
+    cat <<EOF > .env
 PORT=3000
 DB_HOST=localhost
 DB_USER=samplevault
 DB_PASS=samplevault
 DB_NAME=samplevault
 JWT_SECRET=tu_clave_secreta_super_segura
-NODE_ENV=production
+NODE_ENV=testing
 EOF
+    echo "✅ Backend dependencies installed and .env created."
+else
+    echo "❌ Error: backend directory not found."
+fi
 
-echo "🚀 Configuración de entorno completada con éxito."
+echo "🚀 Setup complete! SampleVault is ready for testing."

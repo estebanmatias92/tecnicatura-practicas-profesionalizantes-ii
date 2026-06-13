@@ -10,13 +10,13 @@ USE samplevault;
 
 -- 2. Configuración de usuario de DB (Restricción de privilegios)
 -- Primero creamos la identidad (si no existe)
-CREATE USER IF NOT EXISTS 'samplevault'@'localhost' IDENTIFIED BY 'samplevault';
+CREATE USER IF NOT EXISTS 'samplevault'@'%' IDENTIFIED BY 'samplevault';
 
 -- Luego asignamos los permisos específicos
 -- Arquitectura de seguridad conocida como el "Principio de Menor Privilegio"
 -- Aplicamos SELECT para lectura y EXECUTE para poder invocar los Stored Procedures.
 -- Esto impide INSERT, UPDATE y DELETE directos desde el código de la aplicación.
-GRANT SELECT, EXECUTE ON samplevault.* TO 'samplevault'@'localhost';
+GRANT SELECT, EXECUTE ON samplevault.* TO 'samplevault'@'%';
 
 -- 3. Tabla de Roles (Normalización)
 CREATE TABLE roles (

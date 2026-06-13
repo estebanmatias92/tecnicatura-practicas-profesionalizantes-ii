@@ -15,29 +15,38 @@
 ## 🛠️ Tecnologías Utilizadas
 
 ### Backend
+
 * **Node.js & Express:** Servidor robusto y escalable.
 * **Multer:** Gestión eficiente de subida de archivos binarios.
 * **MySQL/MariaDB:** Persistencia de metadatos de forma relacional.
 
 ### Frontend
+
 * **Vanilla JavaScript:** Lógica pura sin dependencias de frameworks pesados.
 * **W3.CSS:** Framework CSS ligero para una interfaz moderna y responsiva.
 * **Web Components (Custom):** Manejo dinámico de la UI mediante inyección de nodos nativos.
 
 ---
 
-### Inicialización del Backend:
+### Inicialización del Backend
+
 Entra en la carpeta del servidor e instala las dependencias necesarias:
+
 ```bash
 cd backend
 npm init -y  # Crea el archivo package.json por defecto
 ```
-### Instalación de módulos:
+
+### Instalación de módulos
+
 Ejecuta este comando para instalar todas las bibliotecas que configuramos en los scripts:
+
 ```bash
 npm install express mysql2 cors multer jsonwebtoken bcrypt dotenv
 ```
-### Agregar archivo .env en el directorio backend/ con estas variables como ejemplo:
+
+### Agregar archivo .env en el directorio backend/ con estas variables como ejemplo
+
 ```text
 PORT=3000
 DB_HOST=localhost
@@ -45,8 +54,73 @@ DB_USER=samplevault
 DB_PASS=samplevault
 DB_NAME=samplevault
 JWT_SECRET=tu_clave_secreta_super_segura
-NODE_ENV=production
+NODE_ENV=testing
 ```
+
+---
+
+## 🐳 Docker Compose (quick start)
+
+```bash
+docker compose up --build -d
+```
+
+La app queda disponible en `http://localhost:3000`.
+
+---
+
+## 📡 API Reference
+
+**Socket:** `http://localhost:3000`
+
+### Autenticación (`/api/auth`)
+
+| Método | Ruta | Auth | Body | Descripción |
+| - | - | - | - |---|
+| `POST` | `/api/auth/register` | ✗ | `{ username, password, role_name }` | Registro (`role_name`: `admin` o `producer`) |
+| `POST` | `/api/auth/login` | ✗ | `{ username, password }` | Login. Retorna `{ token, user: { id, username, role } }` |
+
+### Samples (`/api/samples`) — requiere token JWT
+
+| Método | Ruta | Auth | Descripción |
+| - | - | - | - |
+| `POST` | `/api/samples/upload` | `verifyToken` | Subir sample (form-data: `audioFile` + `display_name`, `category`, `bpm`) |
+| `GET` | `/api/samples/my-samples` | `verifyToken` | Listar samples del usuario autenticado |
+| `DELETE` | `/api/samples/:id` | `verifyToken` | Eliminar sample propio |
+
+### Admin (`/api/admin`) — requiere token + rol admin
+
+| Método | Ruta | Auth | Descripción |
+| - | - | - | - |
+| `GET` | `/api/admin/users` | `verifyToken` + `isAdmin` | Listar todos los usuarios |
+| `DELETE` | `/api/admin/users/:id` | `verifyToken` + `isAdmin` | Eliminar usuario |
+
+### Frontend (navegación)
+
+Con `NODE_ENV=testing`:
+
+| Ruta | Archivo |
+| - | - |
+| `/` | `frontend/html/tests.html` (zona de tests) |
+
+Con `NODE_ENV=production`:
+
+| Ruta | Archivo |
+| - | - |
+| `/` o `/login` | `login.html` |
+| `/register` | `register.html` |
+| `/producer-dashboard` | `producer-dashboard.html` |
+| `/admin-dashboard` | `admin-dashboard.html` |
+
+### Usuarios de prueba
+
+| Usuario | Contraseña | Rol |
+| - | - | - |
+| `admin` | `12345` | admin |
+| `pepe` | `12345` | producer |
+
+---
+
 ## 📂 Estructura del Proyecto
 
 ```text

@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: samplevault-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: samplevault
+    volumes:
+      - ./backend/config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - app-network
+
+  app:
+    build: .
+    container_name: samplevault-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_USER: samplevault
+      DB_PASS: samplevault
+      DB_NAME: samplevault
+      JWT_SECRET: tu_clave_secreta_super_segura
+      NODE_ENV: testing
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - /app/backend/node_modules
+      - uploads_data:/app/backend/uploads
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+  uploads_data:
+
+networks:
+  app-network:
+    driver: bridge
