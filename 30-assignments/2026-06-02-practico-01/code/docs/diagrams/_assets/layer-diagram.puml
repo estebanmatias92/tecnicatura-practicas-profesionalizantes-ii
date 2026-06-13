@@ -1,0 +1,68 @@
+@startuml LayerDiagram
+title Diagrama de Capas — Sample Vault
+
+skinparam packageStyle rectangle
+
+package "Capa 1: Frontend (SPA)" {
+  [HTML Views] as views
+  [Front Controllers] as front_ctrl
+  [API Service] as api_svc
+  [Auth Helper] as auth_helper
+  [UI Handlers (Modal)] as modal
+
+  views --> front_ctrl : eventos DOM
+  front_ctrl --> api_svc : fetch()
+  api_svc --> auth_helper : getToken()
+}
+
+package "Capa 2: API Router (Express)" {
+  [authRoutes] as auth_routes
+  [sampleRoutes] as sample_routes
+  [adminRoutes] as admin_routes
+  [verifyToken] as verify
+  [isAdmin] as is_admin
+  [multer Upload] as multer
+}
+
+package "Capa 3: Controladores" {
+  [authController] as auth_ctrl
+  [sampleController] as sample_ctrl
+  [adminController] as admin_ctrl
+}
+
+package "Capa 4: Repositorios (Data Access)" {
+  [userRepo] as user_repo
+  [sampleRepo] as sample_repo
+}
+
+package "Capa 5: Persistencia" {
+  [MySQL / Stored Procedures] as mysql
+  [File System / uploads/] as fs
+}
+
+' Conexiones entre frontend y API
+api_svc --> auth_routes : POST /auth/*
+api_svc --> sample_routes : GET|POST|DELETE /samples/*
+api_svc --> admin_routes : GET|DELETE /admin/*
+
+' Middleware chain
+auth_routes --> auth_ctrl : register / login
+sample_routes --> verify : router-level
+verify --> multer : upload (solo POST)
+multer --> sample_ctrl : uploadSample
+sample_routes --> sample_ctrl : getMySamples / deleteSample
+admin_routes --> verify : router-level
+verify --> is_admin : solo /admin/*
+is_admin --> admin_ctrl : getAllUsers / deleteUser
+
+' Capa de controladores a repositorios
+auth_ctrl --> user_repo : findByUsername / create
+sample_ctrl --> sample_repo : create / findByUserId / findById / delete
+admin_ctrl --> user_repo : findAll / delete
+
+' Capa de repositorios a persistencia
+user_repo --> mysql : CALL sp_find_user_*, sp_create_user
+sample_repo --> mysql : CALL sp_find_sample_*, sp_create_sample
+sample_ctrl --> fs : fileHelper.deleteFile
+admin_ctrl --> fs : fileHelper.deleteFile (fisicos al borrar usuario)
+@enduml

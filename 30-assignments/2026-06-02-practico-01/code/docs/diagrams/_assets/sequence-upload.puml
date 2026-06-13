@@ -1,0 +1,93 @@
+@startuml SequenceUpload
+title Secuencia: Subir Sample
+
+actor "Producer" as user
+participant "samplesFrontController.js" as fe
+participant "apiService.js" as api
+participant "POST /api/samples/upload" as route
+participant "verifyToken" as verify
+participant "multerConfig.js" as multer
+participant "sampleController.js" as ctrl
+participant "sampleRepo.js" as repo
+participant "fileHelper.js" as fh
+database "MySQL\n(sp_create_sample)" as db
+collections "File System\nuploads/" as fs
+
+user -> fe : Completa form, selecciona archivo, click "Subir"
+activate fe
+
+fe -> api : request('/samples/upload',\n           'POST', formData, isFormData=true)
+activate api
+
+api -> route : fetch('/api/samples/upload',\n              {method: 'POST',\n               headers: {Authorization: Bearer <token>},\n               body: FormData})
+activate route
+
+route -> verify : verifyToken(req, res, next)
+activate verify
+
+alt token inválido
+    verify --> route : HTTP 403/401
+    route --> api : error
+    api --> fe : throw
+    fe -> fe : showModal('Error', msg)
+else token válido
+    verify --> verify : req.userId = decoded.id
+    verify --> route : next()
+    deactivate verify
+
+    route -> multer : upload.single('audioFile')
+    activate multer
+
+    alt MIME type no permitido\n(!audio/mpeg,wav,ogg,flac)
+        multer --> route : HTTP 400\nerror Multer
+        route --> api : error
+        api --> fe : throw
+        fe -> fe : showModal('Error',\n                       'Formato inválido')
+    else archivo OK
+        multer --> fs : write file
+        multer --> route : req.file = {filename, path, mimetype}
+        deactivate multer
+
+        route -> ctrl : sampleController.uploadSample(req, res)
+        activate ctrl
+
+        ctrl -> ctrl : !req.file → HTTP 400
+        ctrl -> ctrl : !display_name || !category →\n                        HTTP 400 + deleteFile
+
+        ctrl -> repo : create({user_id,\n                           filename,\n                           display_name,\n                           category,\n                           bpm: parseInt(bpm) || 0,\n                           file_path})
+        activate repo
+
+        repo -> db : CALL sp_create_sample(?,?,?,?,?,?)
+        activate db
+        db --> repo : insertId
+        deactivate db
+
+        repo --> ctrl : insertId
+        deactivate repo
+
+        alt error DB
+            ctrl -> fh : deleteFile(/uploads/filename)
+            ctrl --> route : HTTP 500
+        else exito
+            ctrl --> route : HTTP 201\n{sample data}
+        end
+
+        deactivate ctrl
+    end
+end
+
+route --> api : JSON response
+deactivate route
+api --> fe : parsed JSON
+deactivate api
+
+alt status 201
+    fe -> fe : showModal('Éxito',\n                  'Sample guardado.')
+    fe -> fe : uploadForm.reset()
+    fe -> fe : loadSamples()
+else status 400/500
+    fe -> fe : showModal('Error al subir',\n                       error.message)
+end
+
+deactivate fe
+@enduml

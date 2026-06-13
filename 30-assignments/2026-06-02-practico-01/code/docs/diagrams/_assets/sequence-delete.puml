@@ -1,0 +1,87 @@
+@startuml SequenceDelete
+title Secuencia: Eliminar Sample
+
+actor "Producer" as user
+participant "samplesFrontController.js" as fe
+participant "apiService.js" as api
+participant "DELETE /api/samples/:id" as route
+participant "verifyToken" as verify
+participant "sampleController.js" as ctrl
+participant "sampleRepo.js" as repo
+participant "fileHelper.js"  as fh
+database "MySQL" as db
+collections "File System\nuploads/" as fs
+
+user -> fe : click "Borrar" en un sample
+activate fe
+
+fe -> fe : confirm('¿Estás seguro?')
+
+alt cancelar
+    fe --> user : no hace nada
+else confirmado
+    fe -> api : request('/samples/${id}',\n           'DELETE')
+    activate api
+
+    api -> route : fetch('/api/samples/{id}',\n              {method: 'DELETE',\n               headers: {Authorization: Bearer <token>}})
+    activate route
+
+    route -> verify : verifyToken(req, res, next)
+    activate verify
+    verify --> route : req.userId = decoded.id
+    verify --> route : next()
+    deactivate verify
+
+    route -> ctrl : sampleController.deleteSample(req, res)
+    activate ctrl
+
+    ctrl -> repo : findById(id, userId)
+    activate repo
+
+    repo -> db : CALL sp_find_sample_by_id(?, ?)
+    activate db
+    db --> repo : sample row
+    deactivate db
+
+    repo --> ctrl : sample or null
+    deactivate repo
+
+    alt !sample (no existe o no es suyo)
+        ctrl --> route : HTTP 404\n"El sample no existe\no no tienes permisos"
+    else sample existe
+        ctrl -> repo : delete(id, userId)
+        activate repo
+
+        repo -> db : CALL sp_delete_sample(?, ?)
+        activate db
+        db --> repo : affectedRows
+        deactivate db
+
+        repo --> ctrl : ok
+        deactivate repo
+
+        ctrl -> fh : deleteFile(sample.file_path)
+        activate fh
+        fh --> fs : unlink
+        fh --> ctrl : ok
+        deactivate fh
+
+        ctrl --> route : HTTP 200\n"Registro eliminado y\narchivo físico removido"
+    end
+
+    deactivate ctrl
+    route --> api : JSON response
+    deactivate route
+    api --> fe : parsed JSON
+    deactivate api
+
+    alt status 200
+        fe -> fe : showModal('Eliminado',\n                      'El sample ha sido borrado.')
+        fe -> fe : loadSamples()
+    else status 404
+        fe -> fe : showModal('Error', error.message)
+    end
+end
+
+deactivate fe
+@enduml

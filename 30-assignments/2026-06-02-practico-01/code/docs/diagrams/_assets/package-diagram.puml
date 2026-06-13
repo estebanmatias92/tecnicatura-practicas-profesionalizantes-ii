@@ -1,0 +1,97 @@
+@startuml PackageDiagram
+title Package Diagram — Backend
+
+package "backend/" as backend {
+  package "routes/" as routes {
+    [authRoutes.js]
+    [sampleRoutes.js]
+    [adminRoutes.js]
+    [viewRoutes.js]
+    [testsRoutes.js]
+  }
+
+  package "controllers/" as controllers {
+    [authController.js]
+    [sampleController.js]
+    [adminController.js]
+  }
+
+  package "middleware/" as middleware {
+    [authMiddleware.js]
+  }
+
+  package "repositories/" as repos {
+    [userRepo.js]
+    [sampleRepo.js]
+  }
+
+  package "config/" as config {
+    [db.js]
+    [multerConfig.js]
+    [init.sql]
+  }
+
+  package "utils/" as utils {
+    [fileHelper.js]
+  }
+
+  [server.js] as server
+}
+
+package "frontend/" as frontend {
+  package "html/" as html {
+    [login.html]
+    [register.html]
+    [producer-dashboard.html]
+    [admin-dashboard.html]
+    [tests.html]
+  }
+
+  package "js/" as js {
+    package "services/" {
+      [apiService.js]
+    }
+    package "frontControllers/" {
+      [authFrontController.js]
+      [samplesFrontController.js]
+      [adminFrontController.js]
+    }
+    package "components/" {
+      [uiHandlers.js]
+    }
+    package "utils/" {
+      [authHelper.js]
+    }
+    package "tests/" {
+      [testUtils.js]
+      [authTests.js]
+      [sampleTests.js]
+      [adminTests.js]
+    }
+  }
+
+  package "css/" as css {
+    [style.css]
+    [styles.css]
+    [w3.css]
+  }
+}
+
+' Dependencias del backend
+server --> routes : monta
+server --> middleware : require
+server --> config
+server --> utils
+
+routes --> controllers : delega
+routes --> middleware : protege rutas
+
+controllers --> repos : llama SP
+controllers --> utils : fileHelper
+
+repos --> config : db pool
+
+' Dependencias del frontend
+html --> js : scripts
+js --> js : imports cruzados
+@enduml

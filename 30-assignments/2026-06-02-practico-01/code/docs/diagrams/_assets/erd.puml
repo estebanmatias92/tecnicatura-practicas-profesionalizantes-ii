@@ -1,0 +1,74 @@
+@startuml ERD
+title Entity-Relationship Diagram — Sample Vault
+
+skinparam shadowing false
+hide circle
+hide empty members
+
+class roles <<table>> {
+  + id : INT <<PK>>
+  + name : VARCHAR(20) <<UNIQUE>>
+}
+
+class users <<table>> {
+  + id : INT <<PK>>
+  + username : VARCHAR(50) <<UNIQUE>>
+  + password : VARCHAR(255)
+  + created_at : TIMESTAMP
+}
+
+class users_roles <<table>> {
+  + user_id : INT <<FK>>
+  + role_id : INT <<FK>>
+  + __PK: (user_id, role_id)__
+}
+
+class samples <<table>> {
+  + id : INT <<PK>>
+  + user_id : INT <<FK>>
+  + filename : VARCHAR(255)
+  + display_name : VARCHAR(100)
+  + category : VARCHAR(50) <<NULL>>
+  + bpm : INT
+  + file_path : VARCHAR(255)
+  + created_at : TIMESTAMP
+}
+
+' Relaciones
+roles ||--o{ users_roles : "1 tiene N"
+users ||--o{ users_roles : "1 tiene N"
+users ||--o{ samples : "1 posee N"
+
+note right of users_roles
+  ON DELETE CASCADE
+  (ambas FKs)
+end note
+
+note right of samples
+  ON DELETE CASCADE
+  FK → users(id)
+end note
+
+note right of roles
+  Datos semilla:
+  - admin
+  - producer
+end note
+
+legend right
+  **Stored Procedures**
+  ____ users ____
+  sp_find_user_by_username
+  sp_create_user
+  sp_find_all_users
+  sp_delete_user
+  ____ samples ____
+  sp_create_sample
+  sp_find_samples_by_user
+  sp_find_sample_by_id
+  sp_delete_sample
+  ____ grants ____
+  DB User: samplevault
+  Grants: SELECT, EXECUTE
+end legend
+@enduml

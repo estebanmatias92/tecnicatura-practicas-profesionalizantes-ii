@@ -1,0 +1,82 @@
+@startuml SequenceLogin
+title Secuencia: Login
+
+actor "Producer / Admin" as user
+participant "Frontend\nsamplesFrontController" as fe
+participant "apiService.js" as api
+participant "POST /api/auth/login" as route
+participant "verifyToken\n(authMiddleware)" as verify
+participant "authController.js" as ctrl
+participant "userRepo.js" as repo
+participant "bcrypt" as bcrypt
+participant "jwt" as jwt
+database "MySQL\n(sp_find_user_by_username)" as db
+
+user -> fe : Completa form login, click "Iniciar Sesión"
+activate fe
+
+fe -> api : request('/auth/login',\n           'POST', {username, password})
+activate api
+
+api -> route : fetch('/api/auth/login',\n              {method: 'POST',\n               headers: 'application/json',\n               body: JSON})
+activate route
+
+route -> verify : (no token needed\npara login)
+activate verify
+verify --> route : next()
+deactivate verify
+
+route -> ctrl : authController.login(req, res)
+activate ctrl
+
+ctrl -> ctrl : Validar !username || !password\n(HTTP 400 si falta)
+
+ctrl -> repo : findByUsername(username)
+activate repo
+
+repo -> db : CALL sp_find_user_by_username(?)
+activate db
+
+db --> repo : {id, username, password,\n              role, ...}
+deactivate db
+
+repo --> ctrl : user row
+deactivate repo
+
+alt usuario no existe
+    ctrl --> route : HTTP 401\n"Credenciales inválidas"
+else usuario existe
+    ctrl -> bcrypt : compare(password,\n                         user.password)
+    activate bcrypt
+
+    alt password incorrecto
+        bcrypt --> ctrl : false
+        ctrl --> route : HTTP 401\n"Credenciales inválidas"
+    else password correcto
+        bcrypt --> ctrl : true
+        deactivate bcrypt
+
+        ctrl -> jwt : sign({id, role},\n                     SECRET_KEY,\n                     {expiresIn: '2h'})
+        activate jwt
+        jwt --> ctrl : token
+        deactivate jwt
+
+        ctrl --> route : HTTP 200\n{token, role}
+    end
+end
+
+deactivate ctrl
+route --> api : JSON response
+deactivate route
+api --> fe : parsed JSON
+deactivate api
+
+alt status 200
+    fe -> fe : authHelper.saveSession(token, role)
+    fe -> fe : redirect según role:\n/admin-dashboard o\n/producer-dashboard
+else status 401
+    fe -> fe : showModal('Error de Acceso',\n                       error.message)
+end
+
+deactivate fe
+@enduml
