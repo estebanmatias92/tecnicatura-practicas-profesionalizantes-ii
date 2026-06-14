@@ -54,20 +54,8 @@ CREATE TABLE samples (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 7. Inserción de Datos Maestros (Roles)
-INSERT INTO roles (name) VALUES ('admin'), ('producer');
-
--- 8. Datos de prueba iniciales
--- Usuario 'admin' (pass: 12345)
-INSERT INTO users (id, username, password) VALUES (1, 'admin', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS');
-INSERT INTO users_roles (user_id, role_id) VALUES (1, 1); -- Rol Admin
-
--- Usuario 'pepe' (pass: 12345)
-INSERT INTO users (id, username, password) VALUES (2, 'pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS');
-INSERT INTO users_roles (user_id, role_id) VALUES (2, 2); -- Rol Producer
-
 -- ==========================================================
--- 9. PROCEDIMIENTOS ALMACENADOS (Stored Procedures)
+-- 7. PROCEDIMIENTOS ALMACENADOS (Stored Procedures)
 -- ==========================================================
 
 DELIMITER //
@@ -118,6 +106,12 @@ BEGIN
     DELETE FROM users WHERE id = p_id;
 END //
 
+-- Sembrar roles maestros
+CREATE PROCEDURE sp_seed_roles()
+BEGIN
+    INSERT INTO roles (name) VALUES ('admin'), ('producer');
+END //
+
 -- --- PROCEDIMIENTOS PARA SAMPLES ---
 
 -- Crear Sample
@@ -154,4 +148,10 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- 8. Datos de prueba iniciales (vía SPs, después de creados)
+CALL sp_seed_roles();
+CALL sp_create_user('admin', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'admin');
+CALL sp_create_user('pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'producer');
+
 SET foreign_key_checks = 1;
