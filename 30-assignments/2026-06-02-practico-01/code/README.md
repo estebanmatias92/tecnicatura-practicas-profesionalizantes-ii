@@ -61,8 +61,25 @@ NODE_ENV=testing
 
 ## 🐳 Docker Compose (quick start)
 
+El project name se define en `.env` (raíz del proyecto) para evitar colisiones entre assignments:
+
+```text
+COMPOSE_PROJECT_NAME=2026-06-02-practico-01
+```
+
+### Comandos disponibles (Makefile)
+
+| Comando | Descripción |
+| - | - |
+| `make up` | `docker compose up --build -d` — levantar el stack |
+| `make down` | `docker compose down` — bajar sin borrar volúmenes |
+| `make destroy` | `docker compose down -v` — bajar y borrar volúmenes (equivale a "desde cero") |
+| `make logs` | `docker compose logs -f app` — seguir logs del backend |
+| `make restart` | down + up — reinicio rápido |
+| `make status` | `docker compose ps` — estado de los servicios |
+
 ```bash
-docker compose up --build -d
+make up
 ```
 
 La app queda disponible en `http://localhost:3000`.
@@ -76,7 +93,7 @@ La app queda disponible en `http://localhost:3000`.
 ### Autenticación (`/api/auth`)
 
 | Método | Ruta | Auth | Body | Descripción |
-| - | - | - | - |---|
+| - | - | - | - | - |
 | `POST` | `/api/auth/register` | ✗ | `{ username, password, role_name }` | Registro (`role_name`: `admin` o `producer`) |
 | `POST` | `/api/auth/login` | ✗ | `{ username, password }` | Login. Retorna `{ token, user: { id, username, role } }` |
 
@@ -124,6 +141,7 @@ Con `NODE_ENV=production`:
 ## 📂 Estructura del Proyecto
 
 ```text
+├── .devcontainer/       # Configuración de Dev Container (VS Code).
 ├── backend/
 │   ├── config/          # Configuración de Multer y DB.
 │   ├── controllers/     # Lógica de negocio.
@@ -139,6 +157,14 @@ Con `NODE_ENV=production`:
 │       ├── components/  # Manejadores de UI dinámicos (uiHandlers.js).
 │       ├── frontControllers/  # Controladores de lógica frontend.
 │       ├── services/    # Cliente API (apiService.js).
-│       ├── utils/  # Lógica de sesión (authHelper.js).
-│       └── tests/  # Scripts necesarios para crear el frontend de los tests.
-├── test-samples/ #samples de prueba para subir.
+│       ├── utils/       # Lógica de sesión (authHelper.js).
+│       └── tests/       # Scripts necesarios para crear el frontend de los tests.
+├── .env                 # Project name para Docker Compose (evita colisiones).
+├── docker-compose.yaml  # Orquestación de servicios (db + app).
+├── Dockerfile           # Build de la imagen Node.
+├── Makefile             # Comandos shorthand (up, down, destroy, logs, etc.).
+├── test-samples/        # Samples de prueba para subir.
+├── AUTHORS.md
+├── LICENSE
+└── README.md
+```
