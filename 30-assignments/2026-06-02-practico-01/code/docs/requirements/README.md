@@ -18,23 +18,37 @@ Dado que las 10 validaciones del backlog son **guardas de seguridad, performance
 ```markdown
 # NFR-NNN: Título de la validación
 
-## Categoría
-[Seguridad / Performance / Fiabilidad / Mantenibilidad / UX / Integridad]
+> **Validación:** [nombre]
+> **HTTP Status:** [código HTTP]
+> **Prioridad:** [Alta / Media / Baja]
+> **Estado actual:** [detalle de implementación existente]
 
 ## Descripción
 Qué validación se agrega, por qué es necesaria, qué protege.
 
-## Criterios de aceptación
-- [ ] [condición de entrada] → [código HTTP] + modal "[mensaje exacto]"
-- [ ] [condición de entrada alternativa] → [código HTTP] + modal "[mensaje exacto]"
+## Criterios de Aceptación
 
-## Implementación
-- **Backend:** [archivo(s) a modificar]
-- **Frontend:** [archivo(s) a modificar y mensaje del modal]
-- **Test:** [archivo de test y qué verifica]
+### Backend
+- [ ] [condición de entrada] → HTTP [código] + mensaje JSON
+- [ ] [condición de entrada alternativa] → HTTP [código] + mensaje JSON
 
-## Estado
-[Pendiente / En Progreso / Completado]
+### Frontend
+- [ ] Mostrar modal/mensaje específico: "[mensaje exacto]"
+
+### Tests
+- [ ] **Test positivo:** [descripción] → espera [código HTTP]
+- [ ] **Test negativo:** [descripción] → espera [código HTTP]
+- [ ] **Test de borde:** [descripción] → espera [código HTTP]
+
+## Mensajes Esperados
+
+| Situación | HTTP | Respuesta |
+|-----------|------|-----------|
+| [situación A] | [código] | `{ "message": "..." }` |
+| [situación B] | [código] | `{ "message": "..." }` |
+
+## Notas de Implementación
+- [referencias a archivos, consideraciones técnicas, orden de validación]
 ```
 
 ### Diferencia con RE tradicional
