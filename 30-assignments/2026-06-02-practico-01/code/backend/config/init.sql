@@ -112,6 +112,22 @@ BEGIN
     INSERT INTO roles (name) VALUES ('admin'), ('producer');
 END //
 
+-- Resetear datos de prueba (truncar + re-sembrar)
+-- Corre con SQL SECURITY DEFINER (privilegios de root) para permitir TRUNCATE
+CREATE PROCEDURE sp_reset_test_data()
+BEGIN
+    SET FOREIGN_KEY_CHECKS = 0;
+    TRUNCATE TABLE samples;
+    TRUNCATE TABLE users_roles;
+    TRUNCATE TABLE users;
+    TRUNCATE TABLE roles;
+    SET FOREIGN_KEY_CHECKS = 1;
+
+    CALL sp_seed_roles();
+    CALL sp_create_user('admin', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'admin');
+    CALL sp_create_user('pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'producer');
+END //
+
 -- --- PROCEDIMIENTOS PARA SAMPLES ---
 
 -- Crear Sample
@@ -149,9 +165,7 @@ END //
 
 DELIMITER ;
 
--- 8. Datos de prueba iniciales (vía SPs, después de creados)
-CALL sp_seed_roles();
-CALL sp_create_user('admin', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'admin');
-CALL sp_create_user('pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'producer');
+-- 8. Datos de prueba iniciales (vía SP, después de creados)
+CALL sp_reset_test_data();
 
 SET foreign_key_checks = 1;
