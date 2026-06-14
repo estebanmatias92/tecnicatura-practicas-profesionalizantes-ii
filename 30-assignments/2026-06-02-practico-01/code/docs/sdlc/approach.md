@@ -35,7 +35,7 @@ El ciclo evolutivo (también llamado "ciclo de mantenimiento correctivo/preventi
 ┌──────────────────────────────────────┐
 │ 1. REQUIRIMIENTO (RE forward-only)   │
 │    NFR format                        │
-│    Criterios de aceptación checklist  │
+│    Criterios de aceptación checklist │
 └───────────┬──────────────────────────┘
             ▼
 ┌──────────────────────────────────────┐

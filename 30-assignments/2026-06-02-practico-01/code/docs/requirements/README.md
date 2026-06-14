@@ -56,7 +56,7 @@ Qué validación se agrega, por qué es necesaria, qué protege.
 
 ### Proceso para agregar un requerimiento
 
-```
+```text
 1. Identificar el gap en el backlog
 2. Redactar `docs/requirements/nfr-NNN-slug.md` con descripción + criterios de aceptación (checklist)
 3. Mapear archivos a modificar (diseño)
