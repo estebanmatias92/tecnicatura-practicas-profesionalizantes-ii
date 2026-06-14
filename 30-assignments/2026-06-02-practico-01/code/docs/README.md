@@ -14,7 +14,7 @@ docs/
 ├── requirements/               ← Ingeniería de requerimientos
 │   ├── README.md               ← Estrategia RE forward-only
 │   ├── validations-backlog.md  ← Estado de las 10 validaciones del TP
-│   └── req-*.md                ← User Stories + Gherkin (una por validación)
+│   └── nfr-*.md                ← Criterios de aceptación (checklist, una por validación)
 └── diagrams/                   ← Diagramas de arquitectura
     ├── README.md               ← Índice + mapeo validación → diagrama
     ├── context-diagram.md      ← C4 Context (actores, sistemas externos)
@@ -46,12 +46,12 @@ El enfoque es **evolutivo/iterativo** porque:
 
 No se reconstruyen requerimientos del pasado. Cada validación nueva se especifica con:
 
-- **User Story** (rol, acción, beneficio)
-- **Criterios de Aceptación en Gherkin** (Dado/Cuando/Entonces)
+- **Descripción** de la validación y su categoría NFR
+- **Criterios de aceptación en checklist** (condición → HTTP + modal)
 - **Mapa de implementación** (archivos a modificar)
 - **Test ejecutable** (botón DOM contra API real)
 
-Cada requerimiento se documenta en `requirements/req-NNN-slug.md`.
+Cada validación se documenta en `requirements/nfr-NNN-slug.md`.
 
 → Ver [`requirements/README.md`](./requirements/README.md)
 
@@ -64,7 +64,7 @@ El archivo [`requirements/validations-backlog.md`](./requirements/validations-ba
 | ✅ | Implementado |
 | ⚠️ | Parcial / incompleto |
 | ❌ | No implementado |
-| 📝 | User Story redactada |
+| 📝 | NFR redactado |
 | 🔧 | En implementación |
 | 🧪 | Test escrito |
 | 🚀 | Ciclo completo |
@@ -82,7 +82,7 @@ Los diagramas (C4, capas, paquetes, secuencias, ERD) son artefactos de la fase d
 2. requirements/README.md               → Cómo se especifica cada validación
 3. requirements/validations-backlog.md  → Estado actual de las 10 validaciones
 4. diagrams/README.md                   → Explorar la arquitectura del sistema
-5. requirements/req-NNN-slug.md         → Leer la especificación de una validación concreta
+5. requirements/nfr-NNN-slug.md         → Leer la especificación de una validación concreta
 6. Código fuente                        → Ver la implementación (backend + frontend + tests)
 ```
 

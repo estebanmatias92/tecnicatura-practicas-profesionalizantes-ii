@@ -10,7 +10,7 @@
 | ✅ | Ya implementado |
 | ⚠️ | Implementación parcial / incompleta |
 | ❌ | No implementado |
-| 📝 | User Story redactada (RE completado) |
+| 📝 | NFR redactado (RE completado) |
 | 🔧 | En implementación |
 | 🧪 | Test escrito |
 | 🚀 | Completado (ciclo entero) |
@@ -61,7 +61,7 @@
 ## Cómo usar este backlog
 
 1. Elegir una validación de la lista
-2. Crear `docs/requirements/req-NNN-slug.md` con User Story + Gherkin
+2. Crear `docs/requirements/nfr-NNN-slug.md` con descripción + checklist de aceptación
 3. Implementar backend y frontend
 4. Escribir el test en `frontend/js/tests/`
 5. Actualizar el estado en esta tabla

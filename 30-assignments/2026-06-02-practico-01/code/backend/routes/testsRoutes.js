@@ -12,11 +12,18 @@ const router = express.Router();
  */
 const path = require('path');
 
+const testController = require('../controllers/testController');
+
 // --- Rutas de Navegación del Frontend HTML ---
 
 // Al entrar a http://localhost:3000/ cargamos el html de los tests
 router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../frontend/html/tests.html'));
 });
+
+// --- Rutas de Testing API ---
+
+// POST /api/test/reset - Restablece el estado de la BD y uploads a los valores semilla
+router.post('/api/test/reset', (req, res) => testController.resetState(req, res));
 
 module.exports = router;

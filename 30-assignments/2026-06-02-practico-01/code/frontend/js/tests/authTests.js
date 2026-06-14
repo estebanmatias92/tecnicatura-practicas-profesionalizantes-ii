@@ -2,6 +2,7 @@
  * Test: POST /api/auth/login
  */
  testUtils.createTestButton("Test Login Correcto (Pepe y 12345)", async (btn) => {
+    await testUtils.resetState();
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -17,6 +18,7 @@
 });
 
 testUtils.createTestButton("Test Login - Password Incorrecto (Pepe y 123)", async (btn) => {
+    await testUtils.resetState();
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -32,6 +34,7 @@ testUtils.createTestButton("Test Login - Password Incorrecto (Pepe y 123)", asyn
 });
 
 testUtils.createTestButton("Test Login - Usuario Incorrecto (Juan y 12345)", async (btn) => {
+    await testUtils.resetState();
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

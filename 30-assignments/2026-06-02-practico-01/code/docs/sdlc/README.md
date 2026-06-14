@@ -12,7 +12,7 @@ stateDiagram-v2
 
     [*] --> RE_Forward
 
-    RE_Forward --> EngineeringDesign : User Story + Gherkin defined
+    RE_Forward --> EngineeringDesign : NFR specification defined
     EngineeringDesign --> Implementation : Where in backend/frontend?
     Implementation --> Testing : Backend validation + Frontend modal
     Testing --> Commit : Test button passes
@@ -26,8 +26,8 @@ stateDiagram-v2
 
 | Fase | Artefacto | Descripción |
 | ------ | ----------- | ------------- |
-| **1. RE (forward-only)** | `docs/requirements/req-NNN-slug.md` | User Story + Criterios de Aceptación (Gherkin). No se reconstruye el pasado, se especifica lo nuevo. |
-| **2. Diseño** | `docs/requirements/req-NNN-slug.md` (sección implementación) | Se identifica dónde va cada cambio: controlador, middleware, frontend controller, test. |
+| **1. RE (forward-only)** | `docs/requirements/nfr-NNN-slug.md` | Descripción NFR + Criterios de aceptación (checklist). No se reconstruye el pasado, se especifica lo nuevo. |
+| **2. Diseño** | `docs/requirements/nfr-NNN-slug.md` (sección implementación) | Se identifica dónde va cada cambio: controlador, middleware, frontend controller, test. |
 | **3. Implementación** | Código fuente | Backend (validación + HTTP status) + Frontend (showModal con mensaje específico). |
 | **4. Test** | `frontend/js/tests/` | Botón DOM existente que prueba el escenario contra la API real. |
 | **5. Commit** | Branch `apellido_nombre` | Un commit por validación completada. |
@@ -43,7 +43,7 @@ stateDiagram-v2
 
 | Fase SDLC clásica | Cómo se aplica acá |
 | --- | --- |
-| **Análisis (RE)** | User Story + Gherkin para la validación elegida. No se documenta todo el sistema. |
+| **Análisis (RE)** | NFR + checklist para la validación elegida. No se documenta todo el sistema. |
 | **Diseño** | Mapa de dónde tocar: ruta, controlador, middleware, frontend controller, test file. |
 | **Implementación** | Código backend y frontend. |
 | **Pruebas** | Botón de test en tests.html + verificación manual del modal. |

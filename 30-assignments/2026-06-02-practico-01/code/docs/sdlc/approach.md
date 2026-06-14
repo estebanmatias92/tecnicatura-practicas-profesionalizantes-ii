@@ -5,7 +5,7 @@
 - **Tipo:** Brownfield (sistema heredado con código existente)
 - **Origen:** Cátedra Prácticas Profesionalizantes II — proyecto "Sample Vault"
 - **Estado actual:** Backend (Express + MySQL) y Frontend (vanilla JS) funcionando con tests DOM manuales
-- **Documentación existente:** Ninguna (no hay SRS, User Stories, ni diagramas)
+- **Documentación existente:** Ninguna (no hay SRS, especificaciones, ni diagramas)
 - **Consigna:** Cada alumno implementa una validación faltante + su test
 
 ## ¿Por qué NO waterfall?
@@ -34,8 +34,8 @@ El ciclo evolutivo (también llamado "ciclo de mantenimiento correctivo/preventi
 ```text
 ┌──────────────────────────────────────┐
 │ 1. REQUIRIMIENTO (RE forward-only)   │
-│    User Story format                 │
-│    Criterios de Aceptación (Gherkin) │
+│    NFR format                        │
+│    Criterios de aceptación checklist  │
 └───────────┬──────────────────────────┘
             ▼
 ┌──────────────────────────────────────┐
@@ -59,7 +59,7 @@ El ciclo evolutivo (también llamado "ciclo de mantenimiento correctivo/preventi
 ┌──────────────────────────────────────┐
 │ 5. COMMIT + BRANCH                   │
 │    Branch: apellido_nombre           │
-│    Commit: "feat: req-002 password   │
+│    Commit: "feat: nfr-002 password   │
 │             length validation"       │
 └──────────────────────────────────────┘
 ```
@@ -67,6 +67,6 @@ El ciclo evolutivo (también llamado "ciclo de mantenimiento correctivo/preventi
 ## Ventajas de este enfoque
 
 1. **Trazabilidad:** cada validación tiene un archivo `.md` que la especifica + un test que la verifica
-2. **Defensa oral:** el alumno presenta su User Story, muestra el código y ejecuta el test
+2. **Defensa oral:** el alumno presenta su NFR, muestra el código y ejecuta el test
 3. **Reutilizable:** el esquema sirve para cualquier proyecto brownfield futuro
 4. **Ágil pero documentado:** no es "codificar nomás" pero tampoco es "escribir un SRS de 50 páginas"

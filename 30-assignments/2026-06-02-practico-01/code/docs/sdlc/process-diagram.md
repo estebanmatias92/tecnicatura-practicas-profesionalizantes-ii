@@ -10,7 +10,7 @@ flowchart TB
 
     subgraph Mini-Cycle
         direction TB
-        C[RE Forward<br/>User Story + Gherkin]
+        C[RE Forward<br/>NFR + checklist]
         D[Design<br/>Map files to modify]
         E[Implement<br/>Backend + Frontend]
         F[Test<br/>DOM button + modal check]
@@ -36,9 +36,8 @@ flowchart TB
 ```mermaid
 flowchart LR
     subgraph RE
-        R1[req-NNN-slug.md]
-        R2[User Story]
-        R3[Gherkin Scenarios]
+        R1[nfr-NNN-slug.md]
+        R2[Acceptance Checklist]
     end
 
     subgraph Design
@@ -75,7 +74,7 @@ code/
 │   ├── requirements/
 │   │   ├── README.md             ← Estrategia RE en brownfield
 │   │   ├── validations-backlog.md ← Backlog con estado
-│   │   └── req-*.md              ← User Stories + Gherkin
+│   │   └── nfr-*.md              ← NFR + checklist
 │   └── RE-brownfield-reference.md
 ├── backend/
 │   ├── controllers/              ← Validación implementada
@@ -99,7 +98,7 @@ gitGraph
     commit id: "initial codebase"
     branch lapenta_carlos_matias
     checkout lapenta_carlos_matias
-    commit id: "docs: add req-002 user story"
+    commit id: "docs: add nfr-002 password length"
     commit id: "feat: password length validation backend"
     commit id: "feat: password length test frontend"
     checkout main

@@ -19,6 +19,7 @@
  * Test: GET /api/samples/my-samples
  */
  testUtils.createTestButton("Test Listar Mis Samples", async (btn) => {
+    await testUtils.resetState();
     // 1. Asegurar y guardar una sesión válida
     await okLogin();
     const token = localStorage.getItem('test_token');
@@ -37,6 +38,7 @@
  * Test: POST /api/samples/upload (Simulado)
  */
 testUtils.createTestButton("Test Subir Sample (Simulado)", async (btn) => {
+    await testUtils.resetState();
     // 1. Asegurar y guardar una sesión válida
     await okLogin();
     const token = localStorage.getItem('test_token');

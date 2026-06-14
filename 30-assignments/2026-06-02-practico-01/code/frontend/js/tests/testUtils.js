@@ -5,6 +5,16 @@
     // Referencia al contenedor de resultados
     console: document.getElementById('api-console'),
 
+    // Restablece el estado de la BD y uploads a los valores semilla
+    async resetState() {
+        const response = await fetch('/api/test/reset', { method: 'POST' });
+        if (!response.ok) {
+            throw new Error('Error al restablecer estado de prueba');
+        }
+        localStorage.removeItem('test_token');
+        return await response.json();
+    },
+
     // Función para crear botones de test dinámicamente
     createTestButton(label, testFn) {
         const btn = document.createElement('button');
