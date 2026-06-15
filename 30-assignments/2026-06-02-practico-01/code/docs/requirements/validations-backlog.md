@@ -22,7 +22,7 @@
 | # | Validación | HTTP | NFR | Backend | Frontend | Test | Prioridad |
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
 | 1 | [Registro - Prevención de Duplicados](nfr-001-prevencion-duplicados.md) | 409 | 📝 | ✅ Captura `ER_DUP_ENTRY` | ✅ showModal existente | 🧪 | Alta |
-| 2 | [Registro - Longitud de Contraseña](nfr-002-longitud-contrasena.md) | 400 | 📝 | ❌ No hay validación antes de bcrypt | ❌ No hay mensaje específico | ❌ | Alta |
+| 2 | [Registro - Longitud de Contraseña](nfr-002-longitud-contrasena.md) | 400 | 📝 | ✅ Valida `password.length` antes de bcrypt | ✅ showModal con mensaje específico | 🧪 | Alta |
 | 3 | [Login - Estructura Incompleta](nfr-003-login-estructura-incompleta.md) | 400 | 📝 | ✅ Verifica `!username \|\| !password` | ✅ showModal existente | ❌ | Alta |
 
 ## Archivos (Multer y Storage)
@@ -55,9 +55,9 @@
 | -------- | ---------- |
 | 📝 NFR redactado | 10 |
 | ✅ Completas (Backend + Frontend + Test) | 0 |
-| ⚠️ Parciales (solo backend o solo frontend) | 5 |
+| ⚠️ Parciales (solo backend o solo frontend) | 4 |
 | ❌ Sin implementar | 0 |
-| 🧪 Con test | 1 |
+| 🧪 Con test | 2 |
 
 ## Cómo usar este backlog
 
