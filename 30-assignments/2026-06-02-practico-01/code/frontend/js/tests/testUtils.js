@@ -15,6 +15,14 @@
         return await response.json();
     },
 
+    // Helper centralizado para fetch + log automático del status HTTP
+    async fetchJson(url, options = {}) {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        this.log(data, false, response.status);
+        return { response, data };
+    },
+
     // Función para crear botones de test dinámicamente
     createTestButton(label, testFn) {
         const btn = document.createElement('button');
@@ -35,11 +43,12 @@
     },
 
     // Función para escribir en la consola simulada
-    log(data, isError = false) {
+    log(data, isError = false, status = null) {
         const entry = document.createElement('pre');
         entry.style.whiteSpace = "pre-wrap";
         entry.style.color = isError ? "#ff5555" : "#55ff55";
-        entry.textContent = `[${new Date().toLocaleTimeString()}] ${JSON.stringify(data, null, 2)}`;
+        const prefix = status !== null ? `[HTTP ${status}] ` : '';
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${prefix}${JSON.stringify(data, null, 2)}`;
         
         // Limpiar consola y agregar nuevo resultado
         while (this.console.firstChild) this.console.removeChild(this.console.firstChild);

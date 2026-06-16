@@ -12,11 +12,8 @@
     
     const { token } = await loginRes.json();
 
-    const response = await fetch('/api/admin/users', {
+    const { response } = await testUtils.fetchJson('/api/admin/users', {
         headers: { 'Authorization': `Bearer ${token}` }
     });
-    
-    const data = await response.json();
-    testUtils.log(data);
     if (response.ok) testUtils.setSuccess(btn);
 });

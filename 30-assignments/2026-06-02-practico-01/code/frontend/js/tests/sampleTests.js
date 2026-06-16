@@ -25,12 +25,9 @@
     const token = localStorage.getItem('test_token');
     
     // 2. Realizar la petición
-    const response = await fetch('/api/samples/my-samples', {
+    const { response } = await testUtils.fetchJson('/api/samples/my-samples', {
         headers: { 'Authorization': `Bearer ${token}` }
     });
-    
-    const data = await response.json();
-    testUtils.log(data);
     if (response.ok) testUtils.setSuccess(btn);
 });
 
@@ -53,13 +50,10 @@ testUtils.createTestButton("Test Subir Sample (Simulado)", async (btn) => {
     const blob = new Blob(["Simulated Audio Content"], { type: 'audio/wav' });
     formData.append('audioFile', blob, 'DRUM_LOOP_01.wav');
 
-    const response = await fetch('/api/samples/upload', {
+    const { response } = await testUtils.fetchJson('/api/samples/upload', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
     });
-
-    const data = await response.json();
-    testUtils.log(data);
     if (response.ok) testUtils.setSuccess(btn);
 });
