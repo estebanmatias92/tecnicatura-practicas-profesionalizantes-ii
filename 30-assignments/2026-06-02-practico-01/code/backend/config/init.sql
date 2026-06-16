@@ -112,6 +112,15 @@ BEGIN
     INSERT INTO roles (name) VALUES ('admin'), ('producer');
 END //
 
+-- Sembrar samples de prueba
+CREATE PROCEDURE sp_seed_samples()
+BEGIN
+    INSERT INTO samples (user_id, filename, display_name, category, bpm, file_path) VALUES
+    (2, 'DRUM_LOOP_01.wav', 'Drum Loop 01', 'Drums', 120, '/uploads/seed/DRUM_LOOP_01.wav'),
+    (2, 'FX_CONGA_1.WAV', 'FX Conga 1', 'Percussion', 100, '/uploads/seed/FX_CONGA_1.WAV'),
+    (2, 'HIHAT_1.wav', 'HiHat 1', 'Drums', 128, '/uploads/seed/HIHAT_1.wav');
+END //
+
 -- Resetear datos de prueba (truncar + re-sembrar)
 -- Corre con SQL SECURITY DEFINER (privilegios de root) para permitir TRUNCATE
 CREATE PROCEDURE sp_reset_test_data()
@@ -126,6 +135,7 @@ BEGIN
     CALL sp_seed_roles();
     CALL sp_create_user('admin', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'admin');
     CALL sp_create_user('pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS', 'producer');
+    CALL sp_seed_samples();
 END //
 
 -- --- PROCEDIMIENTOS PARA SAMPLES ---
