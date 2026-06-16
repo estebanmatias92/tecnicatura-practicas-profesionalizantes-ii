@@ -47,14 +47,13 @@ testUtils.createTestButton("Test Login - Usuario Incorrecto (Juan y 12345)", asy
  */
 testUtils.createTestButton("NFR-002: Registrar con contraseña de 8 caracteres (debe dar 201)", async (btn) => {
     await testUtils.resetState();
-    const response = await fetch('/api/auth/register', {
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'longitud_valida', password: '12345678' })
     });
 
-    const data = await response.json();
-    testUtils.log(data);
+
 
     if (response.status === 201 && data.message === "Usuario registrado con éxito.") {
         testUtils.setSuccess(btn);
@@ -63,14 +62,13 @@ testUtils.createTestButton("NFR-002: Registrar con contraseña de 8 caracteres (
 
 testUtils.createTestButton("NFR-002: Registrar con contraseña de 7 caracteres (debe dar 400)", async (btn) => {
     await testUtils.resetState();
-    const response = await fetch('/api/auth/register', {
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'longitud_corta', password: '1234567' })
     });
 
-    const data = await response.json();
-    testUtils.log(data);
+
 
     if (response.status === 400 && data.message === "La contraseña debe tener al menos 8 caracteres.") {
         testUtils.setSuccess(btn);
@@ -79,14 +77,13 @@ testUtils.createTestButton("NFR-002: Registrar con contraseña de 7 caracteres (
 
 testUtils.createTestButton("NFR-002: Registrar con contraseña vacía (debe dar 400 por presencia)", async (btn) => {
     await testUtils.resetState();
-    const response = await fetch('/api/auth/register', {
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'sin_password', password: '' })
     });
 
-    const data = await response.json();
-    testUtils.log(data);
+
 
     if (response.status === 400 && data.message === "Usuario y contraseña son requeridos.") {
         testUtils.setSuccess(btn);
@@ -95,14 +92,13 @@ testUtils.createTestButton("NFR-002: Registrar con contraseña vacía (debe dar 
 
 testUtils.createTestButton("NFR-002: Registrar con exactamente 8 caracteres (debe dar 201)", async (btn) => {
     await testUtils.resetState();
-    const response = await fetch('/api/auth/register', {
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'exacto_8', password: '12345678' })
     });
 
-    const data = await response.json();
-    testUtils.log(data);
+
 
     if (response.status === 201 && data.message === "Usuario registrado con éxito.") {
         testUtils.setSuccess(btn);
@@ -114,14 +110,12 @@ testUtils.createTestButton("NFR-002: Registrar con exactamente 8 caracteres (deb
  */
 testUtils.createTestButton("NFR-001: Registrar Usuario Nuevo (debe dar 201)", async (btn) => {
     await testUtils.resetState();
-    const response = await fetch('/api/auth/register', {
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'nuevo_usuario', password: '12345678' })
     });
-    
-    const data = await response.json();
-    testUtils.log(data);
+
 
     if (response.status === 201 && data.message === "Usuario registrado con éxito.") {
         testUtils.setSuccess(btn);
@@ -137,14 +131,12 @@ testUtils.createTestButton("NFR-001: Registrar Usuario Duplicado (debe dar 409)"
         body: JSON.stringify({ username: 'usuario_dup', password: '12345678' })
     });
     // Segundo registro con el mismo username — debe dar 409
-    const response = await fetch('/api/auth/register', {
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'usuario_dup', password: '12345678' })
     });
-    
-    const data = await response.json();
-    testUtils.log(data);
+
 
     if (response.status === 409 && data.message === "El nombre de usuario ya existe.") {
         testUtils.setSuccess(btn);
