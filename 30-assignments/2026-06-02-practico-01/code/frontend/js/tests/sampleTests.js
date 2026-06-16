@@ -119,6 +119,114 @@ testUtils.createTestButton("NFR-004: Subir MP3 falso (texto, debe dar 415)", asy
     }
 });
 
+/**
+ * Helper: crear blob WAV de tamaño arbitrario (con magic bytes reales)
+ */
+function createWavBlobOfSize(sizeInBytes) {
+    const header = new Uint8Array([
+        0x52, 0x49, 0x46, 0x46, // RIFF
+        0x00, 0x00, 0x00, 0x00, // file size (placeholder)
+        0x57, 0x41, 0x56, 0x45, // WAVE
+    ]);
+    const padding = new Uint8Array(sizeInBytes - header.length);
+    return new Blob([header, padding], { type: 'audio/wav' });
+}
+
+/**
+ * NFR-005: Subida — Límite de Peso (10 MB)
+ */
+testUtils.createTestButton("NFR-005: Subir 1MB (debe dar 201)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR005 1MB');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = createWavBlobOfSize(1 * 1024 * 1024);
+    formData.append('audioFile', blob, 'sample_1mb.wav');
+
+    const { response } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 201) testUtils.setSuccess(btn);
+});
+
+testUtils.createTestButton("NFR-005: Subir 15MB (debe dar 413)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR005 15MB');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = new Blob([new Uint8Array(15 * 1024 * 1024)], { type: 'audio/wav' });
+    formData.append('audioFile', blob, 'sample_15mb.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 413 && data.message === "El archivo excede el límite de 10 MB.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-005: Subir 10MB exacto (debe dar 201)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR005 10MB Exacto');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = createWavBlobOfSize(10 * 1024 * 1024);
+    formData.append('audioFile', blob, 'sample_10mb.wav');
+
+    const { response } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 201) testUtils.setSuccess(btn);
+});
+
+testUtils.createTestButton("NFR-005: Subir 10.1MB (debe dar 413)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR005 10.1MB');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = new Blob([new Uint8Array(Math.floor(10.1 * 1024 * 1024))], { type: 'audio/wav' });
+    formData.append('audioFile', blob, 'sample_101mb.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 413 && data.message === "El archivo excede el límite de 10 MB.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
 testUtils.createTestButton("NFR-004: Subir PDF (MIME no soportado, debe dar 400)", async (btn) => {
     await testUtils.resetState();
     await okLogin();

@@ -3,7 +3,7 @@
 > **Validación:** Subida — Límite de Peso
 > **HTTP Status:** `413 Payload Too Large`
 > **Prioridad:** Media
-> **Estado actual:** Backend ❌ | Frontend ❌ | Test ❌
+> **Estado actual:** Backend ✅ | Frontend ✅ | Test 🧪
 
 ---
 
@@ -15,23 +15,23 @@ Cuando un usuario intenta subir un archivo de audio que excede el tamaño máxim
 
 ### Backend
 
-- [ ] Configurar `limits.fileSize` en Multer con un máximo de `10 * 1024 * 1024` (10 MB)
-- [ ] Si el archivo excede el límite, Multer debe lanzar un error `LIMIT_FILE_SIZE`
-- [ ] Capturar el error `LIMIT_FILE_SIZE` y responder con HTTP `413` y `{ message: "El archivo excede el límite de 10 MB." }`
-- [ ] No escribir ningún archivo en `uploads/` si excede el límite
-- [ ] No ejecutar ninguna consulta a la DB si excede el límite
+- [x] Configurar `limits.fileSize` en Multer con un máximo de `10 * 1024 * 1024` (10 MB)
+- [x] Si el archivo excede el límite, Multer debe lanzar un error `LIMIT_FILE_SIZE`
+- [x] Capturar el error `LIMIT_FILE_SIZE` y responder con HTTP `413` y `{ message: "El archivo excede el límite de 10 MB." }`
+- [x] No escribir ningún archivo en `uploads/` si excede el límite
+- [x] No ejecutar ninguna consulta a la DB si excede el límite
 
 ### Frontend
 
-- [ ] Mostrar modal/mensaje específico: "El archivo excede el límite de 10 MB."
-- [ ] El mensaje debe ser visible para el usuario antes de cualquier otra interacción
+- [x] Mostrar modal/mensaje específico: "El archivo excede el límite de 10 MB."
+- [x] El mensaje debe ser visible para el usuario antes de cualquier otra interacción
 
 ### Tests
 
-- [ ] **Test positivo:** Subir archivo de 1 MB → espera `201`
-- [ ] **Test negativo:** Subir archivo de 15 MB → espera `413` + mensaje
-- [ ] **Test de borde:** Subir archivo de exactamente 10 MB → espera `201`
-- [ ] **Test de borde:** Subir archivo de 10.1 MB → espera `413`
+- [x] **Test positivo:** Subir archivo de 1 MB → espera `201`
+- [x] **Test negativo:** Subir archivo de 15 MB → espera `413` + mensaje
+- [x] **Test de borde:** Subir archivo de exactamente 10 MB → espera `201`
+- [x] **Test de borde:** Subir archivo de 10.1 MB → espera `413`
 
 ## Mensajes Esperados
 
