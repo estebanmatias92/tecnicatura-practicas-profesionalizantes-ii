@@ -14,6 +14,7 @@ El sistema debe estar protegido contra ataques de inyección SQL. Actualmente to
 ## Criterios de Aceptación
 
 ### Backend
+
 - [ ] Todas las consultas SQL deben usar parámetros posicionales (`?`) o Stored Procedures
 - [ ] No debe existir ninguna concatenación de strings en consultas SQL
 - [ ] Si se agrega una ruta de búsqueda (GET /api/samples/search?q=...), debe usar `LIKE ?` con parámetro, no concatenación
@@ -21,10 +22,12 @@ El sistema debe estar protegido contra ataques de inyección SQL. Actualmente to
 - [ ] El usuario de DB (`samplevault`) tiene solo permisos `SELECT, EXECUTE` (Principio de Menor Privilegio)
 
 ### Frontend
+
 - [ ] Si se agrega una barra de búsqueda, escapar caracteres especiales antes de enviar al backend
 - [ ] No mostrar mensajes de error SQL crudos al usuario
 
 ### Tests
+
 - [ ] **Test de seguridad:** Enviar payload con `' OR 1=1 --` en un campo de texto → esperar que no retorne datos no autorizados
 - [ ] **Test de seguridad:** Enviar payload con `'; DROP TABLE samples; --` → esperar que no altere la DB
 - [ ] **Test de seguridad:** Enviar payload con `<script>alert(1)</script>` → esperar que se maneje como string literal, no se ejecute

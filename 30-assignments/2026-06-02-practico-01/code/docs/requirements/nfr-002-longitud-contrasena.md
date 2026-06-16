@@ -14,17 +14,20 @@ Cuando un usuario intenta registrarse con una contraseña que no cumple con la l
 ## Criterios de Aceptación
 
 ### Backend
+
 - [x] En `authController.register`, antes de `bcrypt.hash(password, 10)`, se valida que `password.length >= 8`
 - [x] Si la contraseña es menor a 8 caracteres, responde con HTTP `400` y `{ message: "La contraseña debe tener al menos 8 caracteres." }`
 - [x] No se ejecuta `bcrypt.hash` si la validación falla
 - [x] No se ejecuta la consulta a la DB si la validación falla
 
 ### Frontend
+
 - [x] El formulario de registro muestra un modal/mensaje con "La contraseña debe tener al menos 8 caracteres."
 - [x] El mensaje es específico para este error (no un genérico "Error en el registro")
 - [x] Los campos del formulario no se pierden al mostrar el error
 
 ### Tests
+
 - [x] **Test positivo:** Registrar con contraseña de 8 caracteres → espera `201`
 - [x] **Test negativo:** Registrar con contraseña de 7 caracteres → espera `400` + mensaje específico
 - [x] **Test de borde:** Registrar con contraseña vacía → espera `400` (por la validación de presencia existente)

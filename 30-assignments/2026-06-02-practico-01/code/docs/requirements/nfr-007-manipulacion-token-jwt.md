@@ -14,16 +14,19 @@ Cuando un usuario intenta acceder a rutas protegidas con un token JWT alterado, 
 ## Criterios de Aceptación
 
 ### Backend
+
 - [ ] `authMiddleware.verifyToken` verifica la firma del token usando `jwt.verify` con `SECRET_KEY`
 - [ ] Si el token está malformado, responde con HTTP `403` y `{ message: "Formato de token incorrecto o inexistente." }`
 - [ ] Si la firma es inválida o el token expiró, responde con HTTP `401` y `{ message: "Token inválido o expirado." }`
 
 ### Frontend
+
 - [ ] Mostrar modal/mensaje específico: "Sesión inválida o corrompida. Por favor, inicie sesión nuevamente."
 - [ ] En caso de `401`, redirigir al usuario a la pantalla de login
 - [ ] Limpiar `localStorage` (remover token) al detectar un `401`
 
 ### Tests
+
 - [ ] **Test positivo:** Acceder a ruta protegida con token válido → espera `200`
 - [ ] **Test negativo 1:** Acceder con token alterado (modificar último carácter) → espera `401`
 - [ ] **Test negativo 2:** Acceder con token expirado (generar token con `expiresIn: '0s'`) → espera `401`

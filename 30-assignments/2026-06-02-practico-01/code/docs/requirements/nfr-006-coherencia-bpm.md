@@ -14,6 +14,7 @@ Cuando un usuario sube un sample con un valor de BPM fuera del rango musical coh
 ## Criterios de Aceptación
 
 ### Backend
+
 - [ ] En `sampleController.uploadSample`, validar que el BPM esté en el rango 20–300 (inclusive)
 - [ ] Si el BPM está fuera de rango, responder con HTTP `400` y `{ message: "El BPM debe estar entre 20 y 300." }`
 - [ ] Si el BPM no es un número válido (NaN), responder con HTTP `400` y `{ message: "El BPM debe ser un valor numérico." }`
@@ -21,11 +22,13 @@ Cuando un usuario sube un sample con un valor de BPM fuera del rango musical coh
 - [ ] No ejecutar la consulta a la DB si la validación falla
 
 ### Frontend
+
 - [ ] Mostrar modal/mensaje específico: "El BPM debe estar entre 20 y 300."
 - [ ] Mostrar modal/mensaje específico: "El BPM debe ser un valor numérico."
 - [ ] Los demás campos del formulario deben conservarse al mostrar el error
 
 ### Tests
+
 - [ ] **Test positivo:** Subir sample con BPM = 120 → espera `201`
 - [ ] **Test negativo 1:** Subir con BPM = 10 → espera `400` + mensaje de rango
 - [ ] **Test negativo 2:** Subir con BPM = 350 → espera `400` + mensaje de rango

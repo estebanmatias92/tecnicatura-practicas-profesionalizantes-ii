@@ -14,17 +14,20 @@ Cuando un usuario intenta registrarse con un nombre de usuario que ya existe en 
 ## Criterios de Aceptación
 
 ### Backend
+
 - [x] El controlador `authController.register` captura el error `ER_DUP_ENTRY` de MySQL
 - [x] Responde con HTTP `409` y `{ message: "El nombre de usuario ya existe." }`
 - [x] No se ejecuta `bcrypt.hash` ni se inserta ningún registro si el username ya existe
 - [x] No se filtran detalles internos (como el stack trace) al cliente
 
 ### Frontend
+
 - [x] El formulario de registro muestra un modal/mensaje con el texto "El nombre de usuario ya existe."
 - [x] El mensaje se muestra en la interfaz sin recargar la página
 - [x] El campo `username` mantiene el valor ingresado para que el usuario pueda corregirlo
 
 ### Tests
+
 - [x] **Test positivo:** Registrar usuario nuevo → espera `201` + `userId`
 - [x] **Test negativo:** Registrar el mismo usuario dos veces → primera `201`, segunda `409` con mensaje de duplicado
 - [ ] **Test de borde:** Registrar con username que difiere solo en mayúsculas (depende del collation de la DB) → verificar comportamiento esperado

@@ -14,15 +14,18 @@ Cuando un usuario intenta eliminar un sample proporcionando un ID que no existe 
 ## Criterios de Aceptación
 
 ### Backend
+
 - [ ] `sampleController.deleteSample` verifica si el sample existe (sin filtrar por usuario primero)
 - [ ] Si el ID no existe en la tabla `samples`, responder HTTP `404` y `{ message: "El sample solicitado no existe." }`
 - [ ] Si el sample existe pero no pertenece al usuario, responder HTTP `403` (ver NFR-008)
 
 ### Frontend
+
 - [ ] Mostrar modal/mensaje específico: "El sample solicitado no existe."
 - [ ] No confundir con mensaje de permisos
 
 ### Tests
+
 - [ ] **Test positivo:** Eliminar sample con ID válido y propio → espera `200`
 - [ ] **Test negativo:** Eliminar sample con ID `99999` (inexistente) → espera `404`
 - [ ] **Test de borde:** Eliminar con ID `0` → espera `404`

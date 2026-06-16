@@ -14,6 +14,7 @@ Cuando un usuario intenta subir un archivo de audio que excede el tamaño máxim
 ## Criterios de Aceptación
 
 ### Backend
+
 - [ ] Configurar `limits.fileSize` en Multer con un máximo de `10 * 1024 * 1024` (10 MB)
 - [ ] Si el archivo excede el límite, Multer debe lanzar un error `LIMIT_FILE_SIZE`
 - [ ] Capturar el error `LIMIT_FILE_SIZE` y responder con HTTP `413` y `{ message: "El archivo excede el límite de 10 MB." }`
@@ -21,10 +22,12 @@ Cuando un usuario intenta subir un archivo de audio que excede el tamaño máxim
 - [ ] No ejecutar ninguna consulta a la DB si excede el límite
 
 ### Frontend
+
 - [ ] Mostrar modal/mensaje específico: "El archivo excede el límite de 10 MB."
 - [ ] El mensaje debe ser visible para el usuario antes de cualquier otra interacción
 
 ### Tests
+
 - [ ] **Test positivo:** Subir archivo de 1 MB → espera `201`
 - [ ] **Test negativo:** Subir archivo de 15 MB → espera `413` + mensaje
 - [ ] **Test de borde:** Subir archivo de exactamente 10 MB → espera `201`
