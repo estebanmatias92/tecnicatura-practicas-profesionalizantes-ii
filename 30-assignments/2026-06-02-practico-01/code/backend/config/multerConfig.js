@@ -37,7 +37,7 @@ const fileFilter = (req, file, cb) => {
     }
     else
     {
-        cb(new Error('Invalid file type. Only MP3, WAV, OGG and FLAC are allowed.'), false);
+        cb(new Error('Formato de archivo no soportado. Use MP3, WAV, OGG o FLAC.'), false);
     }
 };
 

@@ -23,13 +23,13 @@
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
 | 1 | [Registro - Prevención de Duplicados](nfr-001-prevencion-duplicados.md) | 409 | 📝 | ✅ Captura `ER_DUP_ENTRY` | ✅ showModal existente | 🧪 | Alta |
 | 2 | [Registro - Longitud de Contraseña](nfr-002-longitud-contrasena.md) | 400 | 📝 | ✅ Valida `password.length` antes de bcrypt | ✅ showModal con mensaje específico | 🧪 | Alta |
-| 3 | [Login - Estructura Incompleta](nfr-003-login-estructura-incompleta.md) | 400 | 📝 | ✅ Verifica `!username \|\| !password` | ✅ showModal existente | ❌ | Alta |
+| 3 | [Login - Estructura Incompleta](nfr-003-login-estructura-incompleta.md) | 400 | 📝 | ✅ Verifica `!username \|\| !password` | ✅ showModal existente | 🧪 | Alta |
 
 ## Archivos (Multer y Storage)
 
 | # | Validación | HTTP | NFR | Backend | Frontend | Test | Prioridad |
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
-| 4 | [Subida - Inconsistencia de Tipo MIME](nfr-004-inconsistencia-tipo-mime.md) | 415/400 | 📝 | ⚠️ Multer filtra MIME pero no verifica contenido real vs extensión | ❌ No hay mensaje específico | ❌ | Media |
+| 4 | [Subida - Inconsistencia de Tipo MIME](nfr-004-inconsistencia-tipo-mime.md) | 415/400 | 📝 | ✅ Magic bytes + MIME filter (2 capas) | ✅ showModal con mensaje específico | 🧪 | Media |
 | 5 | [Subida - Límite de Peso](nfr-005-limite-peso.md) | 413 | 📝 | ❌ No hay `limits.fileSize` en Multer | ❌ No hay mensaje específico | ❌ | Media |
 | 6 | [Subida - Coherencia del BPM](nfr-006-coherencia-bpm.md) | 400 | 📝 | ❌ Solo `parseInt(bpm) \|\| 0`, sin rango (20-300) | ❌ No hay mensaje específico | ❌ | Alta |
 
@@ -54,10 +54,10 @@
 | Estado | Cantidad |
 | -------- | ---------- |
 | 📝 NFR redactado | 10 |
-| ✅ Completas (Backend + Frontend + Test) | 0 |
-| ⚠️ Parciales (solo backend o solo frontend) | 4 |
-| ❌ Sin implementar | 0 |
-| 🧪 Con test | 2 |
+| 🚀 Ciclo completo (Backend + Frontend + Test) | 4 |
+| ⚠️ Parciales (falta backend, frontend o test) | 4 |
+| ❌ Sin implementar | 2 |
+| 🧪 Con test | 4 |
 
 ## Cómo usar este backlog
 

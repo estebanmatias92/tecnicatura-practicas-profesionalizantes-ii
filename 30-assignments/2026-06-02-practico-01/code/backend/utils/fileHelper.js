@@ -12,7 +12,8 @@
  * Ofrece métodos síncronos y asíncronos (más eficientes para 
  * alto rendimiento) sin necesidad de instalaciones adicionales.
  */
-const fs = require('fs'); // para manejar el filesystem al borrar archivos
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 
 /**
  * El módulo path en Node.js es una utilidad integrada que permite 
@@ -28,6 +29,36 @@ const path = require('path'); // para el manejo de rutas
  */
 const fileHelper = 
 {
+    /**
+     * Lee los magic bytes del archivo y detecta el formato real
+     * @param {string} absolutePath - Ruta absoluta al archivo
+     * @returns {string|null} MIME type detectado o null si no se reconoce
+     */
+    async detectFileType(absolutePath) {
+        try {
+            const fd = await fsPromises.open(absolutePath, 'r');
+            const buffer = Buffer.alloc(12);
+            await fd.read(buffer, 0, 12, 0);
+            await fd.close();
+
+            // MP3 — ID3 tag
+            if (buffer[0] === 0x49 && buffer[1] === 0x44 && buffer[2] === 0x33) return 'audio/mpeg';
+            // MP3 — MPEG frame sync (11 bits)
+            if (buffer[0] === 0xFF && (buffer[1] & 0xE0) === 0xE0) return 'audio/mpeg';
+            // WAV — RIFF + WAVE
+            if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+                buffer[8] === 0x57 && buffer[9] === 0x41 && buffer[10] === 0x56 && buffer[11] === 0x45) return 'audio/wav';
+            // OGG — OggS
+            if (buffer[0] === 0x4F && buffer[1] === 0x67 && buffer[2] === 0x67 && buffer[3] === 0x53) return 'audio/ogg';
+            // FLAC — fLaC
+            if (buffer[0] === 0x66 && buffer[1] === 0x4C && buffer[2] === 0x61 && buffer[3] === 0x43) return 'audio/flac';
+
+            return null;
+        } catch {
+            return null;
+        }
+    },
+
     /**
      * Elimina un archivo del disco de forma segura
      * @param {string} relativePath - Ruta guardada en la DB (ej: /uploads/audio.mp3)

@@ -43,6 +43,48 @@ testUtils.createTestButton("Test Login - Usuario Incorrecto (Juan y 12345)", asy
 });
 
 /**
+ * NFR-003: POST /api/auth/login — Estructura Incompleta
+ */
+testUtils.createTestButton("NFR-003: Login sin username (debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    const { response, data } = await testUtils.fetchJson('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: '12345' })
+    });
+
+    if (response.status === 400 && data.message === "Credenciales incompletas.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-003: Login sin password (debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    const { response, data } = await testUtils.fetchJson('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'pepe' })
+    });
+
+    if (response.status === 400 && data.message === "Credenciales incompletas.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-003: Login con ambos campos vacios (debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    const { response, data } = await testUtils.fetchJson('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: '', password: '' })
+    });
+
+    if (response.status === 400 && data.message === "Credenciales incompletas.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
  * NFR-002: POST /api/auth/register — Longitud de Contraseña
  */
 testUtils.createTestButton("NFR-002: Registrar con contraseña de 8 caracteres (debe dar 201)", async (btn) => {

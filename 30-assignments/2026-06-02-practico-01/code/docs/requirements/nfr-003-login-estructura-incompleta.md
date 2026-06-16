@@ -3,7 +3,7 @@
 > **Validación:** Login — Estructura Incompleta
 > **HTTP Status:** `400 Bad Request`
 > **Prioridad:** Alta
-> **Estado actual:** Backend ✅ | Frontend ✅ | Test ❌
+> **Estado actual:** Backend ✅ | Frontend ✅ | Test 🧪
 
 ---
 
@@ -14,19 +14,19 @@ Cuando un usuario intenta iniciar sesión sin enviar todos los campos requeridos
 ## Criterios de Aceptación
 
 ### Backend
-- [ ] En `authController.login`, se verifica que `username` y `password` estén presentes y no sean cadenas vacías
-- [ ] Si falta alguno, responde con HTTP `400` y `{ message: "Credenciales incompletas." }`
-- [ ] No se ejecuta `userRepo.findByUsername` si la validación falla
+- [x] En `authController.login`, se verifica que `username` y `password` estén presentes y no sean cadenas vacías
+- [x] Si falta alguno, responde con HTTP `400` y `{ message: "Credenciales incompletas." }`
+- [x] No se ejecuta `userRepo.findByUsername` si la validación falla
 
 ### Frontend
-- [ ] El formulario de login muestra un modal/mensaje con "Credenciales incompletas."
-- [ ] El mensaje es específico (no un genérico "Error de inicio de sesión")
+- [x] El formulario de login muestra un modal/mensaje con "Credenciales incompletas."
+- [x] El mensaje es específico (no un genérico "Error de inicio de sesión")
 
 ### Tests
-- [ ] **Test positivo:** Login con `username` y `password` válidos → espera `200` + `token`
-- [ ] **Test negativo 1:** Login sin `username` → espera `400` + mensaje
-- [ ] **Test negativo 2:** Login sin `password` → espera `400` + mensaje
-- [ ] **Test negativo 3:** Login con ambos campos vacíos (`""`) → espera `400` + mensaje
+- [x] **Test positivo:** Login con `username` y `password` válidos → espera `200` + `token`
+- [x] **Test negativo 1:** Login sin `username` → espera `400` + mensaje
+- [x] **Test negativo 2:** Login sin `password` → espera `400` + mensaje
+- [x] **Test negativo 3:** Login con ambos campos vacíos (`""`) → espera `400` + mensaje
 
 ## Mensajes Esperados
 

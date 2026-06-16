@@ -5,6 +5,7 @@
 * Date        : Marzo 2026
 */
 
+const path = require('path');
 const fileHelper = require('../utils/fileHelper');
 const sampleRepo = require('../repositories/sampleRepo');
 
@@ -19,6 +20,13 @@ class SampleController
             if (!req.file)
             {
                 return res.status(400).json({ message: "No se subió ningún archivo o el formato es inválido." });
+            }
+
+            const absolutePath = path.join(process.cwd(), '/uploads/', req.file.filename);
+            const detectedType = await fileHelper.detectFileType(absolutePath);
+            if (detectedType !== req.file.mimetype) {
+                fileHelper.deleteFile(`/uploads/${req.file.filename}`);
+                return res.status(415).json({ message: "El tipo de archivo no coincide con su contenido real." });
             }
 
             const { display_name, category, bpm } = req.body;
