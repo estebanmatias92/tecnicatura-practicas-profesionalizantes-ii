@@ -7,7 +7,8 @@ Este documento centraliza todas las constantes y variables de entorno que gobier
 | Archivo | Propósito |
 |---------|-----------|
 | `backend/config/constants.js` | Constantes del sistema (límites, rangos, valores fijos) |
-| `backend/.env` | Variables de entorno sensibles (no versionado, ver `.env.example`) |
+| `backend/.env` | Variables de entorno sensibles (no versionado) |
+| `backend/.env.example` | Plantilla con valores de ejemplo (versionado) |
 | `backend/config/db.js` | Pool de conexión a MariaDB |
 | `backend/config/multerConfig.js` | Middleware Multer (usa `constants.js`) |
 
@@ -25,7 +26,7 @@ const { MAX_FILE_SIZE } = require('../config/constants');
 
 | Constante | Valor | Descripción |
 |-----------|-------|-------------|
-| `MAX_FILE_SIZE` | `10 * 1024 * 1024 + 1` | Tamaño máximo de archivo (10 MB + 1 byte por el límite exclusivo de busboy) |
+| `MAX_FILE_SIZE` | `10 * (1024 * 1024)` | Tamaño máximo de archivo (10 MB por defecto) |
 | `ALLOWED_MIME_TYPES` | `['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac']` | Tipos MIME aceptados en subida |
 | `PASSWORD_MIN_LENGTH` | `8` | Longitud mínima de contraseña |
 | `BCRYPT_SALT_ROUNDS` | `10` | Rondas de sal para bcrypt |
