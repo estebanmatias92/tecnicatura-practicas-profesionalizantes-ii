@@ -28,8 +28,12 @@ const apiService = {
         const response = await fetch(`${API_URL}${endpoint}`, config);
         const result = await response.json();
 
-        // Si el token expiró (401), forzamos logout automático
-        if (response.status === 401) authHelper.logout();
+        // Si el token expiró (401), limpiamos sesión y redirigimos al login
+        if (response.status === 401) {
+            authHelper.storage.clear();
+            window.location.href = '/login?session=expired';
+            return;
+        }
 
         if (!response.ok) throw new Error(result.message || 'Error en la petición');
         return result;

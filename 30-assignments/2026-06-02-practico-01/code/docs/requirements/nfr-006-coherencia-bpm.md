@@ -3,7 +3,7 @@
 > **Validación:** Subida — Coherencia del BPM
 > **HTTP Status:** `400 Bad Request`
 > **Prioridad:** Alta
-> **Estado actual:** Backend ❌ | Frontend ❌ | Test ❌
+> **Estado actual:** Backend ✅ | Frontend ✅ | Test ✅ | 🚀
 
 ---
 
@@ -15,29 +15,29 @@ Cuando un usuario sube un sample con un valor de BPM fuera del rango musical coh
 
 ### Backend
 
-- [ ] En `sampleController.uploadSample`, validar que el BPM esté en el rango 20–300 (inclusive)
-- [ ] Si el BPM está fuera de rango, responder con HTTP `400` y `{ message: "El BPM debe estar entre 20 y 300." }`
-- [ ] Si el BPM no es un número válido (NaN), responder con HTTP `400` y `{ message: "El BPM debe ser un valor numérico." }`
-- [ ] Eliminar el archivo físico si la validación falla (para no dejar basura en `uploads/`)
-- [ ] No ejecutar la consulta a la DB si la validación falla
+- [x] En `sampleController.uploadSample`, validar que el BPM esté en el rango 20–300 (inclusive)
+- [x] Si el BPM está fuera de rango, responder con HTTP `400` y `{ message: "El BPM debe estar entre 20 y 300." }`
+- [x] Si el BPM no es un número válido (NaN), responder con HTTP `400` y `{ message: "El BPM debe ser un valor numérico." }`
+- [x] Eliminar el archivo físico si la validación falla (para no dejar basura en `uploads/`)
+- [x] No ejecutar la consulta a la DB si la validación falla
 
 ### Frontend
 
-- [ ] Mostrar modal/mensaje específico: "El BPM debe estar entre 20 y 300."
-- [ ] Mostrar modal/mensaje específico: "El BPM debe ser un valor numérico."
-- [ ] Los demás campos del formulario deben conservarse al mostrar el error
+- [x] Mostrar modal/mensaje específico: "El BPM debe estar entre 20 y 300."
+- [x] Mostrar modal/mensaje específico: "El BPM debe ser un valor numérico."
+- [x] Los demás campos del formulario deben conservarse al mostrar el error
 
 ### Tests
 
-- [ ] **Test positivo:** Subir sample con BPM = 120 → espera `201`
-- [ ] **Test negativo 1:** Subir con BPM = 10 → espera `400` + mensaje de rango
-- [ ] **Test negativo 2:** Subir con BPM = 350 → espera `400` + mensaje de rango
-- [ ] **Test negativo 3:** Subir con BPM = "abc" → espera `400` + mensaje numérico
-- [ ] **Test de borde:** Subir con BPM = 20 → espera `201`
-- [ ] **Test de borde:** Subir con BPM = 300 → espera `201`
-- [ ] **Test de borde:** Subir con BPM = 19 → espera `400`
-- [ ] **Test de borde:** Subir con BPM = 301 → espera `400`
-- [ ] **Test de borde:** Subir con BPM = 0 → espera `400`
+- [x] **Test positivo:** Subir sample con BPM = 120 → espera `201`
+- [x] **Test negativo 1:** Subir con BPM = 10 → espera `400` + mensaje de rango
+- [x] **Test negativo 2:** Subir con BPM = 350 → espera `400` + mensaje de rango
+- [x] **Test negativo 3:** Subir con BPM = "abc" → espera `400` + mensaje numérico
+- [x] **Test de borde:** Subir con BPM = 20 → espera `201`
+- [x] **Test de borde:** Subir con BPM = 300 → espera `201`
+- [x] **Test de borde:** Subir con BPM = 19 → espera `400`
+- [x] **Test de borde:** Subir con BPM = 301 → espera `400`
+- [x] **Test de borde:** Subir con BPM = 0 → espera `400`
 
 ## Mensajes Esperados
 

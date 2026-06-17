@@ -8,6 +8,7 @@
 const path = require('path');
 const fileHelper = require('../utils/fileHelper');
 const sampleRepo = require('../repositories/sampleRepo');
+const { BPM_MIN, BPM_MAX } = require('../config/constants');
 
 class SampleController 
 {
@@ -37,17 +38,37 @@ class SampleController
                 return res.status(400).json({ message: "El nombre y la categoría son obligatorios." });
             }
 
-            const userId = req.userId; // Proveniente del verifyToken
             const filename = req.file.filename;
             const filePath = `/uploads/${filename}`;
 
-            // 2. Persistencia mediante el SP sp_create_sample
+            // 2. Validación de BPM (NFR-006)
+            let dbBpm = null;
+
+            if (bpm !== undefined && bpm !== null && bpm !== '') {
+                const bpmNum = parseInt(bpm, 10);
+
+                if (isNaN(bpmNum)) {
+                    fileHelper.deleteFile(filePath);
+                    return res.status(400).json({ message: "El BPM debe ser un valor numérico." });
+                }
+
+                if (bpmNum < BPM_MIN || bpmNum > BPM_MAX) {
+                    fileHelper.deleteFile(filePath);
+                    return res.status(400).json({ message: `El BPM debe estar entre ${BPM_MIN} y ${BPM_MAX}.` });
+                }
+
+                dbBpm = bpmNum;
+            }
+
+            const userId = req.userId; // Proveniente del verifyToken
+
+            // 3. Persistencia mediante el SP sp_create_sample
             const insertId = await sampleRepo.create({
                 user_id: userId,
                 filename,
                 display_name,
                 category,
-                bpm: parseInt(bpm) || 0,
+                bpm: dbBpm,
                 file_path: filePath
             });
 

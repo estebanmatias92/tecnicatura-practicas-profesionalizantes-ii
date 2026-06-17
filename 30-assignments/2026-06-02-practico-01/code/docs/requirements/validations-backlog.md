@@ -31,13 +31,13 @@
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
 | 4 | [Subida - Inconsistencia de Tipo MIME](nfr-004-inconsistencia-tipo-mime.md) | 415/400 | 📝 | ✅ Magic bytes + MIME filter (2 capas) | ✅ showModal con mensaje específico | 🧪 | Media |
 | 5 | [Subida - Límite de Peso](nfr-005-limite-peso.md) | 413 | 📝 | ✅ `limits.fileSize` configurado + 413 capturado | ✅ showModal con mensaje específico | 🧪 | Media |
-| 6 | [Subida - Coherencia del BPM](nfr-006-coherencia-bpm.md) | 400 | 📝 | ❌ Solo `parseInt(bpm) \|\| 0`, sin rango (20-300) | ❌ No hay mensaje específico | ❌ | Alta |
+| 6 | [Subida - Coherencia del BPM](nfr-006-coherencia-bpm.md) | 400 | 📝 | ✅ Valida rango 20-300 + numérico, elimina archivo si falla | ✅ Modal con mensaje específico | 🧪 | Alta |
 
 ## Seguridad (Aislamiento y Autenticación)
 
 | # | Validación | HTTP | NFR | Backend | Frontend | Test | Prioridad |
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
-| 7 | [Manipulación del Token JWT](nfr-007-manipulacion-token-jwt.md) | 401 | 📝 | ✅ verifyToken rechaza firmas inválidas | ❌ No hay mensaje específico ("Sesión inválida o corrompida") | ❌ | Alta |
+| 7 | [Manipulación del Token JWT](nfr-007-manipulacion-token-jwt.md) | 401 | 📝 | ✅ verifyToken rechaza firmas inválidas | ✅ Modal con "Sesión inválida o corrompida" + redirect login | 🧪 | Alta |
 | 8 | [Eliminación de Recurso Ajeno](nfr-008-eliminacion-recurso-ajeno.md) | 403/404 | 📝 | ✅ SP filtra por `user_id` | ⚠️ Mensaje genérico "no tienes permisos" | ❌ | Alta |
 
 ## Integridad Lógica
@@ -54,10 +54,10 @@
 | Estado | Cantidad |
 | -------- | ---------- |
 | 📝 NFR redactado | 10 |
-| 🚀 Ciclo completo (Backend + Frontend + Test) | 5 |
-| ⚠️ Parciales (falta backend, frontend o test) | 4 |
-| ❌ Sin implementar | 1 |
-| 🧪 Con test | 5 |
+| 🚀 Ciclo completo (Backend + Frontend + Test) | 7 |
+| ⚠️ Parciales (falta backend, frontend o test) | 3 |
+| ❌ Sin implementar | 0 |
+| 🧪 Con test | 7 |
 
 ## Cómo usar este backlog
 

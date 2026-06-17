@@ -184,3 +184,102 @@ testUtils.createTestButton("NFR-001: Registrar Usuario Duplicado (debe dar 409)"
         testUtils.setSuccess(btn);
     }
 });
+
+/**
+ * NFR-007: Seguridad — Manipulación del Token JWT
+ */
+testUtils.createTestButton("NFR-007: Token valido accede a ruta protegida (debe dar 200)", async (btn) => {
+    await testUtils.resetState();
+    const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'pepe', password: '12345' })
+    });
+    const loginData = await loginRes.json();
+    const token = loginData.token;
+
+    const { response } = await testUtils.fetchJson('/api/samples/my-samples', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.ok) testUtils.setSuccess(btn);
+});
+
+testUtils.createTestButton("NFR-007: Token alterado (debe dar 401)", async (btn) => {
+    await testUtils.resetState();
+    const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'pepe', password: '12345' })
+    });
+    const loginData = await loginRes.json();
+    // Alterar el último carácter del token
+    const tamperedToken = loginData.token.slice(0, -1) + 'X';
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/my-samples', {
+        headers: { 'Authorization': `Bearer ${tamperedToken}` }
+    });
+
+    if (response.status === 401 && data.message === "Token inválido o expirado.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-007: Token expirado (firmeza invalida, debe dar 401)", async (btn) => {
+    await testUtils.resetState();
+    // Construir un JWT con payload expirado (la firma será inválida, jwt.verify rechaza)
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const payload = btoa(JSON.stringify({
+        id: 2,
+        role: 'producer',
+        iat: Math.floor(Date.now() / 1000) - 7200,
+        exp: Math.floor(Date.now() / 1000) - 3600
+    }));
+    const expiredToken = `${header}.${payload}.signerinvalida`;
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/my-samples', {
+        headers: { 'Authorization': `Bearer ${expiredToken}` }
+    });
+
+    if (response.status === 401 && data.message === "Token inválido o expirado.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-007: Sin header Authorization (debe dar 403)", async (btn) => {
+    await testUtils.resetState();
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/my-samples');
+
+    if (response.status === 403 && data.message === "Formato de token incorrecto o inexistente.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-007: Eliminar sample ajeno con token válido (debe dar 404)", async (btn) => {
+    await testUtils.resetState();
+
+    // 1. Crear usuario nuevo (sin samples)
+    await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'test_user_nfr007', password: '12345678' })
+    });
+
+    // 2. Login como ese usuario
+    const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'test_user_nfr007', password: '12345678' })
+    });
+    const loginData = await loginRes.json();
+
+    // 3. Intentar borrar sample de pepe (id=1)
+    const { response } = await testUtils.fetchJson('/api/samples/1', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${loginData.token}` }
+    });
+
+    // 4. El SP filtra por userId, usuario nuevo no tiene samples
+    if (response.status === 404) testUtils.setSuccess(btn);
+});

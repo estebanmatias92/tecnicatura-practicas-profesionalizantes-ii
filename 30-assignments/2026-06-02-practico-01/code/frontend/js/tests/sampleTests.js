@@ -250,3 +250,216 @@ testUtils.createTestButton("NFR-004: Subir PDF (MIME no soportado, debe dar 400)
         testUtils.setSuccess(btn);
     }
 });
+
+/**
+ * NFR-006: Subida — Coherencia del BPM (Rango 20-300)
+ */
+testUtils.createTestButton("NFR-006: BPM 120 valido (debe dar 201)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 120');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_120.wav');
+
+    const { response } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 201) testUtils.setSuccess(btn);
+});
+
+testUtils.createTestButton("NFR-006: BPM 10 (debajo del minimo, debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 10');
+    formData.append('category', 'Test');
+    formData.append('bpm', '10');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_10.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "El BPM debe estar entre 20 y 300.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-006: BPM 350 (sobre el maximo, debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 350');
+    formData.append('category', 'Test');
+    formData.append('bpm', '350');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_350.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "El BPM debe estar entre 20 y 300.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-006: BPM 'abc' (no numerico, debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM abc');
+    formData.append('category', 'Test');
+    formData.append('bpm', 'abc');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_abc.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "El BPM debe ser un valor numérico.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-006: BPM 20 (borde inferior, debe dar 201)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 20');
+    formData.append('category', 'Test');
+    formData.append('bpm', '20');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_20.wav');
+
+    const { response } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 201) testUtils.setSuccess(btn);
+});
+
+testUtils.createTestButton("NFR-006: BPM 300 (borde superior, debe dar 201)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 300');
+    formData.append('category', 'Test');
+    formData.append('bpm', '300');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_300.wav');
+
+    const { response } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 201) testUtils.setSuccess(btn);
+});
+
+testUtils.createTestButton("NFR-006: BPM 19 (apenas debajo, debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 19');
+    formData.append('category', 'Test');
+    formData.append('bpm', '19');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_19.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "El BPM debe estar entre 20 y 300.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-006: BPM 301 (apenas sobre, debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 301');
+    formData.append('category', 'Test');
+    formData.append('bpm', '301');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_301.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "El BPM debe estar entre 20 y 300.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+testUtils.createTestButton("NFR-006: BPM 0 (cero, debe dar 400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', 'NFR006 BPM 0');
+    formData.append('category', 'Test');
+    formData.append('bpm', '0');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'bpm_0.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "El BPM debe estar entre 20 y 300.") {
+        testUtils.setSuccess(btn);
+    }
+});
