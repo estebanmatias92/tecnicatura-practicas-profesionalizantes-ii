@@ -9,11 +9,11 @@
 | Paquete | Archivos | Responsabilidad |
 | --------- | ---------- | ----------------- |
 | `routes/` | 5 archivos | Define endpoints y monta middlewares |
-| `controllers/` | 3 clases | Lógica de negocio y validación |
+| `controllers/` | 4 clases | Lógica de negocio y validación (auth, sample, admin, test) |
 | `middleware/` | 1 archivo | `verifyToken` + `isAdmin` |
 | `repositories/` | 2 archivos | Data access mediante stored procedures |
-| `config/` | 3 archivos | Conexión DB, multer, schema SQL |
-| `utils/` | 1 archivo | `fileHelper.deleteFile` |
+| `config/` | 6 archivos | Conexión DB, multer, constants, init.sql, reset.sql, delete.sql |
+| `utils/` | 2 archivos | `fileHelper.deleteFile` + `validation.validateInput` |
 
 ## Frontend
 

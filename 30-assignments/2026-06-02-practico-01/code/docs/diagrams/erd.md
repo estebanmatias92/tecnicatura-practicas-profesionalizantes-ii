@@ -31,7 +31,16 @@
 | `sp_create_sample` | `p_user_id, p_filename, p_display_name, p_category, p_bpm, p_file_path` | Subida de sample |
 | `sp_find_samples_by_user` | `p_user_id` | Listar mis samples |
 | `sp_find_sample_by_id` | `p_id, p_user_id` | Buscar un sample (filtrado por dueño) |
+| `sp_find_sample_by_id_only` | `p_id` | Buscar un sample sin filtrar por dueño (usado para distinguir 404 vs 403 en delete) |
 | `sp_delete_sample` | `p_id, p_user_id` | Eliminar sample (filtrado por dueño) |
+
+### Seeding / testing
+
+| SP | Parámetros | Uso |
+| --- | ------------ | ----- |
+| `sp_seed_roles` | — | Inserta roles `admin` y `producer` (ejecutado en `init.sql`) |
+| `sp_seed_samples` | — | Inserta samples de prueba (ejecutado en `init.sql` y `reset.sql`) |
+| `sp_reset_test_data` | — | Limpia tablas + re-ejecuta seed (invocado por `POST /api/test/reset`) |
 
 ## Seguridad (Principle of Least Privilege)
 

@@ -12,7 +12,8 @@ make up                    # docker compose up --build -d
 make destroy               # down -v (reset DB + uploads from scratch)
 make logs                  # tail backend logs
 ```
-App at `http://localhost:3000`. With `NODE_ENV=testing` (default), `/` serves `frontend/html/tests.html`.
+App at `http://localhost:3000`. With `NODE_ENV=testing`, `/` serves `frontend/html/tests.html`.  
+Default is `production` (sirve login); se cambia en `.env` o en `docker-compose.yaml`.
 
 ## Project anatomy
 ```
@@ -22,19 +23,22 @@ code/
 │   ├── controllers/       # req/res handlers (classes, exported as singletons)
 │   ├── repositories/      # SP calls via mysql2 pool.promise()
 │   ├── middleware/         # JWT verify + isAdmin guards
-│   ├── config/            # db pool, constants, multer config, init.sql + reset.sql
+│   ├── config/            # db pool, constants, multer config, init.sql + reset.sql + delete.sql
+│   ├── utils/             # fileHelper.js (magic bytes detection) + validation.js (SQLi/XSS)
 │   └── routes/            # Express routers (auth, samples, admin, tests, views)
 ├── frontend/
 │   ├── html/              # static pages (tests.html, login.html, etc.)
 │   ├── js/
 │   │   ├── frontControllers/  # per-page event wiring + showModal calls
 │   │   ├── services/apiService.js  # fetch wrapper, auto-logout on 401
+│   │   ├── components/uiHandlers.js  # showModal() notifications
 │   │   ├── utils/authHelper.js     # localStorage token helpers
 │   │   └── tests/          # DOM test buttons (createTestButton pattern)
 │   └── css/
 ├── docs/requirements/      # NFR specs (nfr-NNN-slug.md) + backlog
 ├── test-samples/           # .wav files for upload tests
 ├── .env                    # COMPOSE_PROJECT_NAME only
+├── .env.example            # template for all env vars (versioned)
 └── Makefile                # up / down / destroy / logs / restart / status
 ```
 
@@ -59,7 +63,7 @@ This calls `POST /api/test/reset` which runs `backend/config/reset.sql` (truncat
 ### Multer 2
 - `upload.single('audioFile')` — field name matters.
 - `limits.fileSize` set in `constants.js:MAX_FILE_SIZE` (10 MB + 1 byte for busboy inclusive boundary).
-- File filter checks `file.mimetype` string only (no magic-byte verification — NFR-004 pending).
+- File filter checks `file.mimetype` string only.
 
 ### JWT flow
 - `authMiddleware.verifyToken` reads `Authorization: Bearer <token>`.
@@ -89,9 +93,9 @@ Each NFR lives in `docs/requirements/nfr-NNN-slug.md` with a checklist. Steps:
 7. Root branch: `lapenta_carlos_matias`
 
 ### Current backlog state (10 NFRs)
-- 🚀 Complete: NFR-001 (duplicates), NFR-002 (password length), NFR-003 (login incomplete), NFR-004 (MIME), NFR-005 (file size limit)
-- ⚠️ Partial: NFR-007 (JWT frontend), NFR-008/009 (403 vs 404), NFR-010 (no tests)
-- ❌ Not started: NFR-006 (BPM range)
+- 🚀 Complete: NFR-001 (duplicates), NFR-002 (password length), NFR-003 (login incomplete), NFR-004 (MIME), NFR-005 (file size limit), NFR-006 (BPM range), NFR-007 (JWT frontend), NFR-008/009 (403 vs 404), NFR-010 (SQLi/XSS)
+- ⚠️ Partial: none
+- ❌ Not started: none
 
 ### Other notes
 - `backend/uploads/` is gitignored — recreated on startup by `server.js`.

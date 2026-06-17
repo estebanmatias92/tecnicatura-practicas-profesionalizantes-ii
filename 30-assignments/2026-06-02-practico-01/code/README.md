@@ -94,8 +94,8 @@ La app queda disponible en `http://localhost:3000`.
 
 | Método | Ruta | Auth | Body | Descripción |
 | - | - | - | - | - |
-| `POST` | `/api/auth/register` | ✗ | `{ username, password, role_name }` | Registro (`role_name`: `admin` o `producer`) |
-| `POST` | `/api/auth/login` | ✗ | `{ username, password }` | Login. Retorna `{ token, user: { id, username, role } }` |
+| `POST` | `/api/auth/register` | ✗ | `{ username, password }` | Registro (siempre asigna rol `producer`; `role_name` en body se ignora) |
+| `POST` | `/api/auth/login` | ✗ | `{ username, password }` | Login. Retorna `{ message, token, role }` |
 
 ### Samples (`/api/samples`) — requiere token JWT
 
@@ -111,6 +111,12 @@ La app queda disponible en `http://localhost:3000`.
 | - | - | - | - |
 | `GET` | `/api/admin/users` | `verifyToken` + `isAdmin` | Listar todos los usuarios |
 | `DELETE` | `/api/admin/users/:id` | `verifyToken` + `isAdmin` | Eliminar usuario |
+
+### Tests (`/api/test`) — solo disponible con `NODE_ENV=testing`
+
+| Método | Ruta | Auth | Descripción |
+| - | - | - | - |
+| `POST` | `/api/test/reset` | ✗ | Reinicia BD (truncate + re-seed) y limpia `backend/uploads/` |
 
 ### Frontend (navegación)
 
