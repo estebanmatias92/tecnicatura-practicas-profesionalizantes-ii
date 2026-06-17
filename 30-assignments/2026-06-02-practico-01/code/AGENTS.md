@@ -22,7 +22,7 @@ code/
 │   ├── controllers/       # req/res handlers (classes, exported as singletons)
 │   ├── repositories/      # SP calls via mysql2 pool.promise()
 │   ├── middleware/         # JWT verify + isAdmin guards
-│   ├── config/            # db pool, multer config, init.sql + reset.sql
+│   ├── config/            # db pool, constants, multer config, init.sql + reset.sql
 │   └── routes/            # Express routers (auth, samples, admin, tests, views)
 ├── frontend/
 │   ├── html/              # static pages (tests.html, login.html, etc.)
@@ -58,7 +58,7 @@ This calls `POST /api/test/reset` which runs `backend/config/reset.sql` (truncat
 
 ### Multer 2
 - `upload.single('audioFile')` — field name matters.
-- No `limits.fileSize` configured yet (NFR-005 pending).
+- `limits.fileSize` set in `constants.js:MAX_FILE_SIZE` (10 MB + 1 byte for busboy inclusive boundary).
 - File filter checks `file.mimetype` string only (no magic-byte verification — NFR-004 pending).
 
 ### JWT flow
@@ -66,6 +66,9 @@ This calls `POST /api/test/reset` which runs `backend/config/reset.sql` (truncat
 - Sets `req.userId` and `req.userRole` on success.
 - `isAdmin` must come AFTER `verifyToken` in route chain.
 - 401 on invalid/expired token, 403 on bad format or missing header.
+
+### System constants live in `backend/config/constants.js`
+All magic numbers are centralized there (`MAX_FILE_SIZE`, `ALLOWED_MIME_TYPES`, `PASSWORD_MIN_LENGTH`, `BCRYPT_SALT_ROUNDS`, `BPM_MIN`, `BPM_MAX`). Import with destructuring — never hardcode in controllers or configs.
 
 ### API seed users
 | User | Pass | Role |
@@ -86,9 +89,9 @@ Each NFR lives in `docs/requirements/nfr-NNN-slug.md` with a checklist. Steps:
 7. Root branch: `lapenta_carlos_matias`
 
 ### Current backlog state (10 NFRs)
-- 🚀 Complete: NFR-001 (duplicates), NFR-002 (password length), NFR-003 (login incomplete), NFR-004 (MIME)
+- 🚀 Complete: NFR-001 (duplicates), NFR-002 (password length), NFR-003 (login incomplete), NFR-004 (MIME), NFR-005 (file size limit)
 - ⚠️ Partial: NFR-007 (JWT frontend), NFR-008/009 (403 vs 404), NFR-010 (no tests)
-- ❌ Not started: NFR-005 (file size limit), NFR-006 (BPM range)
+- ❌ Not started: NFR-006 (BPM range)
 
 ### Other notes
 - `backend/uploads/` is gitignored — recreated on startup by `server.js`.

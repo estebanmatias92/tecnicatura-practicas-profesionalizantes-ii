@@ -5,9 +5,10 @@
 *    Date        : Marzo 2026
 */
 
-const bcrypt = require('bcrypt'); // Biblioteca para encriptar contraseñas
-const jwt = require('jsonwebtoken'); // Para generar tokens de sesión
-const userRepo = require('../repositories/userRepo'); // Importamos el repositorio de usuarios
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const userRepo = require('../repositories/userRepo');
+const { PASSWORD_MIN_LENGTH, BCRYPT_SALT_ROUNDS } = require('../config/constants');
 
 /**
  * Deserialización moderna: "Del objeto que devuelve este require, buscá la propiedad que se 
@@ -30,11 +31,11 @@ class AuthController
             }
 
             // 2. Validación de longitud mínima de contraseña
-            if (password.length < 8) {
+            if (password.length < PASSWORD_MIN_LENGTH) {
                 return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres." });
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);            
+            const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);            
             
             // 2. Creación mediante el repositorio (que usa el SP sp_create_user)
             const userId = await userRepo.create(username, hashedPassword, 'producer');

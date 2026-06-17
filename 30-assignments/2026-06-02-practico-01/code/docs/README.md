@@ -7,6 +7,7 @@ Sample Vault es un sistema **brownfield** (código existente sin documentación 
 ```text
 docs/
 ├── README.md                   ← Este archivo (punto de entrada)
+├── configuration.md            ← Constantes del sistema y variables de entorno
 ├── sdlc/                       ← Ciclo de vida del desarrollo
 │   ├── README.md               ← Enfoque general (evolutivo/iterativo)
 │   ├── approach.md             ← Justificación brownfield detallada
@@ -89,3 +90,4 @@ Los diagramas (C4, capas, paquetes, secuencias, ERD) son artefactos de la fase d
 ## Referencias externas
 
 - [RE Brownfield — Referencia Rápida](../sdlc/approach.md) (nota metodológica general)
+- [Configuración del sistema](./configuration.md) (constantes, variables de entorno, cómo modificar)

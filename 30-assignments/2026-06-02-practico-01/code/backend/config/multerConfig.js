@@ -15,7 +15,7 @@
  * file o files al objeto request.
  */
 const multer = require('multer');
-// const path = require('path');
+const { MAX_FILE_SIZE, ALLOWED_MIME_TYPES } = require('./constants');
 
 // Configuración de almacenamiento de Multer
 const storage = multer.diskStorage({
@@ -30,8 +30,7 @@ const storage = multer.diskStorage({
 
 // Filtro para aceptar solo formatos de audio compatibles con HTML5
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac'];
-    if (allowedTypes.includes(file.mimetype))
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype))
     {
         cb(null, true);
     }
@@ -41,7 +40,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = multer({ storage, fileFilter, limits: { fileSize: MAX_FILE_SIZE } });
 
 // 'audioFile' es el nombre del campo en el formulario
 module.exports = upload.single('audioFile');
