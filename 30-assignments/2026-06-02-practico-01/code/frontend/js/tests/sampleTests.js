@@ -560,6 +560,80 @@ testUtils.createTestButton("NFR-008: Admin elimina sample ajeno (200)", async (b
     }
 });
 
+/**
+ * NFR-009: Test positivo — eliminar sample propio
+ */
+testUtils.createTestButton("NFR-009: Eliminar sample propio (200)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const sampleId = await uploadSampleHelper(token);
+
+    const { response, data } = await testUtils.fetchJson(`/api/samples/${sampleId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.status === 200 && data.message === "Registro eliminado y archivo físico removido con éxito.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-009: Test negativo — ID 99999 inexistente
+ */
+testUtils.createTestButton("NFR-009: ID 99999 inexistente (404)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/99999', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.status === 404 && data.message === "El sample solicitado no existe.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-009: Test de borde — ID 0
+ */
+testUtils.createTestButton("NFR-009: ID 0 (404)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/0', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.status === 404 && data.message === "El sample solicitado no existe.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-009: Test de borde — ID negativo
+ */
+testUtils.createTestButton("NFR-009: ID -1 negativo (404)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/-1', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.status === 404 && data.message === "El sample solicitado no existe.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
 testUtils.createTestButton("NFR-006: BPM 0 (cero, debe dar 400)", async (btn) => {
     await testUtils.resetState();
     await okLogin();
