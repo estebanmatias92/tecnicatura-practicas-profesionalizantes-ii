@@ -283,3 +283,35 @@ testUtils.createTestButton("NFR-007: Token de otro usuario (debe dar 404)", asyn
     // 4. El SP filtra por userId, usuario nuevo no tiene samples
     if (response.status === 404) testUtils.setSuccess(btn);
 });
+
+/**
+ * NFR-010: Register con payload SQL injection
+ */
+testUtils.createTestButton("NFR-010: Register SQLi ' OR 1=1 -- (400)", async (btn) => {
+    await testUtils.resetState();
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: "' OR 1=1 --", password: '12345678' })
+    });
+
+    if (response.status === 400 && data.message === "Caracteres no permitidos en la entrada.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-010: Register con payload XSS
+ */
+testUtils.createTestButton("NFR-010: Register XSS <script> (400)", async (btn) => {
+    await testUtils.resetState();
+    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: '<script>alert(1)</script>', password: '12345678' })
+    });
+
+    if (response.status === 400 && data.message === "Caracteres no permitidos en la entrada.") {
+        testUtils.setSuccess(btn);
+    }
+});

@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userRepo = require('../repositories/userRepo');
 const { PASSWORD_MIN_LENGTH, BCRYPT_SALT_ROUNDS } = require('../config/constants');
+const { validateInput } = require('../utils/validation');
 
 /**
  * Deserialización moderna: "Del objeto que devuelve este require, buscá la propiedad que se 
@@ -28,6 +29,12 @@ class AuthController
             // 1. Validación de presencia
             if (!username || !password) {
                 return res.status(400).json({ message: "Usuario y contraseña son requeridos." });
+            }
+
+            // 1b. Validación de entrada contra SQL injection / XSS
+            const validationError = validateInput(username);
+            if (validationError) {
+                return res.status(400).json({ message: validationError });
             }
 
             // 2. Validación de longitud mínima de contraseña

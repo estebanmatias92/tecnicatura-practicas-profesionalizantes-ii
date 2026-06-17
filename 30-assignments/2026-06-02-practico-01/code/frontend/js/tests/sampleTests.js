@@ -657,3 +657,57 @@ testUtils.createTestButton("NFR-006: BPM 0 (cero, debe dar 400)", async (btn) =>
         testUtils.setSuccess(btn);
     }
 });
+
+/**
+ * NFR-010: Upload con payload SQL injection en display_name
+ */
+testUtils.createTestButton("NFR-010: Upload SQLi '; DROP TABLE (400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', "'; DROP TABLE samples; --");
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'sqli_test.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "Caracteres no permitidos en la entrada.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-010: Upload con payload XSS en display_name
+ */
+testUtils.createTestButton("NFR-010: Upload XSS <script> (400)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const formData = new FormData();
+    formData.append('display_name', '<script>alert(1)</script>');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const blob = createWavBlob();
+    formData.append('audioFile', blob, 'xss_test.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (response.status === 400 && data.message === "Caracteres no permitidos en la entrada.") {
+        testUtils.setSuccess(btn);
+    }
+});

@@ -9,6 +9,7 @@ const path = require('path');
 const fileHelper = require('../utils/fileHelper');
 const sampleRepo = require('../repositories/sampleRepo');
 const { BPM_MIN, BPM_MAX } = require('../config/constants');
+const { validateInput } = require('../utils/validation');
 
 class SampleController 
 {
@@ -36,6 +37,14 @@ class SampleController
                 // Si faltan datos, eliminamos el archivo físico para no dejar basura (Storage Efficiency)
                 fileHelper.deleteFile(`/uploads/${req.file.filename}`);
                 return res.status(400).json({ message: "El nombre y la categoría son obligatorios." });
+            }
+
+            // Validación de entrada contra SQL injection / XSS
+            const nameError = validateInput(display_name);
+            const catError = validateInput(category);
+            if (nameError || catError) {
+                fileHelper.deleteFile(`/uploads/${req.file.filename}`);
+                return res.status(400).json({ message: nameError || catError });
             }
 
             const filename = req.file.filename;

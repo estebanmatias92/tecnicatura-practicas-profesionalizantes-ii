@@ -45,7 +45,7 @@
 | # | Validación | HTTP | NFR | Backend | Frontend | Test | Prioridad |
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
 | 9 | [Borrado Fantasma (ID inexistente)](nfr-009-borrado-fantasma.md) | 404 | 🚀 | ✅ Controller responde "El sample solicitado no existe." | ✅ Modal con título "No encontrado" | 🧪 | Media |
-| 10 | [Prevención de SQL Injection](nfr-010-prevencion-sql-injection.md) | 400 | 📝 | ✅ Uso de consultas preparadas (`?` en mysql2) | ❌ No implementado (ruta de búsqueda no existe aún) | ❌ | Baja |
+| 10 | [Prevención de SQL Injection](nfr-010-prevencion-sql-injection.md) | 400 | 🚀 | ✅ Validation layer + SPs + DB user `SELECT, EXECUTE` | ✅ Sin barra de búsqueda (N/A), errores SQL nunca llegan al frontend | 🧪 | Baja |
 
 ---
 
@@ -54,10 +54,10 @@
 | Estado | Cantidad |
 | -------- | ---------- |
 | 📝 NFR redactado | 10 |
-| 🚀 Ciclo completo (Backend + Frontend + Test) | 9 |
-| ⚠️ Parciales (falta backend, frontend o test) | 1 |
+| 🚀 Ciclo completo (Backend + Frontend + Test) | 10 |
+| ⚠️ Parciales (falta backend, frontend o test) | 0 |
 | ❌ Sin implementar | 0 |
-| 🧪 Con test | 9 |
+| 🧪 Con test | 10 |
 
 ## Cómo usar este backlog
 
