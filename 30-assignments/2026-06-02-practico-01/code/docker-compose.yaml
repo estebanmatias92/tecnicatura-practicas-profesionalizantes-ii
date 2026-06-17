@@ -32,7 +32,7 @@ services:
       DB_PASS: samplevault
       DB_NAME: samplevault
       JWT_SECRET: tu_clave_secreta_super_segura
-      NODE_ENV: testing
+      NODE_ENV: ${NODE_ENV:-production}
     ports:
       - "3000:3000"
     volumes:
