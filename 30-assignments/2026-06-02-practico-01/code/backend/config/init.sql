@@ -173,6 +173,12 @@ BEGIN
     DELETE FROM samples WHERE id = p_id AND user_id = p_user_id;
 END //
 
+-- Buscar sample por ID únicamente (sin filtro de dueño)
+CREATE PROCEDURE sp_find_sample_by_id_only(IN p_id INT)
+BEGIN
+    SELECT * FROM samples WHERE id = p_id;
+END //
+
 DELIMITER ;
 
 -- 8. Datos de prueba iniciales (vía SP, después de creados)

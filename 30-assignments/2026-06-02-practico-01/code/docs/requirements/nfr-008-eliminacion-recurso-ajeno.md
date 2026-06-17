@@ -3,7 +3,7 @@
 > **Validación:** Eliminación de Recurso Ajeno
 > **HTTP Status:** `403 Forbidden` / `404 Not Found`
 > **Prioridad:** Alta
-> **Estado actual:** Backend ✅ | Frontend ⚠️ (parcial) | Test ❌
+> **Estado actual:** Backend ✅ | Frontend ✅ | Test 🧪
 
 ---
 
@@ -15,22 +15,23 @@ Cuando un productor intenta eliminar un sample que no le pertenece, el sistema d
 
 ### Backend
 
-- [ ] `sampleController.deleteSample` verifica que el sample pertenezca al usuario autenticado
-- [ ] Si el sample existe pero no pertenece al usuario, responder HTTP `403` y `{ message: "No tienes permisos para eliminar este sample." }`
-- [ ] Si el sample no existe (independientemente del usuario), responder HTTP `404` y `{ message: "El sample solicitado no existe." }`
-- [ ] Diferenciar claramente entre "no existe" y "no tienes permisos" (códigos HTTP distintos)
+- [x] `sampleController.deleteSample` verifica que el sample pertenezca al usuario autenticado
+- [x] Si el sample existe pero no pertenece al usuario, responder HTTP `403` y `{ message: "No tienes permisos para eliminar este sample." }`
+- [x] Si el sample no existe (independientemente del usuario), responder HTTP `404` y `{ message: "El sample solicitado no existe." }`
+- [x] Diferenciar claramente entre "no existe" y "no tienes permisos" (códigos HTTP distintos)
+- [x] Admin puede eliminar cualquier sample (bypass de propiedad)
 
 ### Frontend
 
-- [ ] Mostrar modal/mensaje específico: "No tienes permisos para eliminar este sample."
-- [ ] Diferenciar visualmente del mensaje de "no existe"
+- [x] Mostrar modal/mensaje específico: "No tienes permisos para eliminar este sample."
+- [x] Diferenciar visualmente del mensaje de "no existe"
 
 ### Tests
 
-- [ ] **Test positivo:** Eliminar sample propio → espera `200`
-- [ ] **Test negativo 1:** Login como `pepe`, intentar eliminar sample de `admin` → espera `403` + mensaje específico
-- [ ] **Test negativo 2:** Eliminar sample con ID inexistente → espera `404`
-- [ ] **Test de borde:** Login como admin, intentar eliminar sample de otro usuario → definir política (403 si no es admin, o permitir si es admin)
+- [x] **Test positivo:** Eliminar sample propio → espera `200`
+- [x] **Test negativo 1:** Login como `pepe`, intentar eliminar sample de `admin` → espera `403` + mensaje específico
+- [x] **Test negativo 2:** Eliminar sample con ID inexistente → espera `404`
+- [x] **Test de borde:** Login como admin, intentar eliminar sample de otro usuario → espera `200` (admin bypass)
 
 ## Mensajes Esperados
 

@@ -109,19 +109,30 @@ class SampleController
         {
             const { id } = req.params;
             const userId = req.userId;
+            const userRole = req.userRole;
 
-            // 1. Obtener metadatos para conocer la ruta del archivo físico
-            const sample = await sampleRepo.findById(id, userId);
+            // 1. Verificar que el sample existe (sin filtro de dueño)
+            const sampleExists = await sampleRepo.findByIdOnly(id);
             
-            if (!sample) {
-                return res.status(404).json({ message: "El sample no existe o no tienes permisos para eliminarlo." });
+            if (!sampleExists) {
+                return res.status(404).json({ message: "El sample solicitado no existe." });
             }
 
-            // 2. Ejecutar sp_delete_sample en la base de datos
-            await sampleRepo.delete(id, userId);
+            // 2. Si no es admin, verificar propiedad
+            const isAdmin = userRole === 'admin';
+            if (!isAdmin) {
+                const sample = await sampleRepo.findById(id, userId);
+                if (!sample) {
+                    return res.status(403).json({ message: "No tienes permisos para eliminar este sample." });
+                }
+            }
 
-            // 3. Eliminación física del archivo (Gestión de recursos)
-            fileHelper.deleteFile(sample.file_path); 
+            // 3. Admin elimina con el ID del dueño real; no-admin con su propio ID
+            const ownerId = isAdmin ? sampleExists.user_id : userId;
+            await sampleRepo.delete(id, ownerId);
+
+            // 4. Eliminación física del archivo (Gestión de recursos)
+            fileHelper.deleteFile(sampleExists.file_path); 
             
             return res.json({ message: "Registro eliminado y archivo físico removido con éxito." });
         }

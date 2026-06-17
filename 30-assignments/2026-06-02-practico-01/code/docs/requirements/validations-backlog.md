@@ -38,7 +38,7 @@
 | # | Validación | HTTP | NFR | Backend | Frontend | Test | Prioridad |
 | --- | ----------- | ------ | --- | --------- | ---------- | ------ | ----------- |
 | 7 | [Manipulación del Token JWT](nfr-007-manipulacion-token-jwt.md) | 401 | 📝 | ✅ verifyToken rechaza firmas inválidas | ✅ Modal con "Sesión inválida o corrompida" + redirect login | 🧪 | Alta |
-| 8 | [Eliminación de Recurso Ajeno](nfr-008-eliminacion-recurso-ajeno.md) | 403/404 | 📝 | ✅ SP filtra por `user_id` | ⚠️ Mensaje genérico "no tienes permisos" | ❌ | Alta |
+| 8 | [Eliminación de Recurso Ajeno](nfr-008-eliminacion-recurso-ajeno.md) | 403/404 | 🚀 | ✅ Controller diferencia 403/404 + admin bypass | ✅ Modal con mensaje específico + titles diferenciados | 🧪 | Alta |
 
 ## Integridad Lógica
 
@@ -54,10 +54,10 @@
 | Estado | Cantidad |
 | -------- | ---------- |
 | 📝 NFR redactado | 10 |
-| 🚀 Ciclo completo (Backend + Frontend + Test) | 7 |
-| ⚠️ Parciales (falta backend, frontend o test) | 3 |
+| 🚀 Ciclo completo (Backend + Frontend + Test) | 8 |
+| ⚠️ Parciales (falta backend, frontend o test) | 2 |
 | ❌ Sin implementar | 0 |
-| 🧪 Con test | 7 |
+| 🧪 Con test | 8 |
 
 ## Cómo usar este backlog
 

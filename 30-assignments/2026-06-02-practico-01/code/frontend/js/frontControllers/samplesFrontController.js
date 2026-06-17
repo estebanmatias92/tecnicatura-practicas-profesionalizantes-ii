@@ -66,11 +66,16 @@ function renderSamplesTable(samples) {
 async function deleteSample(id) {
     if (!confirm('¿Estás seguro de eliminar este sonido?')) return;
     try {
-        await apiService.request(`/samples/${id}`, 'DELETE');
-        showModal('Eliminado', 'El sample ha sido borrado.');
+        const result = await apiService.request(`/samples/${id}`, 'DELETE');
+        showModal('Eliminado', result.message);
         loadSamples();
     } catch (error) {
-        showModal('Error', error.message);
+        const title = error.message === 'No tienes permisos para eliminar este sample.'
+            ? 'Permiso denegado'
+            : error.message === 'El sample solicitado no existe.'
+                ? 'No encontrado'
+                : 'Error';
+        showModal(title, error.message);
     }
 }
 

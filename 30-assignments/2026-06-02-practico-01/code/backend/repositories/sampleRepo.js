@@ -40,6 +40,13 @@ class SampleRepository
         await db.execute('CALL sp_delete_sample(?, ?)', [id, userId]);
         return true;
     }
+
+    // Buscar sample por ID únicamente (sin filtro de dueño)
+    async findByIdOnly(id)
+    {
+        const [rows] = await db.execute('CALL sp_find_sample_by_id_only(?)', [id]);
+        return rows[0][0];
+    }
 }
 
 module.exports = new SampleRepository();

@@ -440,6 +440,126 @@ testUtils.createTestButton("NFR-006: BPM 301 (apenas sobre, debe dar 400)", asyn
     }
 });
 
+/**
+ * Helper: upload a sample and return its ID
+ */
+async function uploadSampleHelper(token) {
+    const formData = new FormData();
+    formData.append('display_name', 'NFR008 Upload Helper');
+    formData.append('category', 'Test');
+    formData.append('bpm', '120');
+
+    const header = new Uint8Array([0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45]);
+    const blob = new Blob([header], { type: 'audio/wav' });
+    formData.append('audioFile', blob, 'nfr008_helper.wav');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+    return data.id;
+}
+
+/**
+ * NFR-008: Test positivo — eliminar sample propio
+ */
+testUtils.createTestButton("NFR-008: Eliminar sample propio (200)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const sampleId = await uploadSampleHelper(token);
+
+    const { response, data } = await testUtils.fetchJson(`/api/samples/${sampleId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.status === 200 && data.message === "Registro eliminado y archivo físico removido con éxito.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-008: Test negativo 1 — pepe intenta eliminar sample de admin
+ */
+testUtils.createTestButton("NFR-008: Pepe elimina sample ajeno (403)", async (btn) => {
+    await testUtils.resetState();
+
+    // Login como admin para subir un sample
+    const adminRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: '12345' })
+    });
+    const adminData = await adminRes.json();
+    const adminToken = adminData.token;
+
+    const sampleId = await uploadSampleHelper(adminToken);
+
+    // Login como pepe
+    await okLogin();
+    const pepeToken = localStorage.getItem('test_token');
+
+    const { response, data } = await testUtils.fetchJson(`/api/samples/${sampleId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${pepeToken}` }
+    });
+
+    if (response.status === 403 && data.message === "No tienes permisos para eliminar este sample.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-008: Test negativo 2 — eliminar sample con ID inexistente
+ */
+testUtils.createTestButton("NFR-008: Eliminar sample inexistente (404)", async (btn) => {
+    await testUtils.resetState();
+    await okLogin();
+    const token = localStorage.getItem('test_token');
+
+    const { response, data } = await testUtils.fetchJson('/api/samples/999999', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.status === 404 && data.message === "El sample solicitado no existe.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
+/**
+ * NFR-008: Test de borde — admin elimina sample de pepe
+ */
+testUtils.createTestButton("NFR-008: Admin elimina sample ajeno (200)", async (btn) => {
+    await testUtils.resetState();
+
+    // Login como pepe y subir un sample
+    await okLogin();
+    const pepeToken = localStorage.getItem('test_token');
+    const sampleId = await uploadSampleHelper(pepeToken);
+
+    // Login como admin
+    const adminRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: '12345' })
+    });
+    const adminData = await adminRes.json();
+    const adminToken = adminData.token;
+
+    const { response, data } = await testUtils.fetchJson(`/api/samples/${sampleId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+
+    if (response.status === 200 && data.message === "Registro eliminado y archivo físico removido con éxito.") {
+        testUtils.setSuccess(btn);
+    }
+});
+
 testUtils.createTestButton("NFR-006: BPM 0 (cero, debe dar 400)", async (btn) => {
     await testUtils.resetState();
     await okLogin();
