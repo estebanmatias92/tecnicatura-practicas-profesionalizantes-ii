@@ -30,17 +30,15 @@ const storage = multer.diskStorage({
 
 // Filtro para aceptar solo formatos de audio compatibles con HTML5
 const fileFilter = (req, file, cb) => {
-    if (ALLOWED_MIME_TYPES.includes(file.mimetype))
-    {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
         cb(null, true);
     }
-    else
-    {
+    else {
         cb(new Error('Formato de archivo no soportado. Use MP3, WAV, OGG o FLAC.'), false);
     }
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: MAX_FILE_SIZE } });
+const upload = multer({ storage, fileFilter, limits: { fileSize: MAX_FILE_SIZE + 1 } }); // 10 MB (+1 por límite exclusivo de busboy)
 
 // 'audioFile' es el nombre del campo en el formulario
 module.exports = upload.single('audioFile');

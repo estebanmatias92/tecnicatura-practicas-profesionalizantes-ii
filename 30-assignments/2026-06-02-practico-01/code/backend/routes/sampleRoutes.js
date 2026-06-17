@@ -14,6 +14,8 @@ const uploadMiddleware = require('../config/multerConfig');
 
 const { verifyToken } = require('../middleware/authMiddleware');
 
+const { MAX_FILE_SIZE } = require('../config/constants');
+
 // Todas las rutas de samples requieren que el usuario esté logueado
 router.use(verifyToken);
 
@@ -23,7 +25,7 @@ router.post('/upload', (req, res, next) => {
     uploadMiddleware(req, res, (err) => {
         if (err) {
             if (err.code === 'LIMIT_FILE_SIZE') {
-                return res.status(413).json({ message: "El archivo excede el límite de 10 MB." });
+                return res.status(413).json({ message: `El archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB.` });
             }
             return res.status(400).json({ message: err.message });
         }

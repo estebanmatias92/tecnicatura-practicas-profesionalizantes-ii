@@ -1,6 +1,6 @@
 const constants = {
     // Archivos
-    MAX_FILE_SIZE: 10 * 1024 * 1024 + 1,  // 10 MB (+1 por límite exclusivo de busboy)
+    MAX_FILE_SIZE: 10 * (1024 * 1024),  // 10 MB 
     ALLOWED_MIME_TYPES: ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac'],
 
     // Seguridad
