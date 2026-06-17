@@ -8,6 +8,7 @@
 // Si venimos de un 401 (sesión expirada o token inválido), mostramos el mensaje específico
 if (window.location.search.includes('session=expired')) {
     showModal("Sesión expirada", "Sesión inválida o corrompida. Por favor, inicie sesión nuevamente.");
+    window.history.replaceState({}, document.title, '/login');
 }
 
 const loginForm = document.getElementById('loginForm');
