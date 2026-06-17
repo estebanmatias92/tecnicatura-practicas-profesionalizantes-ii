@@ -1,7 +1,7 @@
 /**
  * Test: POST /api/auth/login
  */
- testUtils.createTestButton("Test Login Correcto (Pepe y 12345)", async (btn) => {
+testUtils.createTestButton("Test Login Correcto (Pepe y 12345)", async (btn) => {
     await testUtils.resetState();
     const { response, data } = await testUtils.fetchJson('/api/auth/login', {
         method: 'POST',
@@ -256,7 +256,7 @@ testUtils.createTestButton("NFR-007: Sin header Authorization (debe dar 403)", a
     }
 });
 
-testUtils.createTestButton("NFR-007: Eliminar sample ajeno con token válido (debe dar 404)", async (btn) => {
+testUtils.createTestButton("NFR-007: Token de otro usuario (debe dar 404)", async (btn) => {
     await testUtils.resetState();
 
     // 1. Crear usuario nuevo (sin samples)
