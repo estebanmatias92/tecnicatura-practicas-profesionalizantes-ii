@@ -6,25 +6,25 @@
 
 ## 🚀 Características Principales
 
-* **Gestión de Samples:** Sube archivos de audio (MP3, WAV, OGG, FLAC) con metadatos personalizados (BPM, categoría).
-* **Reproductor Integrado:** Escucha tus sonidos directamente desde la biblioteca mediante una interfaz minimalista.
-* **Arquitectura Limpia:** Separación total de responsabilidades entre controladores, servicios y utilidades.
-* **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa para máxima seguridad y rendimiento.
-* **Sostenibilidad de Software:** Código optimizado siguiendo principios de eficiencia en el consumo de recursos (inspirado en el modelo **GREENSOFT**).
+- **Gestión de Samples:** Sube archivos de audio (MP3, WAV, OGG, FLAC) con metadatos personalizados (BPM, categoría).
+- **Reproductor Integrado:** Escucha tus sonidos directamente desde la biblioteca mediante una interfaz minimalista.
+- **Arquitectura Limpia:** Separación total de responsabilidades entre controladores, servicios y utilidades.
+- **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa para máxima seguridad y rendimiento.
+- **Sostenibilidad de Software:** Código optimizado siguiendo principios de eficiencia en el consumo de recursos (inspirado en el modelo **GREENSOFT**).
 
 ## 🛠️ Tecnologías Utilizadas
 
 ### Backend
 
-* **Node.js & Express:** Servidor robusto y escalable.
-* **Multer:** Gestión eficiente de subida de archivos binarios.
-* **MySQL/MariaDB:** Persistencia de metadatos de forma relacional.
+- **Node.js & Express:** Servidor robusto y escalable.
+- **Multer:** Gestión eficiente de subida de archivos binarios.
+- **MySQL/MariaDB:** Persistencia de metadatos de forma relacional.
 
 ### Frontend
 
-* **Vanilla JavaScript:** Lógica pura sin dependencias de frameworks pesados.
-* **W3.CSS:** Framework CSS ligero para una interfaz moderna y responsiva.
-* **Web Components (Custom):** Manejo dinámico de la UI mediante inyección de nodos nativos.
+- **Vanilla JavaScript:** Lógica pura sin dependencias de frameworks pesados.
+- **W3.CSS:** Framework CSS ligero para una interfaz moderna y responsiva.
+- **Web Components (Custom):** Manejo dinámico de la UI mediante inyección de nodos nativos.
 
 ---
 
@@ -45,7 +45,7 @@ Ejecuta este comando para instalar todas las bibliotecas que configuramos en los
 npm install express mysql2 cors multer jsonwebtoken bcrypt dotenv
 ```
 
-### Agregar archivo .env en el directorio backend/ con estas variables como ejemplo
+### Agregar archivo .env en el directorio ./ con estas variables como ejemplo
 
 ```text
 PORT=3000
@@ -69,14 +69,14 @@ COMPOSE_PROJECT_NAME=2026-06-02-practico-01
 
 ### Comandos disponibles (Makefile)
 
-| Comando | Descripción |
-| - | - |
-| `make up` | `docker compose up --build -d` — levantar el stack |
-| `make down` | `docker compose down` — bajar sin borrar volúmenes |
+| Comando        | Descripción                                                                   |
+| -------------- | ----------------------------------------------------------------------------- |
+| `make up`      | `docker compose up --build -d` — levantar el stack                            |
+| `make down`    | `docker compose down` — bajar sin borrar volúmenes                            |
 | `make destroy` | `docker compose down -v` — bajar y borrar volúmenes (equivale a "desde cero") |
-| `make logs` | `docker compose logs -f app` — seguir logs del backend |
-| `make restart` | down + up — reinicio rápido |
-| `make status` | `docker compose ps` — estado de los servicios |
+| `make logs`    | `docker compose logs -f app` — seguir logs del backend                        |
+| `make restart` | down + up — reinicio rápido                                                   |
+| `make status`  | `docker compose ps` — estado de los servicios                                 |
 
 ```bash
 make up
@@ -92,55 +92,55 @@ La app queda disponible en `http://localhost:3000`.
 
 ### Autenticación (`/api/auth`)
 
-| Método | Ruta | Auth | Body | Descripción |
-| - | - | - | - | - |
-| `POST` | `/api/auth/register` | ✗ | `{ username, password }` | Registro (siempre asigna rol `producer`; `role_name` en body se ignora) |
-| `POST` | `/api/auth/login` | ✗ | `{ username, password }` | Login. Retorna `{ message, token, role }` |
+| Método | Ruta                 | Auth | Body                     | Descripción                                                             |
+| ------ | -------------------- | ---- | ------------------------ | ----------------------------------------------------------------------- |
+| `POST` | `/api/auth/register` | ✗    | `{ username, password }` | Registro (siempre asigna rol `producer`; `role_name` en body se ignora) |
+| `POST` | `/api/auth/login`    | ✗    | `{ username, password }` | Login. Retorna `{ message, token, role }`                               |
 
 ### Samples (`/api/samples`) — requiere token JWT
 
-| Método | Ruta | Auth | Descripción |
-| - | - | - | - |
-| `POST` | `/api/samples/upload` | `verifyToken` | Subir sample (form-data: `audioFile` + `display_name`, `category`, `bpm`) |
-| `GET` | `/api/samples/my-samples` | `verifyToken` | Listar samples del usuario autenticado |
-| `DELETE` | `/api/samples/:id` | `verifyToken` | Eliminar sample propio |
+| Método   | Ruta                      | Auth          | Descripción                                                               |
+| -------- | ------------------------- | ------------- | ------------------------------------------------------------------------- |
+| `POST`   | `/api/samples/upload`     | `verifyToken` | Subir sample (form-data: `audioFile` + `display_name`, `category`, `bpm`) |
+| `GET`    | `/api/samples/my-samples` | `verifyToken` | Listar samples del usuario autenticado                                    |
+| `DELETE` | `/api/samples/:id`        | `verifyToken` | Eliminar sample propio                                                    |
 
 ### Admin (`/api/admin`) — requiere token + rol admin
 
-| Método | Ruta | Auth | Descripción |
-| - | - | - | - |
-| `GET` | `/api/admin/users` | `verifyToken` + `isAdmin` | Listar todos los usuarios |
-| `DELETE` | `/api/admin/users/:id` | `verifyToken` + `isAdmin` | Eliminar usuario |
+| Método   | Ruta                   | Auth                      | Descripción               |
+| -------- | ---------------------- | ------------------------- | ------------------------- |
+| `GET`    | `/api/admin/users`     | `verifyToken` + `isAdmin` | Listar todos los usuarios |
+| `DELETE` | `/api/admin/users/:id` | `verifyToken` + `isAdmin` | Eliminar usuario          |
 
 ### Tests (`/api/test`) — solo disponible con `NODE_ENV=testing`
 
-| Método | Ruta | Auth | Descripción |
-| - | - | - | - |
-| `POST` | `/api/test/reset` | ✗ | Reinicia BD (truncate + re-seed) y limpia `backend/uploads/` |
+| Método | Ruta              | Auth | Descripción                                                  |
+| ------ | ----------------- | ---- | ------------------------------------------------------------ |
+| `POST` | `/api/test/reset` | ✗    | Reinicia BD (truncate + re-seed) y limpia `backend/uploads/` |
 
 ### Frontend (navegación)
 
 Con `NODE_ENV=testing`:
 
-| Ruta | Archivo |
-| - | - |
-| `/` | `frontend/html/tests.html` (zona de tests) |
+| Ruta | Archivo                                    |
+| ---- | ------------------------------------------ |
+| `/`  | `frontend/html/tests.html` (zona de tests) |
 
 Con `NODE_ENV=production`:
 
-| Ruta | Archivo |
-| - | - |
-| `/` o `/login` | `login.html` |
-| `/register` | `register.html` |
+| Ruta                  | Archivo                   |
+| --------------------- | ------------------------- |
+| `/` o `/login`        | `login.html`              |
+| `/register`           | `register.html`           |
 | `/producer-dashboard` | `producer-dashboard.html` |
-| `/admin-dashboard` | `admin-dashboard.html` |
+| `/admin-dashboard`    | `admin-dashboard.html`    |
 
 ### Usuarios de prueba
 
-| Usuario | Contraseña | Rol |
-| - | - | - |
-| `admin` | `12345` | admin |
-| `pepe` | `12345` | producer |
+| Usuario | Contraseña | Rol      |
+| ------- | ---------- | -------- |
+| `admin` | `12345`    | admin    |
+| `pepe`  | `12345`    | producer |
 
 ---
 
