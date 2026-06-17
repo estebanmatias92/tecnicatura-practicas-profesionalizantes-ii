@@ -14,16 +14,19 @@ Cuando un productor intenta eliminar un sample que no le pertenece, el sistema d
 ## Criterios de Aceptación
 
 ### Backend
+
 - [ ] `sampleController.deleteSample` verifica que el sample pertenezca al usuario autenticado
 - [ ] Si el sample existe pero no pertenece al usuario, responder HTTP `403` y `{ message: "No tienes permisos para eliminar este sample." }`
 - [ ] Si el sample no existe (independientemente del usuario), responder HTTP `404` y `{ message: "El sample solicitado no existe." }`
 - [ ] Diferenciar claramente entre "no existe" y "no tienes permisos" (códigos HTTP distintos)
 
 ### Frontend
+
 - [ ] Mostrar modal/mensaje específico: "No tienes permisos para eliminar este sample."
 - [ ] Diferenciar visualmente del mensaje de "no existe"
 
 ### Tests
+
 - [ ] **Test positivo:** Eliminar sample propio → espera `200`
 - [ ] **Test negativo 1:** Login como `pepe`, intentar eliminar sample de `admin` → espera `403` + mensaje específico
 - [ ] **Test negativo 2:** Eliminar sample con ID inexistente → espera `404`
