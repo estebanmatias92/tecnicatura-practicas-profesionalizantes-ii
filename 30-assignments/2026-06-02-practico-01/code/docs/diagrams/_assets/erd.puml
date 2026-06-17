@@ -1,4 +1,4 @@
-@startuml ERD
+@startuml erd
 title Entity-Relationship Diagram — Sample Vault
 
 skinparam shadowing false
@@ -66,7 +66,12 @@ legend right
   sp_create_sample
   sp_find_samples_by_user
   sp_find_sample_by_id
+  sp_find_sample_by_id_only
   sp_delete_sample
+  ____ seeding ____
+  sp_seed_roles
+  sp_seed_samples
+  sp_reset_test_data
   ____ grants ____
   DB User: samplevault
   Grants: SELECT, EXECUTE

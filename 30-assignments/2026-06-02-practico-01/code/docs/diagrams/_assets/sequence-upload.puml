@@ -1,4 +1,4 @@
-@startuml SequenceUpload
+@startuml sequence-upload
 title Secuencia: Subir Sample
 
 actor "Producer" as user
@@ -43,7 +43,12 @@ else token válido
         route --> api : error
         api --> fe : throw
         fe -> fe : showModal('Error',\n                       'Formato inválido')
-    else archivo OK
+    else fileSize excede MAX_FILE_SIZE
+        multer --> route : HTTP 413\n(Multer: File too large)
+        route --> api : error
+        api --> fe : throw
+        fe -> fe : showModal('Error',\n                       'Archivo demasiado grande')
+    else archivo OK (pasa multer)
         multer --> fs : write file
         multer --> route : req.file = {filename, path, mimetype}
         deactivate multer
@@ -52,24 +57,37 @@ else token válido
         activate ctrl
 
         ctrl -> ctrl : !req.file → HTTP 400
-        ctrl -> ctrl : !display_name || !category →\n                        HTTP 400 + deleteFile
 
-        ctrl -> repo : create({user_id,\n                           filename,\n                           display_name,\n                           category,\n                           bpm: parseInt(bpm) || 0,\n                           file_path})
-        activate repo
+        ctrl -> fh : detectFileType(absolutePath)
+        alt MIME real ≠ MIME declarado
+            ctrl -> fh : deleteFile
+            ctrl --> route : HTTP 415\n"El tipo de archivo no coincide"
+        else magic bytes OK
 
-        repo -> db : CALL sp_create_sample(?,?,?,?,?,?)
-        activate db
-        db --> repo : insertId
-        deactivate db
+            ctrl -> ctrl : !display_name || !category →\n                           HTTP 400 + deleteFile
 
-        repo --> ctrl : insertId
-        deactivate repo
+            ctrl -> ctrl : validateInput(display_name)\nvalidateInput(category) →\nHTTP 400 + deleteFile
 
-        alt error DB
-            ctrl -> fh : deleteFile(/uploads/filename)
-            ctrl --> route : HTTP 500
-        else exito
-            ctrl --> route : HTTP 201\n{sample data}
+            ctrl -> ctrl : bpm = parseInt(bpm)\nbpm < BPM_MIN || bpm > BPM_MAX →\nHTTP 400 + deleteFile
+
+            ctrl -> repo : create({user_id,\n                               filename,\n                               display_name,\n                               category,\n                               bpm: dbBpm,\n                               file_path})
+            activate repo
+
+            repo -> db : CALL sp_create_sample(?,?,?,?,?,?)
+            activate db
+            db --> repo : insertId
+            deactivate db
+
+            repo --> ctrl : insertId
+            deactivate repo
+
+            alt error DB
+                ctrl -> fh : deleteFile
+                ctrl --> route : HTTP 500
+            else exito
+                ctrl --> route : HTTP 201\n{message, id, path}
+            end
+
         end
 
         deactivate ctrl

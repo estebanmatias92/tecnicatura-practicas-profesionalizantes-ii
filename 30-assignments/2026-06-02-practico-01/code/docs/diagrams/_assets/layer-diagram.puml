@@ -1,4 +1,4 @@
-@startuml LayerDiagram
+@startuml layer-diagram
 title Diagrama de Capas — Sample Vault
 
 skinparam packageStyle rectangle

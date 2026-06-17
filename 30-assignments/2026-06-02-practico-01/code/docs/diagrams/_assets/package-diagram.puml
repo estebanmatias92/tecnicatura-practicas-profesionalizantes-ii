@@ -1,4 +1,4 @@
-@startuml PackageDiagram
+@startuml package-diagram
 title Package Diagram — Backend
 
 package "backend/" as backend {
@@ -14,6 +14,7 @@ package "backend/" as backend {
     [authController.js]
     [sampleController.js]
     [adminController.js]
+    [testController.js]
   }
 
   package "middleware/" as middleware {
@@ -26,13 +27,17 @@ package "backend/" as backend {
   }
 
   package "config/" as config {
+    [constants.js]
     [db.js]
     [multerConfig.js]
     [init.sql]
+    [reset.sql]
+    [delete.sql]
   }
 
   package "utils/" as utils {
     [fileHelper.js]
+    [validation.js]
   }
 
   [server.js] as server
@@ -87,7 +92,8 @@ routes --> controllers : delega
 routes --> middleware : protege rutas
 
 controllers --> repos : llama SP
-controllers --> utils : fileHelper
+controllers --> utils : fileHelper, validation
+controllers --> config : constants
 
 repos --> config : db pool
 

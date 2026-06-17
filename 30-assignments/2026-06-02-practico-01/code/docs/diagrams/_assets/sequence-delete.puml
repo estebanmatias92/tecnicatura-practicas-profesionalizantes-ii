@@ -1,4 +1,4 @@
-@startuml SequenceDelete
+@startuml sequence-delete
 title Secuencia: Eliminar Sample
 
 actor "Producer" as user
@@ -35,28 +35,46 @@ else confirmado
     route -> ctrl : sampleController.deleteSample(req, res)
     activate ctrl
 
-    ctrl -> repo : findById(id, userId)
+    ctrl -> repo : findByIdOnly(id)
     activate repo
 
-    repo -> db : CALL sp_find_sample_by_id(?, ?)
+    repo -> db : CALL sp_find_sample_by_id_only(?)
     activate db
-    db --> repo : sample row
+    db --> repo : sample row (sin filtro de dueño)
     deactivate db
 
     repo --> ctrl : sample or null
     deactivate repo
 
-    alt !sample (no existe o no es suyo)
-        ctrl --> route : HTTP 404\n"El sample no existe\no no tienes permisos"
+    alt sample == null (ID inexistente)
+        ctrl --> route : HTTP 404\n"El sample solicitado no existe."
     else sample existe
-        ctrl -> repo : delete(id, userId)
-        activate repo
 
+        ctrl -> ctrl : userRole === 'admin'?
+        alt es admin
+            ctrl -> repo : delete(id, sample.user_id)
+        else no es admin → verificar dueño
+            ctrl -> repo : findById(id, userId)
+            activate repo
+            repo -> db : CALL sp_find_sample_by_id(?, ?)
+            activate db
+            db --> repo : sample row (filtrado por dueño)
+            deactivate db
+            repo --> ctrl : sample or null
+            deactivate repo
+
+            alt sample == null (es de otro usuario)
+                ctrl --> route : HTTP 403\n"No tienes permisos para\neliminar este sample."
+            else es suyo
+                ctrl -> repo : delete(id, userId)
+            end
+        end
+
+        activate repo
         repo -> db : CALL sp_delete_sample(?, ?)
         activate db
         db --> repo : affectedRows
         deactivate db
-
         repo --> ctrl : ok
         deactivate repo
 
@@ -78,7 +96,7 @@ else confirmado
     alt status 200
         fe -> fe : showModal('Eliminado',\n                      'El sample ha sido borrado.')
         fe -> fe : loadSamples()
-    else status 404
+    else status 403/404
         fe -> fe : showModal('Error', error.message)
     end
 end
