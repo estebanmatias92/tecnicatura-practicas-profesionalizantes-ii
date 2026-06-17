@@ -1,7 +1,7 @@
 /**
  * Test: POST /api/auth/login
  */
-testUtils.createTestButton("Test Login Correcto (Pepe y 12345)", async (btn) => {
+ testUtils.createTestButton("Test Login Correcto (Pepe y 12345)", async (btn) => {
     await testUtils.resetState();
     const { response, data } = await testUtils.fetchJson('/api/auth/login', {
         method: 'POST',
