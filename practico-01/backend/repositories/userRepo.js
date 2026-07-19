@@ -14,7 +14,7 @@ class UserRepository
     {
         // El SP devuelve una lista; tomamos el primer elemento del primer conjunto de resultados
         const [rows] = await db.execute('CALL sp_find_user_by_username(?)', [username]);
-        return rows[0][0]; 
+        return rows[0][0];
     }
 
     // Crear un nuevo usuario y asignar su rol en una sola operación atómica

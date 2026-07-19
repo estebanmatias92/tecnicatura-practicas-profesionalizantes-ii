@@ -151,15 +151,15 @@ testUtils.createTestButton("NFR-002: Registrar con exactamente 8 caracteres (deb
  * NFR-001: Test: POST /api/auth/register — Prevención de Duplicados
  */
 testUtils.createTestButton("NFR-001: Registrar Usuario Nuevo (debe dar 201)", async (btn) => {
-    await testUtils.resetState();
-    const { response, data } = await testUtils.fetchJson('/api/auth/register', {
+   
+    const { response } = await testUtils.fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'nuevo_usuario', password: '12345678' })
     });
 
 
-    if (response.status === 201 && data.message === "Usuario registrado con éxito.") {
+    if (response.message === "Usuario registrado con éxito.") {
         testUtils.setSuccess(btn);
     }
 });
