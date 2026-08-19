@@ -1,0 +1,45 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam defaultFontSize 12
+title SampleVault - Vista de componentes
+
+package "Navegador (frontend)" {
+  [login - register\nproducer - admin - tests] as HTML
+  [apiService] as API
+  [authHelper] as AUTH
+  [uiHandlers] as UI
+  [frontControllers] as CTRL
+}
+
+package "Servidor Express" {
+  [server.js] as APP
+  [routes API] as RAPI
+  [routes vistas] as RVIEW
+  [authMiddleware] as MW
+  [multer] as UPLOAD
+  [controllers] as CONTROLLERS
+  [repositories] as REPOS
+  [fileHelper] as FS
+}
+
+database "MySQL\n(stored procedures)" as DB
+folder "uploads" as DISK
+
+HTML --> API
+CTRL --> API
+AUTH ..> API
+UI ..> CTRL
+
+API --> APP : HTTP /api (fetch)
+APP --> RAPI
+APP --> RVIEW
+RAPI --> MW
+RAPI --> UPLOAD
+RAPI --> CONTROLLERS
+CONTROLLERS --> REPOS
+CONTROLLERS --> FS
+REPOS --> DB : CALL sp_*
+UPLOAD --> DISK : escribe audio
+FS --> DISK : elimina audio
+APP --> HTML : sirve estaticos
+@enduml

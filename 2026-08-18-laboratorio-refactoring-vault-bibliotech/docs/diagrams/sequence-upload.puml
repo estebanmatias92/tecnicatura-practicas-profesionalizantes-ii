@@ -1,0 +1,35 @@
+@startuml
+skinparam defaultFontSize 12
+skinparam maxMessageSize 140
+title Secuencia: Subir sample
+
+actor Productor
+participant "samplesFrontController" as FE
+participant "apiService" as API
+participant "multer" as MW
+participant "SampleController" as CTRL
+participant "SampleRepository" as REPO
+participant "fileHelper" as FS
+database "MySQL (SPs)" as DB
+participant "uploads/" as DISK <<filesystem>>
+
+Productor -> FE : submit uploadForm (FormData)
+FE -> API : request('/samples/upload', formData)
+API -> MW : fetch multipart + Bearer
+MW -> DISK : escribe audio
+MW --> CTRL : req.file
+
+CTRL -> REPO : create({user_id, filename, ...})
+REPO -> DB : CALL sp_create_sample
+DB --> REPO : insertId
+REPO --> CTRL : insertId
+CTRL --> API : 201 { id, path }
+API --> FE : response
+FE -> FE : showModal + loadSamples()
+
+alt error de validacion o DB
+  CTRL -> FS : deleteFile(ruta)
+  FS -> DISK : unlink
+  CTRL --> API : 400 o 500 { error }
+end
+@enduml

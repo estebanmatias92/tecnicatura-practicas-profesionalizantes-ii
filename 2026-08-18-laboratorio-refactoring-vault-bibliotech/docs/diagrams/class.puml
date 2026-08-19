@@ -1,0 +1,76 @@
+@startuml
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+title SampleVault - Estructura de clases (backend)
+
+class app <<server>>
+class authRoutes <<route>>
+class sampleRoutes <<route>>
+class adminRoutes <<route>>
+class viewRoutes <<route>>
+class testsRoutes <<route>>
+
+class AuthController {
+  + register(req, res)
+  + login(req, res)
+}
+class SampleController {
+  + uploadSample(req, res)
+  + getMySamples(req, res)
+  + deleteSample(req, res)
+}
+class AdminController {
+  + getAllUsers(req, res)
+  + deleteUser(req, res)
+}
+class UserRepository {
+  + findByUsername(username)
+  + create(username, hash, role)
+  + findAll()
+  + delete(id)
+}
+class SampleRepository {
+  + create(data)
+  + findByUserId(userId)
+  + findById(id, userId)
+  + delete(id, userId)
+}
+class authMiddleware <<middleware>> {
+  + SECRET_KEY
+  + verifyToken(req, res, next)
+  + isAdmin(req, res, next)
+}
+class fileHelper <<utils>> {
+  + deleteFile(relativePath)
+}
+class dbPool <<config>> {
+  + execute(sql, params)
+}
+class multerUpload <<config>> {
+  + single('audioFile')
+}
+
+app *-- authRoutes
+app *-- sampleRoutes
+app *-- adminRoutes
+app *-- viewRoutes
+app *-- testsRoutes
+
+authRoutes --> AuthController
+sampleRoutes --> SampleController
+sampleRoutes --> multerUpload
+sampleRoutes --> authMiddleware
+adminRoutes --> AdminController
+adminRoutes --> authMiddleware
+
+AuthController --> UserRepository
+AuthController ..> authMiddleware : SECRET_KEY
+SampleController --> SampleRepository
+SampleController --> fileHelper
+AdminController --> UserRepository
+AdminController --> SampleRepository
+AdminController --> fileHelper
+
+UserRepository --> dbPool : CALL sp_user_*
+SampleRepository --> dbPool : CALL sp_sample_*
+@enduml

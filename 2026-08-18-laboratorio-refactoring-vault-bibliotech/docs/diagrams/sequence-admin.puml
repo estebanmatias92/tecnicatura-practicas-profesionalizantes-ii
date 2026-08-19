@@ -1,0 +1,40 @@
+@startuml
+skinparam defaultFontSize 12
+skinparam maxMessageSize 140
+title Secuencia: Admin elimina usuario
+
+actor Admin
+participant "adminFrontController" as FE
+participant "apiService" as API
+participant "verifyToken + isAdmin" as MW
+participant "AdminController" as CTRL
+participant "SampleRepository" as REPO_S
+participant "UserRepository" as REPO_U
+participant "fileHelper" as FS
+database "MySQL (SPs)" as DB
+participant "uploads/" as DISK <<filesystem>>
+
+Admin -> FE : click eliminar usuario
+FE -> API : request('/admin/users/{id}')
+API -> MW : fetch + Bearer
+MW -> MW : verifyToken + isAdmin
+MW --> CTRL : autorizado
+CTRL -> CTRL : valida no auto-borrado
+
+alt target = admin actual
+  CTRL --> API : 403
+else target valido
+  CTRL -> REPO_S : findByUserId(targetId)
+  REPO_S -> DB : CALL sp_find_samples_by_user
+  DB --> REPO_S : samples
+  REPO_S --> CTRL : samples
+  CTRL -> REPO_U : delete(targetId)
+  REPO_U -> DB : CALL sp_delete_user
+  DB --> REPO_U : ok (cascade)
+  CTRL -> FS : deleteFile(sample.file_path)
+  FS -> DISK : unlink
+  CTRL --> API : { message }
+  API --> FE : response
+  FE -> FE : loadUsers()
+end
+@enduml

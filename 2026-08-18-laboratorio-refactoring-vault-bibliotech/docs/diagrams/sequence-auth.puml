@@ -1,0 +1,35 @@
+@startuml
+skinparam defaultFontSize 12
+skinparam maxMessageSize 140
+title Secuencia: Login
+
+actor Productor
+participant "authFrontController" as FE
+participant "apiService" as API
+participant "POST /api/auth/login" as ROUTE
+participant "AuthController" as CTRL
+participant "UserRepository" as REPO
+database "MySQL (SPs)" as DB
+
+Productor -> FE : submit loginForm
+FE -> API : request('/auth/login', data)
+API -> ROUTE : fetch JSON
+ROUTE -> CTRL : login(req, res)
+CTRL -> REPO : findByUsername(username)
+REPO -> DB : CALL sp_find_user_by_username
+DB --> REPO : usuario + rol
+REPO --> CTRL : user
+CTRL -> CTRL : bcrypt.compare(password)
+
+alt credenciales validas
+  CTRL -> CTRL : jwt.sign({id, role})
+  CTRL --> API : { token, role }
+  API --> FE : token
+  FE -> FE : saveSession(token, role)
+  FE --> Productor : redirect a dashboard
+else credenciales invalidas
+  CTRL --> API : 401
+  API --> FE : error
+  FE --> Productor : showModal(error)
+end
+@enduml
