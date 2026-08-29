@@ -139,13 +139,13 @@ classDiagram
     Validation <|.. Cuit : implementa
     Validation <|.. Password : implementa
 
-    ValidationHandler --> Validation : visita via isValid()\nbackend/utils/validation_handler/validation_handler.js:17\nwith() backend/utils/validation_handler/validation_handler.js:37
-    Email ..> LanguageManager : usa via validationHandler.languageManager.getThisMessage()\nbackend/utils/validation_handler/validations/email.js:25
+    ValidationHandler --> Validation : "visita via isValid()<br/>backend/utils/validation_handler/validation_handler.js:17<br/>with() backend/utils/validation_handler/validation_handler.js:37"
+    Email ..> LanguageManager : "usa via validationHandler.languageManager.getThisMessage()<br/>backend/utils/validation_handler/validations/email.js:25"
     Cuit ..> LanguageManager : previsto
     Password ..> LanguageManager : previsto
-    ValidationHandler o--> LanguageManager : compone\nbackend/utils/validation_handler/validation_handler.js:7
-    ValidationHandler ..> Validation : inyecta visitor\nvalidationObject.validationHandler = this\nbackend/utils/validation_handler/validation_handler.js:39
-    Validation ..> ValidationHandler : callback validate()\nbackend/utils/validation_handler/validations/email.js:21
+    ValidationHandler o--> LanguageManager : "compone<br/>backend/utils/validation_handler/validation_handler.js:7"
+    ValidationHandler ..> Validation : "inyecta visitor<br/>validationObject.validationHandler = this<br/>backend/utils/validation_handler/validation_handler.js:39"
+    Validation ..> ValidationHandler : "callback validate()<br/>backend/utils/validation_handler/validations/email.js:21"
 ```
 
 ### Roles GoF
