@@ -15,6 +15,7 @@ The main seam of the whole system is the **HTTP API at `/api`**: it is the singl
 
 ![Component diagram](diagrams/svg/components.svg)
 
+
 **Flow at a glance.** The browser loads static assets served by Express. The JS modules (`apiService`, `frontControllers`) issue requests to `/api`. Express routes dispatch to middleware (authentication, multer) and controllers, which read/write through repositories backed by stored procedures, and touch the filesystem through `fileHelper`.
 
 ---
