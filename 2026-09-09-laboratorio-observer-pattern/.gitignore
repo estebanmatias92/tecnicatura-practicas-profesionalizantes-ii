@@ -1,0 +1,17 @@
+# C++ build artifacts
+*.o
+*.obj
+*.exe
+*.out
+bin/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
