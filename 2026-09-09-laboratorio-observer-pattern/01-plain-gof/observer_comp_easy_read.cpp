@@ -5,8 +5,7 @@ Vlissides
  Implementer : Gabriel Nicolás González Ferreira
 **/
 #include <sstream>
-#define TO_STRING( x ) dynamic_cast< std::ostringstream & >( \
- ( std::ostringstream() << std::dec << x ) ).str()
+#define TO_STRING( x ) std::to_string( x )
 #include <iostream>
 #include <list>
 #include <string>
