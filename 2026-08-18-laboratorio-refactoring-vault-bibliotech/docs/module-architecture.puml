@@ -1,0 +1,48 @@
+@startuml
+'====================================================================
+' Sample Vault — Module Architecture (PlantUML)
+'====================================================================
+
+' Colors
+skinparam backgroundColor #F5F5F5
+skinparam componentStyle rectangle
+
+' ===== BACKEND MODULES =====
+package "Backend" as BACKEND #A2D5F2 {
+    component "server.js"
+    component "authMiddleware.js"
+    component "db.js"
+    component "sampleRepo.js"
+    component "fileHelper.js"
+    component "sampleController.js"
+    component "adminController.js"
+    component "authController.js"
+}
+
+' ===== FRONTEND MODULES =====
+package "Frontend" as FRONTEND #D5F5C5 {
+    component "apiService.js"
+    component "authFrontController.js"
+    component "adminFrontController.js"
+    component "samplesFrontController.js"
+}
+
+' ===== DEPENDENCY MODULES (auxiliary / referenced) =====
+package "Dependencies" as DEPS #E0E0E0 {
+    database "mysql2"
+    component "userRepo.js"
+    component "authHelper.js"
+    component "routes/*"
+}
+
+' ===== PACKAGE RELATIONSHIPS =====
+BACKEND ..> DEPS : uses (MySQL, repos, routes)
+FRONTEND ..> BACKEND : calls REST API
+FRONTEND ..> DEPS : uses (authHelper)
+
+' ===== KEY SEAMS =====
+legend bottom
+  Seams: sampleRepo = DB adapter | fileHelper = storage adapter | authMiddleware = auth strategy | apiService = API client
+endlegend
+
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+'====================================================================
+' Sample Vault — Depth Improvement Priorities (PlantUML)
+'====================================================================
+
+' Colors
+skinparam backgroundColor #F0F8FF
+skinparam shadowing false
+
+' ===== PRIORITIES =====
+
+' Priority 1
+rectangle "P1: Extract FileStorageAdapter<BR>- Local FS -> adapter interface<BR>- Enable S3/Cloudinary swap<BR>- Duplicate fix: adminController<BR>- Effort: Medium<BR>Impact: High" #C0D8FF {
+    note right : sampleController uses adapter<BR>adminController uses same adapter<BR>Reduces file logic duplication
+}
+
+' Priority 2
+rectangle "P2: Parameterize role in authController.register()<BR>- register(req, res, role = 'producer')<BR>- Increases caller leverage<BR>- Effort: Low<BR>Impact: Low-Medium" #D8F0C0 {
+    note right : Callers pass role explicitly<BR>No need to fork function
+}
+
+' Priority 3
+rectangle "P3: Add business-facing methods to sampleRepo<BR>- countByCategory(category)<BR>- exists(id, userId)<BR>- getRecentSamples(days)<BR>- Hide SP complexity<BR>- Effort: Low<BR>Impact: Medium" #FFF0C0 {
+    note right : Callers use simpler interface<BR>Don't need to understand SP return structure
+}
+
+' Priority 4
+rectangle "P4: Split apiService into specific methods<BR>- apiGet(), apiPost(), apiUpload()<BR>- Or comprehensive JSDoc<BR>- Evaluate based on frontend growth<BR>- Effort: Low-Medium<BR>Impact: Medium" #FFD8C0 {
+    note right : If frontend grows, split methods<BR>If staying small, add JSDoc
+}
+
+' Priority 5
+rectangle "P5: Extract UserDeletionValidator<BR>- canDelete(adminId, targetUserId)<BR>- Separate business rule from orchestration<BR>- Effort: Medium<BR>Impact: Medium" #D8C0FF {
+    note right : Rule testable in isolation<BR>Keeps controller focused on orchestration
+}
+
+' Priority 6
+rectangle "P6: Extract table renderers into adapter components<BR>- UsersTableRenderer, SamplesTableRenderer<BR>- Localize DOM details<BR>- Effort: Medium-High<BR>Impact: Medium" #F5C0C0 {
+    note right : Front controllers depend on<BR>renderer interface, not inline DOM
+}
+
+' Priority 7
+rectangle "P7: Extract form validation into dedicated modules<BR>- AuthFormValidator<BR>- validateLogin(), validateRegister()<BR>- Effort: Medium<BR>Impact: Medium" #FFF5B0 {
+    note right : Reduces duplication in<BR>front controllers event handlers
+}
+
+' Priority 8
+rectangle "P8: Extract AudioPlayerAdapter<BR>- Configurable baseURL<BR>- Replace hardcoded http://localhost:3000{path}<BR>- Effort: Low<BR>Impact: Low-Medium" #E0E0E0 {
+    note right : Sample renderer depends on<BR>adapter interface
+}
+
+@enduml

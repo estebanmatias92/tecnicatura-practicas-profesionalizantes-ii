@@ -1,0 +1,6 @@
+{
+  "CT_INVALID_EMAIL": "Invalid email address format",
+  "CT_INVALID_CUIT": "Invalid cuit format",
+  "CT_INVALID_BOOK": "Invalid Book binary",
+  "CT_INVALID_RESOURCE_CONSTANT": "Invalid language resource or missing key"
+}

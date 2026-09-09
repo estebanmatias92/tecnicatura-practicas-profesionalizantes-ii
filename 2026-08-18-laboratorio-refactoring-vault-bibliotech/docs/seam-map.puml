@@ -1,0 +1,26 @@
+@startuml
+'====================================================================
+' Sample Vault — Seam Map (PlantUML)
+'====================================================================
+
+' Colors
+skinparam backgroundColor #FFF8F0
+skinparam componentStyle rectangle
+
+' ===== CONFIRMED SEAMS (2+ adapters) =====
+component "DB adapter — MySQL SP ⇄ TypeORM / in-memory fake" as DB_SEAM #D8F0C0
+component "Auth strategy — JWT ⇄ session / OAuth" as AUTH_SEAM #D8F0C0
+component "File storage — local FS ⇄ S3 / Cloudinary" as FILE_SEAM #D8F0C0
+component "API client — fetch ⇄ mock / versioned API" as API_SEAM #D8F0C0
+
+' ===== HYPOTHETICAL SEAMS (1 adapter — needs a 2nd) =====
+component "Form validation — inline DOM ⇄ AuthFormValidator?" as FORM_SEAM #FFF0C0
+component "Table rendering — inline DOM ⇄ TableRenderer?" as TABLE_SEAM #FFF0C0
+component "Audio player — localhost ⇄ AudioPlayerAdapter?" as AUDIO_SEAM #FFF0C0
+
+legend right
+  green = confirmed seam (2+ adapters)
+  yellow = hypothetical (needs a 2nd adapter)
+endlegend
+
+@enduml
