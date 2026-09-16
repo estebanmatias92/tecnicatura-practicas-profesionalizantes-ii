@@ -1,0 +1,65 @@
+@startuml
+' Secuencia real JS: ValidationHandler - Email - LanguageManager
+' Base (rutas relativas a 2026-08-26-practico-visitor-pattern-analysis/ en este repo):
+'   backend/utils/validation_handler/validation_handler.js:30-40
+'   backend/utils/validation_handler/validations/email.js:14-27
+'   backend/utils/language_manager/language_manager.js:64
+skinparam sequenceArrowThickness 1.2
+autonumber
+
+actor Client
+participant "validator\n:ValidationHandler" as VH
+participant "email\n:Email" as EM
+participant "languageManager\n:LanguageManager" as LM
+
+== Variante fluent con efecto (validateThis + with) ==
+Client -> VH : validateThis("contacto@ejemplo.com")
+activate VH
+VH -> VH : _target = target
+VH --> Client : return this (fluent)
+deactivate VH
+
+Client -> VH : with(email)
+activate VH
+VH -> EM : validationHandler = this\n(inyeccion, validation_handler.js:39)
+activate EM
+EM --> VH
+deactivate EM
+VH -> EM : validate(_target)\n(validation_handler.js:40)
+activate EM
+EM -> EM : evaluate(target)\nregex JS email.js:17
+alt no valido
+  EM -> VH : languageManager
+  activate VH
+  VH --> EM
+  deactivate VH
+  EM -> LM : getThisMessage("CT_INVALID_EMAIL")\n(language_manager.js:64)
+  activate LM
+  LM --> EM : "El formato de correo electrónico no es válido"
+  deactivate LM
+  EM --> VH : throw Error(message + ": " + target)
+else valido
+  EM --> VH : return (sin efecto)
+end
+deactivate EM
+VH --> Client : return this
+deactivate VH
+
+== Variante stateless pura (isValid) ==
+Client -> VH : isValid(target, email)
+activate VH
+VH -> EM : evaluate(target)\n(sin i18n, sin throw, validation_handler.js:19)
+activate EM
+EM --> VH : bool
+deactivate EM
+VH --> Client : bool
+deactivate VH
+
+note over VH, EM
+  No hay accept(visitor) ni visitEmail/visitCuit/visitPassword.
+  Por eso NO es doble despacho GoF:
+  la operacion vive en Email.evaluate(),
+  ValidationHandler solo presta contexto (i18n + _target).
+  Patron real: Strategy + Fluent Interface + inyeccion.
+end note
+@enduml
