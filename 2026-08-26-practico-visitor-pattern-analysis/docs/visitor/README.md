@@ -22,6 +22,8 @@ Dos variantes:
 
 ## Mapeo Refactoring.Guru / GoF vs JS
 
+Referencia: [Visitor — Refactoring.Guru](https://refactoring.guru/design-patterns/visitor)
+
 | Rol GoF | Esperado | JS real | Veredicto |
 |---|---|---|---|
 | Visitor | `visitEmail/visitCuit/visitPassword` | No existe (`isValid/validateThis/with`) | No cumple |

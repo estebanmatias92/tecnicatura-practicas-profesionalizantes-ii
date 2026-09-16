@@ -166,3 +166,7 @@ classDiagram
 4. El elemento hace callback al visitor para i18n: `this.validationHandler.languageManager.getThisMessage(this._messageName)` — `backend/utils/validation_handler/validations/email.js:25` → `backend/utils/language_manager/language_manager.js:64`.
 
 > **Nota:** `isValid(target, validationObject)` — `backend/utils/validation_handler/validation_handler.js:17` es la variante stateless/pura (`return validationObject.evaluate(target)`) sin efecto de excepción ni i18n; `with()` es la variante Visitor con efecto y mensaje localizado.
+
+> **Análisis didáctico posterior:** este diagrama describe la intención original del diseño.
+> El análisis comparativo (réplica fiel JS vs Visitor GoF canónico, secuencia y veredicto)
+> vive en [docs/visitor/](docs/visitor/).
