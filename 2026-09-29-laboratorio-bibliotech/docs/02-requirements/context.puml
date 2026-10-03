@@ -1,0 +1,20 @@
+@startuml BiblioTech - System Boundary (C4 Context)
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(admin, "Admin", "Gestion total (BR-004)")
+Person(professor, "Professor", "Sube material (UC-002)")
+Person(student, "Student", "Lee y busca todo (UC-003, UC-005)")
+
+System(boundary, "BiblioTech", "NestJS + React + TS. UC-001..UC-006.")
+
+System_Ext(mariadb, "MariaDB 11", "RST-003, via Repository (BR-006)")
+System_Ext(fs, "File storage", "Uploads Multer (NFR-005)")
+
+Rel(admin, boundary, "UC-001, UC-004")
+Rel(professor, boundary, "UC-001, UC-002")
+Rel(student, boundary, "UC-001, UC-003, UC-005, UC-006")
+Rel(boundary, mariadb, "TypeORM repositories")
+Rel(boundary, fs, "FileInterceptor")
+
+SHOW_LEGEND()
+@enduml

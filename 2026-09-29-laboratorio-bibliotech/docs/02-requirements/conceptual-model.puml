@@ -1,0 +1,53 @@
+@startuml BiblioTech - Conceptual Model
+!theme plain
+skinparam linetype ortho
+
+enum Role {
+  Admin
+  Professor
+  Student
+}
+
+class User {
+  id : number
+  email : string
+  passwordHash : string
+  role : Role
+}
+
+class Material {
+  id : number
+  title : string
+  author : string
+  subject : string <<optional>>
+  year : number <<optional>>
+  edition : string <<optional>>
+  tags : string[] <<optional>>
+  contentHash : string <<SHA-256 bytes, unique>>
+  mimeType : string
+  sizeBytes : number
+  storageKey : string
+  ownerId : number
+  createdAt : datetime
+}
+
+class AuthSession {
+  token : string
+  userId : number
+  expiresAt : datetime
+}
+
+User "1" -- "*" Material : uploads (ownerId)
+User "1" -- "*" AuthSession : holds
+
+note right of Material
+  RST-005: PDF/EPUB <= 50MB
+  BR-007: contentHash SHA-256 de bytes, unico global
+  v0.3.0: category fuera; similar_resources derivado
+end note
+
+note right of User
+  BR-003: email/password
+  validados (Validator)
+end note
+@enduml

@@ -1,0 +1,20 @@
+@startuml BiblioTech - C4 Context (tentative L1)
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(admin, "Admin", "Control total")
+Person(professor, "Professor", "Sube material")
+Person(student, "Student", "Lee todo (exige JWT)")
+
+System(bibliotech, "BiblioTech", "Plataforma web: publica y consulta libros digitales.\nFrontend + Backend, JWT+BCrypt, Multer, Repository, Validator, MariaDB.")
+
+System_Ext(mariadb, "MariaDB", "Persistencia minima exigida (metadatos + usuarios).")
+System_Ext(fs, "Almacenamiento de archivos", "Destino de uploads via Multer.")
+
+Rel(admin, bibliotech, "Gestiona usuarios y material")
+Rel(professor, bibliotech, "Sube material, consulta")
+Rel(student, bibliotech, "Lee y busca todo (con JWT)")
+Rel(bibliotech, mariadb, "Lee/escribe via Repository")
+Rel(bibliotech, fs, "Guarda binarios via Multer")
+
+SHOW_LEGEND()
+@enduml
