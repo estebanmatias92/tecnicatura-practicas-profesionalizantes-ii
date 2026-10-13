@@ -41,16 +41,17 @@ Auth JWT+BCrypt (UC-001), subida Professor (UC-002), lectura por visibilidad (UC
 | FR-001 | Registrar usuarios (Student auto-registro; Admin crea roles) | F-001 / UC-001 | Must | — |
 | FR-002 | Login emite JWT (BCrypt, expira ≤24h) | F-001 / UC-001 | Must | FR-001 |
 | FR-003 | Autorización por rol en cada endpoint | F-001 / UC-001..004 | Must | FR-002 |
-| FR-004 | Professor sube archivo + metadatos (title/author + subject/year/edition/tags opcionales; dedup SHA-256 → 409, BR-007) | F-002 / UC-002 | Must | FR-003 |
+| FR-004 | Professor sube archivo + metadatos (title/author + subject/year/edition/tags opcionales; duplicados permitidos — cada POST crea Material + FileBlob 1:1 nuevos) | F-002 / UC-002 | Must | FR-003 |
 | FR-006 | Catálogo consultable (exige JWT) | F-003 / UC-003 | Must | FR-003 |
 | FR-007 | Lectura exige JWT; todos los roles ven todo | F-003 / UC-003 | Must | FR-003 |
 | FR-008 | Descarga del original (exige JWT; 401 primero; inline; sin cap global v1) | F-009 / UC-006 | Should | FR-007 |
 | FR-009 | Búsqueda/filtrado (q + campos, AND, envelope paginado) | F-008 / UC-005 | Should | FR-006 |
 | FR-010 | Paginación de catálogo | F-010 / UC-005 | Could | FR-006 |
-| FR-011 | Admin CRUD usuarios | F-004 / UC-004 | Must | FR-003 |
-| FR-012 | Admin CRUD cualquier material | F-004 / UC-004 | Must | FR-003 |
-| FR-013 | Professor edita/elimina material propio | F-002 / UC-004 | Must | FR-003, FR-004 |
-| FR-014 | Transferencia de ownership (Professor→Professor; Admin force-transfer; borrado de cuenta exige sin material, sin cascada) | UC-004 | Must | FR-003, FR-011 |
+| FR-011 | Admin CRUD usuarios (borrar Professor borra en cascada sus materials + blobs) | F-004 / UC-004 | Must | FR-003 |
+| FR-012 | Admin CRUD cualquier material (borrar material borra su blob) | F-004 / UC-004 | Must | FR-003 |
+| FR-013 | Professor edita/elimina material propio + su blob | F-002 / UC-004 | Must | FR-003, FR-004 |
+
+_ELIMINADA v0.4.0 (ID estable): FR-014 (transferencia de ownership — reemplazada por cascada BR-004)._
 
 Criterio de aceptación por FR: ver UC correspondiente (Gherkin).
 
@@ -59,8 +60,9 @@ Criterio de aceptación por FR: ver UC correspondiente (Gherkin).
 | FR | UC | Conceptual Class | ADR |
 |----|----|------------------|-----|
 | FR-001/002 | UC-001 | User, AuthSession | ADR pendiente (architect) |
-| FR-004 | UC-002 | Material, FileStorage | ADR pendiente (architect) |
+| FR-004 | UC-002 | Material, FileBlob, FileStorage | ADR pendiente (architect) |
 | FR-006/007 | UC-003 | Material | ADR pendiente |
+| FR-011/012/013 | UC-004 | User, Material, FileBlob | ADR pendiente (cascada) |
 
 Full RTM at `RTM.csv`.
 
@@ -77,11 +79,11 @@ Full RTM at `RTM.csv`.
 
 ## 5. Conceptual Model
 
-See `conceptual-model.puml` (+ `.svg`). Entidades: User (Role), Material, AuthSession.
+See `conceptual-model.puml` (+ `.svg`). Entidades: User (Role), Material, FileBlob (1:1 con Material, cascada), AuthSession.
 
 ## 6. Design Constraints
 
-Clean 4 Layers, dependencia hacia adentro; Repository (TypeORM) como única salida a MariaDB (BR-006); Validator (`class-validator`) como Pure Fabrication; dedup por SHA-256 con constraint única (BR-007); borrado seguro sin cascada con transferencia de ownership (FR-014, BR-004) → ADR en architect.
+Clean 4 Layers, dependencia hacia adentro; Repository (TypeORM) como única salida a MariaDB (RST-004, ex-BR-006); Validator (`class-validator`) como Pure Fabrication; duplicados permitidos — cada POST crea Material + FileBlob 1:1 nuevos, sin unique en hash; borrado en cascada dura (delete user → materials + blobs; delete material → blob), sin transferencia (FR-014 eliminada, BR-004 v0.4.0) → ADR en architect.
 
 ## 7. Approval / Baseline
 
@@ -91,4 +93,4 @@ Clean 4 Layers, dependencia hacia adentro; Repository (TypeORM) como única sali
 | Stakeholder | | |
 | Tech Lead | | |
 
-> Validado en `validation.md` (Fagan). Baseline `v0.2.0` en `CHANGELOG-RE.md`.
+> Validado en `validation.md` (Fagan). Baseline `v0.4.0` en `CHANGELOG-RE.md`.

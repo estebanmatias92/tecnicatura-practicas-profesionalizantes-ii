@@ -7,7 +7,7 @@ Person(student, "Student", "Lee y busca todo (UC-003, UC-005)")
 
 System(boundary, "BiblioTech", "NestJS + React + TS. UC-001..UC-006.")
 
-System_Ext(mariadb, "MariaDB 11", "RST-003, via Repository (BR-006)")
+System_Ext(mariadb, "MariaDB 11", "RST-003, via Repository (RST-004)")
 System_Ext(fs, "File storage", "Uploads Multer (NFR-005)")
 
 Rel(admin, boundary, "UC-001, UC-004")

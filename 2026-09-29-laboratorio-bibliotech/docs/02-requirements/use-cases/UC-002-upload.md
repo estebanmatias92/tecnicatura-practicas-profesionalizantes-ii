@@ -5,7 +5,7 @@
 - **Primary Actor**: Professor (Admin también puede)
 - **Secondary Actors**: —
 - **Precondition**: JWT con rol Professor/Admin; límites PDF/EPUB ≤50MB
-- **Success Postcondition**: material persistido con metadatos + binario guardado
+- **Success Postcondition**: material + FileBlob 1:1 persistidos (binario guardado)
 - **Priority**: Must
 - **Source**: PRD F-002
 
@@ -22,20 +22,18 @@
 
 Fuera v1 (explícito): `category` (se solapa con `subject`); `similar_resources` almacenado (se deriva por autor/subject en UC-005).
 
-## Content Hash / Dedup (BR-007)
+## Blobs / Duplicados (v0.4.0)
 
-- `contentHash` = SHA-256 hex (64 chars) calculado sobre **los bytes del binario** (stream del temp de Multer, `node:crypto`), nunca sobre el filename. Dos nombres distintos con mismos bytes → mismo hash; mismo nombre con bytes distintos → hash distinto.
-- Alcance global (cualquier dueño). Misma obra en PDF vs EPUB → hashes distintos → no se deduplica (dedup por bytes, no por obra; limitación conocida).
-- Carrera concurrente (dos subidas idénticas a la vez): la constraint única en DB sobre `contentHash` se mapea a 409.
+- Cada `POST /material` crea un `Material` + un `FileBlob` 1:1 nuevos, aunque los bytes coincidan con otro material existente. Duplicados permitidos — nunca 409 por contenido.
+- `contentHash` (SHA-256 de los bytes, si se calcula) es informativo, no único; no gobierna nada.
 
 ## Main Flow (happy path)
 
 1. Professor envía archivo + metadatos (título/autor obligatorios; subject/year/edition/tags opcionales).
 2. Sistema verifica rol (403 si Student).
 3. Sistema valida MIME + tamaño vía Multer/Validator (antes de persistir) y valida metadatos vía `class-validator` (400 si inválidos).
-4. Sistema calcula SHA-256 sobre los bytes; si el hash ya existe → 409 con `{existingId}`, borra el temp, nada persistido.
-5. Sistema guarda binario (FileStorage) y crea Material con ownerId + contentHash.
-6. Sistema responde 201 con metadatos (sin bytes).
+4. Sistema guarda binario como FileBlob nuevo (FileStorage) y crea Material con ownerId + blobId.
+5. Sistema responde 201 con metadatos (sin bytes).
 
 ## Alternative Flows
 
@@ -43,7 +41,6 @@ Fuera v1 (explícito): `category` (se solapa con `subject`); `similar_resources`
 |------|-----------|--------|
 | 3a | MIME no permitido o >50MB | 413/415 con mensaje, nada persistido |
 | 3a | Metadatos inválidos (título/autor ausentes, year fuera de rango, tag inválido, subject largo) | 400 vía `class-validator`, nada persistido |
-| 4a | SHA-256 de los bytes ya existe (global, cualquier dueño) | 409 con `{existingId}`, borra temp, nada persistido |
 
 ## Exception Flows
 
@@ -53,8 +50,8 @@ Fuera v1 (explícito): `category` (se solapa con `subject`); `similar_resources`
 
 ## Associated Business Rules
 
-- BR-006: persistencia solo vía Repository.
-- BR-007: dedup global por SHA-256 de los bytes (no del filename); duplicado → 409.
+- RST-004: persistencia solo vía Repository.
+- BR-004 (v0.4.0): cada material nace con su propio FileBlob 1:1; duplicados permitidos.
 - RST-005: PDF/EPUB ≤50MB.
 
 ## Acceptance Criteria (Gherkin)
@@ -86,10 +83,10 @@ Feature: UC-002 Subir material
     When POST /material con year=999
     Then 400 y nada persistido
 
-  Scenario: subida de binario duplicado
-    Given material existente con SHA-256 H y JWT Professor
-    When POST /material con bytes cuyo SHA-256 es H (aunque el filename difiera)
-    Then 409 con existingId y nada persistido
+  Scenario: subida de binario duplicado → dos recursos
+    Given material existente con bytes B y JWT Professor
+    When POST /material con bytes B (aunque el filename difiera)
+    Then 201 con id y blobId nuevos y ambos materiales consultables
 ```
 
 ## Sequence Diagram

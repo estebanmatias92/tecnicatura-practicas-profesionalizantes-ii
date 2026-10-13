@@ -23,11 +23,17 @@ class Material {
   year : number <<optional>>
   edition : string <<optional>>
   tags : string[] <<optional>>
-  contentHash : string <<SHA-256 bytes, unique>>
+  ownerId : number
+  blobId : number
+  createdAt : datetime
+}
+
+class FileBlob {
+  id : number
+  storageKey : string
   mimeType : string
   sizeBytes : number
-  storageKey : string
-  ownerId : number
+  contentHash : string <<informativo, no-unico>>
   createdAt : datetime
 }
 
@@ -37,17 +43,28 @@ class AuthSession {
   expiresAt : datetime
 }
 
-User "1" -- "*" Material : uploads (ownerId)
+User "1" -- "*" Material : uploads (ownerId) <<ON DELETE CASCADE>>
+Material "1" -- "1" FileBlob : stores (blobId) <<ON DELETE CASCADE>>
 User "1" -- "*" AuthSession : holds
 
 note right of Material
   RST-005: PDF/EPUB <= 50MB
-  BR-007: contentHash SHA-256 de bytes, unico global
+  BR-004 v0.4.0: cascada dura 1:1,
+  duplicados permitidos (201)
   v0.3.0: category fuera; similar_resources derivado
+  v0.4.0: FR-014/BR-007 eliminadas
+end note
+
+note right of FileBlob
+  1:1 con Material, sin dueno propio,
+  sin refCount, sin compartir.
+  Nace y muere con su Material.
 end note
 
 note right of User
   BR-003: email/password
   validados (Validator)
+  BR-004 v0.4.0: delete Professor
+  borra materials + blobs
 end note
 @enduml

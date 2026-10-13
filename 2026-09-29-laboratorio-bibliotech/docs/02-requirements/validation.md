@@ -1,4 +1,4 @@
-# Validation — Fagan Inspection (RE baseline v0.3.0)
+# Validation — Fagan Inspection (RE baseline v0.4.0)
 
 Inspección del analista sobre `raw-needs.md`, `SRS.md`, `UC-001..006`, `conceptual-model.puml`, `context.puml`, `crc-cards.md`, `RTM.csv`, `CONTEXT.md`. Checklist: complete, consistent, unambiguous, verifiable, traceable, correct, boundary defined.
 
@@ -29,6 +29,18 @@ Alcance: UC-004 (flujos T-1..T-4, E-001 sin cascada, 7 escenarios Gherkin nuevos
 - Traceable: RTM 21 filas; CONTEXT actualizado.
 
 Defectos Fagan abiertos v0.3.1: 0. Firmas humanas PRD/SRS siguen pendientes; avance a `ooad-architect` por orden explícita del usuario (2026-10-03), como en v0.1.0.
+
+## Re-inspección v0.4.0 (cascada dura 1:1, sin dedup, sin transfer)
+
+Alcance: UC-002 (sin BR-007, duplicados → 201+201), UC-004 (flujos C-1..C-3, E-001 con rollback, FR-014 eliminada) + `raw-needs` (FR-004/BR-004 reescritas, BR-007/FR-014 eliminadas, BR-006 → RST-004, NFR-005 sin duplicadas), `SRS` (§3/§5/§6), `conceptual-model.puml/.svg` (split Material/FileBlob 1:1 CASCADE), `crc-cards.md` (FileBlob, FileBlobRepository), `RTM.csv` (20 filas con BR-004/RST-004), `CONTEXT.md` (FileBlob, descartados transfer/dedup/withdraw), `CHANGELOG-RE.md`.
+
+- Complete: cascada delete-user y delete-material con blob, duplicados con 201, todos con Gherkin (UC-002 ×1 nuevo, UC-004 ×3 cascada).
+- Consistent: BR-004/raw-needs/SRS §6/UC-004 E-001 dicen lo mismo (cascada dura); ningún doc exige transfer, 409-duplicado ni precondición sin material.
+- Unambiguous: 1:1 nacimiento-muerte juntos, sin refCount, sin compartir blob, sin withdraw v1; contentHash informativo no-único.
+- Verifiable: escenarios ejecutables (GET material/file → 404 tras cascada; doble POST mismos bytes → 2 ids/blobIds).
+- Traceable: RTM 20 filas (BR-004 → User;Material;FileBlob; RST-004 → repositories); cada FR viva traza a su UC.
+
+Defectos Fagan abiertos v0.4.0: 0.
 
 Proceso pendiente (no defecto del contenido): firmas formales de PRD y SRS siguen abiertas; el avance fue por decisión explícita del usuario (2026-10-03), registrada en `CHANGELOG-RE.md`. Puerta RUP: requerir firmas antes de `ooad-architect`.
 | Role | Date | Signature |

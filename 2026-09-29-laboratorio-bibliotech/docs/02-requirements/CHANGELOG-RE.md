@@ -1,5 +1,11 @@
 # CHANGELOG-RE — BiblioTech
 
+## v0.4.0 — 2026-10-13 (cascada dura 1:1, sin dedup, sin transfer)
+
+- Eliminadas FR-014 (transferencia/force-transfer, sin `PATCH owner/transfer`) y BR-007 (dedup global con 409 → duplicados permitidos, cada POST crea Material + FileBlob 1:1 nuevos con 201). BR-006 movida a RST-004 (constraint de diseño, no negocio).
+- BR-004 reescrita: Professor edita/elimina solo lo propio + su blob; Admin todo; `DELETE user` Professor borra materials + blobs; `DELETE material` borra su blob. Sin precondición, sin 409-pendientes. UC-004 reescrito (flujos C-1..C-3, E-001 con rollback); UC-002 sin hash-dedup (escenario duplicado → 201+201).
+- Modelo: split Material (publicación con ownerId+blobId) / FileBlob (storageKey, mime, size, hash informativo no-único) 1:1 `ON DELETE CASCADE`, sin refCount, sin withdraw v1. CRC: nueva FileBlob + FileBlobRepository; RTM 20 filas (BR-004 cascada, RST-004); CONTEXT con FileBlob y descartados transfer/dedup/withdraw; NFR-005 sin fixtures duplicadas.
+
 ## v0.3.1 — 2026-10-03 (transferencia de ownership, sin cascada)
 
 - Nueva FR-014: Professor transfiere material propio a otro Professor en cualquier momento (`PATCH /material/:id/owner`); borrado explícito propio sin transferencia previa; **borrado de cuenta Professor exige precondición sin material** (con material → 409 con pendientes); Admin fuerza transferencia de uno/todos los recursos entre Professors.
