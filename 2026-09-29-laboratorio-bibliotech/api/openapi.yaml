@@ -14,7 +14,7 @@ paths:
     post:
       operationId: register
       security: []
-      summary: UC-001 — auto-registro Student (Admin puede fijar rol)
+      summary: UC-001 — auto-registro público, siempre Student (Admin fija rol vía POST /users)
       requestBody:
         required: true
         content:
@@ -147,6 +147,26 @@ paths:
         '401': { description: Sin JWT (primero) }
         '404': { description: Material inexistente }
   /users:
+    post:
+      operationId: createUser
+      summary: UC-004 — Admin crea cuenta con rol (requestedRole requerido)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, requestedRole]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                requestedRole: { type: string, enum: [Admin, Professor, Student] }
+      responses:
+        '201': { description: JWT sin password, content: { application/json: { schema: { $ref: '#/components/schemas/Token' } } } }
+        '400': { description: Validator BR-003 / requestedRole faltante }
+        '401': { description: Sin JWT }
+        '403': { description: No Admin }
+        '409': { description: Email duplicado }
     get:
       operationId: listUsers
       summary: UC-004 — Admin lista usuarios

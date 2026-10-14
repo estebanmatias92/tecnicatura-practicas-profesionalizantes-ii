@@ -81,7 +81,7 @@ Feature: UC-006 Descargar archivo
 
 ## Sequence Diagram
 
-See `../../03-architecture/sequence-diagram-UC-006.puml` (en `ooad-architect`).
+See `../../03-architecture/sequence-diagram-UC-006.puml` (pendiente en `ooad-architect` — solo existen UC-001/002/004).
 
 ## Notes / Open
 

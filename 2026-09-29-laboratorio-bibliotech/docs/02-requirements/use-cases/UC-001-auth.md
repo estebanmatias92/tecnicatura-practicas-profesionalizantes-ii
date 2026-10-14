@@ -62,4 +62,4 @@ See `../../03-architecture/sequence-diagram-UC-001.puml` (en `ooad-architect`).
 
 ## Notes / Open
 
-- [ ] OQ-01 cerrada: auto-registro Student + Admin crea cualquier rol.
+- [x] OQ-01 cerrada: auto-registro Student + Admin crea cualquier rol.

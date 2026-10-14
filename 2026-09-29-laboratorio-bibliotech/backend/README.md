@@ -14,7 +14,7 @@ src/
 └── frameworks/  nest/app.module.ts (DI Factory), security (BCrypt/JWT), main.ts
 ```
 
-Cada clase lleva traza `// FR-xxx / UC-xxx [GRASP]` (ver `docs/03-architecture/adrs/`).
+Cada clase lleva traza `// FR-xxx / UC-xxx [GRASP]` (ver [`docs/03-architecture/adrs/`](../docs/03-architecture/adrs/)).
 
 ## Comandos
 
@@ -26,6 +26,9 @@ npm run lint    # eslint
 npm start       # node dist/frameworks/main.js (requiere .env + MariaDB)
 ```
 
+Dev local sin compose: copiar `.env.example` a `.env` **dentro de `backend/`**
+(el `.env` de la raíz del lab es solo para `docker compose`).
+
 ## Seed Admin inicial
 
 El registro público crea solo Student (UC-001). El primer Admin se siembra por SQL:
@@ -36,9 +39,9 @@ INSERT INTO users (email, password_hash, role) VALUES
 ```
 
 Generar el hash: `node -e "require('bcrypt').hash('tu-password',10).then(console.log)"`.
-Luego el Admin crea Professors vía `POST /users` (UC-004).
+Luego el Admin promueve cuentas en `/admin` o crea Professors vía `POST /users` (UC-004).
 
 ## Contrato
 
-`api/openapi.yaml` (contract-first). Smoke E2E verificado UC-001..UC-006 + C-1/C-2/C-3
-contra MariaDB 11 real (ver CHANGELOG del lab).
+[`api/openapi.yaml`](../api/openapi.yaml) (contract-first). Smoke E2E verificado UC-001..UC-006 + C-1/C-2/C-3
+contra MariaDB 11 real (ver [CHANGELOG del lab](../docs/02-requirements/CHANGELOG-RE.md)).

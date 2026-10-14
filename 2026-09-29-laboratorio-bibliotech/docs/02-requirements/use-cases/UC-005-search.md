@@ -87,7 +87,7 @@ Feature: UC-005 Buscar catálogo
 
 ## Sequence Diagram
 
-See `../../03-architecture/sequence-diagram-UC-005.puml` (en `ooad-architect`).
+See `../../03-architecture/sequence-diagram-UC-005.puml` (pendiente en `ooad-architect` — solo existen UC-001/002/004).
 
 ## Notes / Open
 
