@@ -13,6 +13,13 @@ describe('AuthSession entity (FR-002 / UC-001)', () => {
     expect(s.isExpired(new Date())).toBe(true);
   });
 
+  it('isExpired usa ahora por defecto cuando no recibe fecha', () => {
+    const vencida = new AuthSession('tok', 7, 'Student', new Date(Date.now() - 1_000));
+    expect(vencida.isExpired()).toBe(true);
+    const vigente = new AuthSession('tok', 7, 'Student', new Date(Date.now() + 60_000));
+    expect(vigente.isExpired()).toBe(false);
+  });
+
   it('toPublic nunca expone secretos (NFR-004)', () => {
     const s = new AuthSession('tok', 7, 'Student', new Date(Date.now() + 60_000));
     expect(JSON.stringify(s.toPublic())).not.toContain('tok');

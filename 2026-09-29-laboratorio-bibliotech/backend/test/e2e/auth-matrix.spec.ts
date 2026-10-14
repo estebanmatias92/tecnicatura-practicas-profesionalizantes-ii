@@ -13,6 +13,7 @@ import { RegisterUserUseCase } from '../../src/usecases/register-user.usecase';
 import { LoginUseCase } from '../../src/usecases/login.usecase';
 import { ManageMaterialUseCase } from '../../src/usecases/manage-material.usecase';
 import { Role } from '../../src/entities/role';
+import { User } from '../../src/entities/user.entity';
 import { createWorld } from '../helpers/fakes';
 
 function reflectorReturning(value: unknown): Reflector {
@@ -238,5 +239,72 @@ describe('AuthController delegacion (UC-001 borde HTTP)', () => {
     await expect(controller.loginUser({ email: 'x@biblio.tech', password: 'Segura123' } as never)).rejects.toMatchObject({
       status: 401,
     });
+  });
+});
+
+describe('UsersController superficie HTTP (FR-011 / UC-004)', () => {
+  const reqAdmin = { headers: { authorization: 'Bearer jwt.1.Admin' }, user: { userId: 1, role: Role.Admin } } as never;
+
+  it('list como Admin devuelve publicos sin hash', async () => {
+    const { w, register, manage } = setupAuth();
+    await w.users.save(User.create({ email: 'u@biblio.tech', passwordHash: 'h', role: Role.Student }));
+    const controller = new UsersController(register, manage);
+    const out = (await controller.list(reqAdmin)) as Array<Record<string, unknown>>;
+    expect(out).toHaveLength(1);
+    for (const u of out) {
+      expect(u).not.toHaveProperty('passwordHash');
+      expect(u).not.toHaveProperty('password');
+    }
+  });
+
+  it('list sin user da 401', async () => {
+    const { register, manage } = setupAuth();
+    const controller = new UsersController(register, manage);
+    await expect(controller.list({ headers: {} } as never)).rejects.toMatchObject({ status: 401 });
+  });
+
+  it('create como Admin con requestedRole respeta el rol', async () => {
+    const { register, manage } = setupAuth();
+    const controller = new UsersController(register, manage);
+    const out = (await controller.create(reqAdmin, {
+      email: 'p@biblio.tech',
+      password: 'Segura123',
+      requestedRole: 'Professor',
+    } as never)) as Record<string, unknown>;
+    expect(out['role']).toBe(Role.Professor);
+  });
+
+  it('changeRole como Admin devuelve 200 con el rol nuevo', async () => {
+    const { w, register, manage } = setupAuth();
+    const u = await w.users.save(User.create({ email: 'u@biblio.tech', passwordHash: 'h', role: Role.Student }));
+    const controller = new UsersController(register, manage);
+    const out = (await controller.changeRole(reqAdmin, u.id as number, { role: 'Professor' } as never)) as Record<
+      string,
+      unknown
+    >;
+    expect(out['role']).toBe(Role.Professor);
+  });
+
+  it('changeRole con rol invalido da 400', async () => {
+    const { w, register, manage } = setupAuth();
+    const u = await w.users.save(User.create({ email: 'u@biblio.tech', passwordHash: 'h', role: Role.Student }));
+    const controller = new UsersController(register, manage);
+    await expect(controller.changeRole(reqAdmin, u.id as number, { role: 'Jefe' } as never)).rejects.toMatchObject({
+      status: 400,
+    });
+  });
+
+  it('remove como Admin resuelve (ruta del 204)', async () => {
+    const { w, register, manage } = setupAuth();
+    const u = await w.users.save(User.create({ email: 'u@biblio.tech', passwordHash: 'h', role: Role.Student }));
+    const controller = new UsersController(register, manage);
+    await expect(controller.remove(reqAdmin, u.id as number)).resolves.toBeUndefined();
+    expect(await w.users.findById(u.id as number)).toBeNull();
+  });
+
+  it('remove sin user da 401', async () => {
+    const { register, manage } = setupAuth();
+    const controller = new UsersController(register, manage);
+    await expect(controller.remove({ headers: {} } as never, 5)).rejects.toMatchObject({ status: 401 });
   });
 });

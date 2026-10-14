@@ -25,21 +25,22 @@ Sesión JWT (expira ≤ 24h) + BCrypt (cost 10). Uploads PDF/EPUB ≤ 50 MB, un
 ## Quickstart
 
 ```bash
-cp backend/.env.example .env   # .env en la RAIZ: solo para `docker compose`. Completar JWT_SECRET (NFR-004: sin default)
-docker compose up --build      # db :3306, api :3000, web :5173
+make init   # deps + .env (falla hasta completar JWT_SECRET, NFR-004)
+make dev    # db :3306, api :3000, web :5173 (aislado Node 22 + HMR; ARGS="-d" para detached)
 ```
 
 El registro público crea solo Student (UC-001): aunque el cliente envíe
 `requestedRole`, el servidor lo ignora sin JWT Admin. Sembrar el primer Admin
-por SQL (ver [`backend/README.md`](./backend/README.md)); luego ese Admin promueve cuentas a
+con `make seed-admin EMAIL=x PASSWORD=y` (requiere db up; SQL manual en
+[`backend/README.md`](./backend/README.md)); luego ese Admin promueve cuentas a
 Professor/Admin desde `/admin` (`PATCH /users/:id`) o las crea directo vía
 `POST /users` (solo API, ver [`api/openapi.yaml`](./api/openapi.yaml)).
 
 ## Primer arranque (checklist)
 
-1. `cp backend/.env.example .env` y completar `JWT_SECRET` (raíz, para compose).
-2. `docker compose up --build` (db :3306, api :3000, web :5173).
-3. Sembrar el primer Admin por SQL (ver [`backend/README.md`](./backend/README.md)).
+1. `make init` y completar `JWT_SECRET` en `.env` (raíz, para compose).
+2. `make dev` (db :3306, api :3000, web :5173).
+3. `make seed-admin EMAIL=x PASSWORD=y` (o SQL manual, ver [`backend/README.md`](./backend/README.md)).
 4. Entrar a la web (`:5173`) y hacer login como Admin en `/login`.
 5. Promover cuentas a Professor/Admin en `/admin` (o crearlas vía `POST /users`).
 6. Cada usuario usa `/login`; tras un cambio de rol debe **loguearse de nuevo**
@@ -58,15 +59,19 @@ Paso a paso por pantalla: [`docs/uso-por-rol.md`](./docs/uso-por-rol.md).
 ## Desarrollo local
 
 ```bash
-# Backend (requiere MariaDB + .env en backend/ — distinto del .env raíz de compose)
-cd backend && npm install && npm test && npm run build && npm start
-# Frontend
-cd frontend && npm install && npm test && npm run build && npm run dev
+make dev        # aislado (Node 22 + HMR, default para trabajar)
+make dev-local  # db en compose + api/web por npm local (loop rápido; requiere Node 22)
+make check      # lint + tests + cobertura con gate 80%
+make up         # prod detached (imágenes multi-stage)
 ```
+
+El `.env` raíz alimenta a compose; `backend/.env` solo lo usa `dev-local`
+(ambos los crea `make init`). Ver `make help` para todos los targets
+(`test`, `seed-admin`, `token`, `docs`, `perf`, `clean`, `destroy`, …).
 
 ## Layout
 
-```
+```text
 api/                 openapi.yaml (contract-first)
 backend/src/         entities/ → usecases/ → adapters/ → frameworks/
 frontend/src/        cliente REST delgado (auth, catálogo, subida, admin)
@@ -75,6 +80,8 @@ docs/uso-por-rol.md  guía de uso por rol (UI: Student/Professor/Admin)
 docs/02-requirements/ SRS, UC-001..006, RTM.csv, CHANGELOG-RE.md
 docs/03-architecture/ C4/UML (PUML+SVG), ADRs MADR, data-model-er
 docker-compose.yaml  db + api + web
+docker-compose.dev.yaml  override dev aislado (HMR, Node 22)
+Makefile             interfaz unificada de tooling (make help)
 ```
 
 ## Estado

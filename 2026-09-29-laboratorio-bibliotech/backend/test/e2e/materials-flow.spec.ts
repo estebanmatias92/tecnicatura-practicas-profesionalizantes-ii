@@ -266,6 +266,18 @@ describe('UC-004 gestion no-cascada (FR-011/FR-013)', () => {
     expect(out['title']).toBe('Redes v2');
   });
 
+  it('Professor edita material propio con todos los opcionales', async () => {
+    const { w, manage } = setupManage();
+    const m = await seedMaterial(w, { ownerId: 3 });
+    const out = (await manage.updateMaterial({
+      callerId: 3,
+      callerRole: Role.Professor,
+      materialId: m.id as number,
+      patch: { subject: 'informatica', year: 2021, edition: '3ra', tags: ['redes'] },
+    })) as Record<string, unknown>;
+    expect(out).toMatchObject({ subject: 'informatica', year: 2021, edition: '3ra', tags: ['redes'] });
+  });
+
   it('Professor edita material ajeno da 403 y material intacto', async () => {
     const { w, manage } = setupManage();
     const m = await seedMaterial(w, { ownerId: 8, title: 'Ajeno' });
@@ -273,6 +285,27 @@ describe('UC-004 gestion no-cascada (FR-011/FR-013)', () => {
       manage.updateMaterial({ callerId: 3, callerRole: Role.Professor, materialId: m.id as number, patch: { title: 'hack' } }),
     ).rejects.toMatchObject({ code: 'FORBIDDEN' });
     expect((await w.materials.findById(m.id as number))?.title).toBe('Ajeno');
+  });
+
+  it('borrado de material inexistente da 404', async () => {
+    const { manage } = setupManage();
+    await expect(manage.deleteMaterial({ callerId: 1, callerRole: Role.Admin, materialId: 999999 })).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
+  });
+
+  it('edicion de material inexistente da 404', async () => {
+    const { manage } = setupManage();
+    await expect(
+      manage.updateMaterial({ callerId: 1, callerRole: Role.Admin, materialId: 999999, patch: { title: 'X' } }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+
+  it('cambio de rol de usuario inexistente da 404', async () => {
+    const { manage } = setupManage();
+    await expect(
+      manage.changeUserRole({ callerRole: Role.Admin, userId: 999999, role: Role.Professor }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 
   it('borrado de usuario inexistente da 404', async () => {
@@ -444,6 +477,22 @@ describe('MaterialsController borde HTTP (UC-002/003/004/005)', () => {
     const out = (await controller.catalog({ page: '2', limit: '10', tag: ['redes', 'ospf'] })) as Record<string, unknown>;
     expect(out).toMatchObject({ total: 1, page: 2, limit: 10 });
     expect(out['items']).toHaveLength(0); // pagina 2 vacia con 1 item total
+  });
+
+  it('catalog con query parcial e invalida usa defaults donde no parsea', async () => {
+    const w = createWorld();
+    await seedMaterial(w, { title: 'Redes OSPF', author: 'Moy', year: 2015, tags: ['redes'] });
+    await seedMaterial(w, { title: 'Cocina', author: 'Otro', year: 2020, tags: ['cocina'] });
+    const controller = setupController(w);
+    const out = (await controller.catalog({
+      q: 'redes',
+      author: 'mo',
+      year: '2015',
+      yearFrom: 'no-numero',
+      tag: 'redes',
+    })) as Record<string, unknown>;
+    expect(out).toMatchObject({ total: 1, page: 1, limit: 10 });
+    expect(out['items']).toHaveLength(1);
   });
 
   it('getOne inexistente mapea a 404', async () => {

@@ -28,10 +28,13 @@ npm start       # node dist/frameworks/main.js (requiere .env + MariaDB)
 
 Dev local sin compose: copiar `.env.example` a `.env` **dentro de `backend/`**
 (el `.env` de la raíz del lab es solo para `docker compose`).
+Atajo desde la raíz del lab: `make test/lint/build/check/dev-local`
+(mismo toolchain; ver `Makefile`).
 
 ## Seed Admin inicial
 
-El registro público crea solo Student (UC-001). El primer Admin se siembra por SQL:
+El registro público crea solo Student (UC-001). El primer Admin se siembra con
+`make seed-admin EMAIL=x PASSWORD=y` (desde la raíz; requiere db up), o por SQL manual:
 
 ```sql
 INSERT INTO users (email, password_hash, role) VALUES
