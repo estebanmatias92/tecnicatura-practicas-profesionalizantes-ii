@@ -1,5 +1,11 @@
 # CHANGELOG-RE — BiblioTech
 
+## v0.4.1 — 2026-10-14 (file_name UX para descarga)
+
+- Nueva columna `file_blobs.file_name VARCHAR(255) NOT NULL`: persiste el nombre original del upload para `Content-Disposition: inline; filename="…"` (UC-006). Aditiva, sin renumerar: ningún FR/NFR cambia de sentido; la cascada 1:1 no se toca; RTM sin cambios.
+- Rationale (decisión stakeholder 2026-10-14, cierra hueco de procedencia v0.3.0): el filename es el nombre del recurso para el usuario (metadato UX, nunca clave — BR-004 ya establecía que el hash se calcula sobre los bytes, no el filename). Alternativa descartada: nombre derivado `material-{id}.{ext}` (incumple "preserva filename original" de UC-006).
+- Trazabilidad: UC-006 (línea v0.4.1) + `docs/03-architecture/data-model-er.puml` + `api/openapi.yaml` (ya describía filename).
+
 ## v0.4.0 — 2026-10-13 (cascada dura 1:1, sin dedup, sin transfer)
 
 - Eliminadas FR-014 (transferencia/force-transfer, sin `PATCH owner/transfer`) y BR-007 (dedup global con 409 → duplicados permitidos, cada POST crea Material + FileBlob 1:1 nuevos con 201). BR-006 movida a RST-004 (constraint de diseño, no negocio).

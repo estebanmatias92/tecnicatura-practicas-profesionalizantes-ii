@@ -1,0 +1,37 @@
+@startuml sequence-diagram-UC-002
+title Sequence UC-002 Subir material — FR-004 / BR-004 v0.4.0
+actor Professor
+participant "MaterialController\n(Adapter, FileInterceptor)" as Ctrl
+participant "UploadMaterialUseCase" as UC
+participant "Validator\n(Pure Fabrication)" as Val
+participant "FileStorage\n(port, Multer detras)" as FS
+participant "Material / FileBlob\n(Entities)" as Ent
+participant "MaterialRepository\n+ FileBlobRepository" as Repo
+database MariaDB as DB
+
+Professor -> Ctrl : POST /material {file + meta} (JWT Professor/Admin)
+' GRASP Controller — Mission: single entry point per system operation, UI stays thin
+Ctrl -> UC : execute(professorId, file, meta)
+' Paso 2: rol verificado con lo que el caller conoce — Information Expert
+UC -> UC : checkRole(caller) [403 si Student, FR-003/NFR-006]
+' Paso 3: MIME + tamano ANTES de persistir — Pure Fabrication + Information Expert
+UC -> Val : validateFile(mime, sizeBytes) [413/415, NFR-005/RST-005]
+Val --> UC : ok
+UC -> Val : validateMetadata(title/author/ subject/year/edition/tags) [400]
+Val --> UC : ok
+' Paso 4: cada POST crea Material + FileBlob 1:1 nuevos — Creator
+' GRASP Creator — Mission: one stable owner per lifecycle, no scattered new
+UC -> FS : store(bytes) -> storageKey [duplicados -> 201, BR-004]
+FS --> UC : storageKey
+UC -> Ent : FileBlob.create(storageKey, mime, size) + Material.create(meta, ownerId, blobId)
+Ent --> UC : material + blob nuevos
+' GRASP Indirection — Mission: both sides depend on something stable
+UC -> Repo : save(blob) + save(material) [transaccion; E-001 -> rollback + 500]
+Repo -> DB : INSERT file_blobs + INSERT materials (RST-004)
+DB --> Repo : ok
+Repo --> UC : ids
+UC --> Ctrl : MaterialDTO (sin bytes)
+Ctrl --> Professor : 201 consultable
+
+note over Ctrl, UC : Clean 4: Controller solo delega; sin SQL en controllers (RST-004)
+@enduml

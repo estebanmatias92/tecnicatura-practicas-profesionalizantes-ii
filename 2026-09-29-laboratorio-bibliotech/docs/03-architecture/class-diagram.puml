@@ -1,0 +1,135 @@
+@startuml class-diagram
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Class Diagram — BiblioTech (Clean 4 Layers, aprobado)
+
+' ============ Entities (Clean core, sin imports framework) ============
+enum Role {
+  Admin
+  Professor
+  Student
+}
+
+class User {
+  + id: number
+  + email: string
+  + passwordHash: string
+  + role: Role
+  + create(data): User
+  + isOwner(materialId): boolean
+}
+
+class Material {
+  + id: number
+  + title: string
+  + author: string
+  + subject: string <<optional>>
+  + year: number <<optional>>
+  + edition: string <<optional>>
+  + tags: string[] <<optional>>
+  + ownerId: number
+  + blobId: number
+  + createdAt: datetime
+  + isOwnedBy(userId): boolean
+}
+
+class FileBlob {
+  + id: number
+  + storageKey: string
+  + mime: string
+  + sizeBytes: number
+  + contentHash: string <<informativo, no-unico>>
+  + createdAt: datetime
+}
+
+class AuthSession {
+  + token: string
+  + userId: number
+  + expiresAt: datetime
+  + verify(password, hash): boolean
+  + sign(userId, role): string
+}
+
+' ============ Use Cases (Controller de eventos de sistema) ============
+class RegisterUserUseCase {
+  + execute(dto): AuthSession
+}
+class LoginUseCase {
+  + execute(dto): AuthSession
+}
+class UploadMaterialUseCase {
+  + execute(professorId, file, meta): Material
+}
+class SearchCatalogUseCase {
+  + execute(query): Page<Material>
+}
+class ManageMaterialUseCase {
+  + deleteMaterial(callerId, id): void
+  + deleteUser(adminId, userId): void
+}
+class DownloadFileUseCase {
+  + execute(callerId, id): FileBlob
+}
+
+' ============ Interface Adapters (ports + controllers) ============
+interface UserRepository {
+  + save(user): User
+  + deleteCascade(userId): void
+}
+interface MaterialRepository {
+  + save(material): Material
+  + search(filters, page, limit): Page<Material>
+  + deleteWithBlob(id): void
+}
+interface FileBlobRepository {
+  + save(blob): FileBlob
+  + delete(id): void
+}
+interface FileStorage {
+  + store(bytes): string
+  + stream(storageKey): Stream
+  + remove(storageKey): void
+}
+class Validator {
+  + validateEmail(email): void
+  + validatePassword(password): void
+  + validateMetadata(meta): void
+  + validateFile(mime, size): void
+}
+
+' ============ Relations ============
+User "1" -- "*" Material : uploads (ownerId) <<ON DELETE CASCADE>>
+Material "1" -- "1" FileBlob : stores (blobId) <<ON DELETE CASCADE>>
+User "1" -- "*" AuthSession : holds
+RegisterUserUseCase ..> User : creates
+UploadMaterialUseCase ..> Material : creates
+UploadMaterialUseCase ..> FileBlob : creates
+ManageMaterialUseCase ..> MaterialRepository : uses
+SearchCatalogUseCase ..> MaterialRepository : uses
+Validator ..> User : valida
+Validator ..> Material : valida
+
+note right of User
+  Entity — FR-001/FR-011 / UC-001/UC-004
+  [Information Expert: co-loca
+  comportamiento con sus datos]
+  BR-003 via Validator; BR-004 C-2
+end note
+note right of ManageMaterialUseCase
+  GRASP Controller — UseCase recibe
+  el evento de sistema; el controller
+  HTTP solo delega. Un UseCase por
+  flujo C-1/C-2/C-3 (no God-controller).
+end note
+note right of Validator
+  GRASP Pure Fabrication — helper sin
+  encaje en dominio; protege la cohesion
+  de User/Material. Protected Variations
+  -> Strategy en reglas y filtros.
+end note
+note bottom of MaterialRepository
+  GRASP Indirection — Adapters dependen
+  de puertos estables (TypeORM detras).
+end note
+@enduml

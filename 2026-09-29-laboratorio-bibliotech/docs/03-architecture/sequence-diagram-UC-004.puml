@@ -1,0 +1,52 @@
+@startuml sequence-diagram-UC-004
+title Sequence UC-004 Gestion Admin + cascada — FR-011/012/013 / BR-004
+actor Admin
+actor Professor
+participant "Users/MaterialController\n(Adapter)" as Ctrl
+participant "ManageMaterialUseCase\n(C-1/C-2/C-3)" as UC
+participant "Material / User\n(Entities)" as Ent
+participant "Validator" as Val
+participant "MaterialRepository\n+ FileBlobRepository\n+ UserRepository" as Repo
+participant "FileStorage\n(port)" as FS
+database MariaDB as DB
+
+' --- C-1: Professor borra material propio ---
+Professor -> Ctrl : DELETE /material/:id (JWT)
+' GRASP Controller — Mission: single entry point per system operation, UI stays thin
+Ctrl -> UC : deleteMaterial(callerId, id)
+' GRASP Information Expert — Mission: co-locate behavior with information
+UC -> Ent : material.isOwnedBy(callerId) [ajeno y no Admin -> 403, nada eliminado]
+Ent --> UC : true
+UC -> Repo : deleteWithBlob(id) [transaccion]
+Repo -> DB : DELETE materials + DELETE file_blobs (C-1)
+DB --> Repo : ok
+UC -> FS : remove(storageKey) [E-001 -> 500 + rollback]
+FS --> UC : ok
+UC --> Ctrl : 204
+Ctrl --> Professor : 204 (GET material/file -> 404)
+
+' --- C-3: Admin borra cualquier material ---
+Admin -> Ctrl : DELETE /material/:id (JWT Admin)
+Ctrl -> UC : deleteMaterial(adminId, id) [rol Admin salta ownership, FR-012]
+UC -> Repo : deleteWithBlob(id)
+Repo -> DB : DELETE materials + DELETE file_blobs (C-3)
+DB --> Repo : ok
+UC -> FS : remove(storageKey)
+FS --> UC : ok
+UC --> Ctrl : 204
+
+' --- C-2: Admin borra cuenta Professor con cascada ---
+Admin -> Ctrl : DELETE /users/:id (JWT Admin)
+Ctrl -> UC : deleteUser(adminId, userId)
+UC -> Val : validateTarget (existe -> 404 si no; 403 si no Admin)
+Val --> UC : ok
+' Un UseCase por flujo, sin God-controller — High Cohesion + Low Coupling
+UC -> Repo : deleteCascade(userId) [transaccion: cuenta + N materials + N blobs]
+Repo -> DB : DELETE users CASCADE materials CASCADE file_blobs (C-2)
+DB --> Repo : ok
+UC -> FS : remove(cada storageKey) [fallo -> 500 + rollback total]
+FS --> UC : ok
+UC --> Ctrl : 204
+
+note over Ctrl, UC : Sin PATCH owner/transfer v1 (FR-014 eliminada). 401 antes que 404 sin JWT (BR-002).
+@enduml

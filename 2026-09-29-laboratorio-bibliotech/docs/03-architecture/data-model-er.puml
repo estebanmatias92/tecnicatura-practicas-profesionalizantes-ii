@@ -1,0 +1,57 @@
+@startuml data-model-er
+!theme plain
+skinparam linetype ortho
+
+title ER — BiblioTech (3NF, MariaDB 11, RST-003)
+
+entity "users" as users {
+  * id : INT PK <<auto>>
+  * email : VARCHAR(255) UNIQUE
+  * password_hash : VARCHAR(255)
+  * role : ENUM('Admin','Professor','Student')
+  * created_at : DATETIME
+}
+
+entity "materials" as materials {
+  * id : INT PK <<auto>>
+  * title : VARCHAR(200) <<NN>>
+  * author : VARCHAR(120) <<NN>>
+  ° subject : VARCHAR(120) NULL
+  ° year : INT NULL <<1000..actual>>
+  ° edition : VARCHAR(40) NULL
+  ° tags : JSON NULL <<<=10, lowercase>>
+  * owner_id : INT FK
+  * blob_id : INT FK UNIQUE
+  * created_at : DATETIME
+  --
+  INDEX (title, author, subject, year)
+  NFR-001: p95 <200ms
+}
+
+entity "file_blobs" as file_blobs {
+  * id : INT PK <<auto>>
+  * storage_key : VARCHAR(255) UNIQUE
+  * file_name : VARCHAR(255) <<NN, UX v0.4.1>>
+  * mime : VARCHAR(100) <<PDF/EPUB>>
+  * size_bytes : INT <<<=50MB, RST-005>>
+  ° content_hash : CHAR(64) NULL <<informativo, NO UNIQUE>>
+  * created_at : DATETIME
+}
+
+users ||--o{ materials : "owns (owner_id)\nON DELETE CASCADE [C-2]"
+materials ||--|| file_blobs : "stores (blob_id)\nON DELETE CASCADE [C-1/C-3]"
+
+note right of materials
+  BR-004 v0.4.0: 1:1 Material:FileBlob,
+  nacen y mueren juntos; duplicados
+  permitidos (201), sin dedup (BR-007
+  eliminada); sin transfer (FR-014 elim.)
+  Tags en JSON (lab scale; join table
+  rechazado por desproporcionado).
+end note
+note right of file_blobs
+  Sin dueno propio, sin refCount,
+  sin compartir. contentHash NO gobierna
+  nada: sin UNIQUE, sin busqueda por hash.
+end note
+@enduml

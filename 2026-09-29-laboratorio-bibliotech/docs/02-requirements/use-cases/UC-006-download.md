@@ -23,6 +23,8 @@
 | `.pdf` | `application/pdf` | `inline; filename="…"` (preserva filename original) |
 | `.epub` | `application/epub+zip` | `inline; filename="…"` |
 
+> v0.4.1: `file_name` persiste el nombre original en `file_blobs` para el `Content-Disposition` (decisión stakeholder 2026-10-14: el filename es el nombre del recurso para el usuario; metadato UX, nunca clave — BR-004).
+
 Sin `Range`/`ETag`/`Last-Modified`/`HEAD` en v1 (supuesto escrito, revalidable).
 
 ## Concurrency (v0.3.0, decisión)

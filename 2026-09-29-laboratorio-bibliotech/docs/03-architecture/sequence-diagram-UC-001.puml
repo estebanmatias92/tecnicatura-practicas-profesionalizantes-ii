@@ -1,0 +1,36 @@
+@startuml sequence-diagram-UC-001
+title Sequence UC-001 Autenticarse — FR-001/FR-002/FR-003
+actor Actor
+participant "AuthController\n(Adapter)" as Ctrl
+participant "RegisterUserUseCase\n/ LoginUseCase" as UC
+participant "User\n(Entity)" as Ent
+participant "Validator\n(Pure Fabrication)" as Val
+participant "UserRepository\n(port)" as Repo
+participant "AuthSession\n(Entity)" as Sess
+database MariaDB as DB
+
+' Paso 1: evento de sistema entra por el adapter
+Actor -> Ctrl : POST /auth/register|/login {email, password}
+' GRASP Controller — Mission: single entry point per system operation, UI stays thin
+Ctrl -> UC : execute(dto)
+' GRASP Pure Fabrication — Mission: protect domain cohesion; reglas fuera de User
+UC -> Val : validateEmail + validatePassword (BR-003)
+Val --> UC : ok / 400
+' GRASP Creator — Mission: one stable owner per lifecycle, no scattered new
+UC -> Ent : create(data) [registro]
+' GRASP Information Expert — Mission: co-locate behavior with information
+Ent -> Sess : verify(password, passwordHash) [login, BCrypt>=10, NFR-003]
+Sess --> UC : ok / 401
+' GRASP Indirection — Mission: both sides depend on something stable
+UC -> Repo : save(user) / findByEmail(email)
+Repo -> DB : INSERT / SELECT (RST-004)
+DB --> Repo : ok
+Repo --> UC : User
+' GRASP Information Expert — AuthSession firma lo que conoce (userId, role, exp<=24h)
+UC -> Sess : sign(userId, role)
+Sess --> UC : JWT
+UC --> Ctrl : {token} (nunca password, NFR-004)
+Ctrl --> Actor : 201/200 con JWT
+
+note over Ctrl, UC : Clean 4: Frameworks/Adapters -> UseCases -> Entities (solo hacia adentro)
+@enduml

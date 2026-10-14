@@ -1,0 +1,26 @@
+@startuml c4-context
+!theme plain
+skinparam linetype ortho
+
+title C4 L1 — Context — BiblioTech (aprobado: Clean 4 Layers)
+
+actor Admin as admin
+actor Professor as professor
+actor Student as student
+
+rectangle "BiblioTech\nNestJS + React + TS\nUC-001..UC-006" as boundary
+
+database "MariaDB 11\nRST-003, via Repository (RST-004)" as mariadb
+folder "File storage\nUploads Multer (NFR-005)" as fs
+
+admin --> boundary : "UC-001, UC-004"
+professor --> boundary : "UC-001, UC-002"
+student --> boundary : "UC-001, UC-003, UC-005, UC-006"
+boundary --> mariadb : "TypeORM repositories"
+boundary --> fs : "FileInterceptor"
+
+note right of boundary
+  BR-002: toda lectura/busqueda exige JWT
+  BR-004 v0.4.0: cascada dura 1:1
+end note
+@enduml
