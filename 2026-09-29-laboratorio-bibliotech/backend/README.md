@@ -26,8 +26,8 @@ npm run lint    # eslint
 npm start       # node dist/frameworks/main.js (requiere .env + MariaDB)
 ```
 
-Dev local sin compose: copiar `.env.example` a `.env` **dentro de `backend/`**
-(el `.env` de la raíz del lab es solo para `docker compose`).
+Dev local (`make dev-local` desde la raíz) lee el `.env` de la raíz del lab;
+`backend/.env.example` es solo la plantilla de variables (ya no hay `backend/.env` en runtime).
 Atajo desde la raíz del lab: `make test/lint/build/check/dev-local`
 (mismo toolchain; ver `Makefile`).
 

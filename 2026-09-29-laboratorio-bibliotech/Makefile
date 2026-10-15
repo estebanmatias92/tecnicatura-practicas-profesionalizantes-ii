@@ -42,13 +42,15 @@ doctor: ## verifica toolchain (docker, compose, node; plantuml/k6 solo avisan)
 	@command -v plantuml >/dev/null && echo "plantuml ok" || echo "AVISO: sin plantuml (solo afecta 'make docs')"
 	@command -v k6 >/dev/null && echo "k6 ok" || echo "AVISO: sin k6 (solo afecta 'make perf')"
 
-init: doctor ## instala deps y crea .env (falla si JWT_SECRET sigue placeholder)
+init: doctor ## instala deps y crea el .env unico en raiz (falla si JWT_SECRET sigue placeholder)
 	@test -d $(BACKEND)/node_modules || (cd $(BACKEND) && npm ci --no-audit --no-fund)
 	@test -d $(FRONTEND)/node_modules || (cd $(FRONTEND) && npm ci --no-audit --no-fund)
 	@test -f .env || cp $(BACKEND)/.env.example .env
-	@test -f $(BACKEND)/.env || cp $(BACKEND)/.env.example $(BACKEND)/.env
+	@if test -f $(BACKEND)/.env; then \
+		if cmp -s $(BACKEND)/.env $(BACKEND)/.env.example; then rm $(BACKEND)/.env && echo "backend/.env heredado (igual al ejemplo) eliminado: rige el .env raiz"; \
+		else echo "AVISO: backend/.env personalizado queda inerte (dev-local ahora usa el .env raiz); migralo a .env y borralo"; fi; \
+	fi
 	@if grep -q '^JWT_SECRET=$(SECRET_PLACEHOLDER)$$' .env; then echo "ERROR: completar JWT_SECRET en .env (NFR-004: sin default)"; exit 1; fi
-	@if grep -q '^JWT_SECRET=$(SECRET_PLACEHOLDER)$$' $(BACKEND)/.env; then echo "ERROR: completar JWT_SECRET en backend/.env"; exit 1; fi
 	@echo "init ok"
 
 dev: ## entorno dev aislado Node 22 + HMR (attached; ARGS="-d" para detached)
@@ -62,12 +64,13 @@ wait-db:
 	done
 	@$(COMPOSE) exec -T db sh -c 'mariadb -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" -e "SELECT 1" >/dev/null' || (echo "ERROR: db no responde" && exit 1)
 
-dev-local: ## db en compose + api/web por npm local (rapido; requiere Node 22)
+dev-local: ## db en compose + api/web por npm local, con el .env raiz (rapido; requiere Node 22)
 	@node --version | grep -q '^v22' || echo "AVISO: node local no es v22 (prod usa Node 22)"
-	@test -f $(BACKEND)/.env || (echo "ERROR: falta backend/.env (make init)" && exit 1)
+	@test -f .env || (echo "ERROR: falta .env (make init)" && exit 1)
+	@if grep -q '^JWT_SECRET=$(SECRET_PLACEHOLDER)$$' .env; then echo "ERROR: completar JWT_SECRET en .env"; exit 1; fi
 	$(COMPOSE) up -d db
 	$(MAKE) wait-db
-	@(trap 'kill 0' INT TERM; cd $(BACKEND) && npm run start:dev & cd $(FRONTEND) && npm run dev & wait)
+	@(trap 'kill 0' INT TERM; set -o allexport; . ./.env; set +o allexport; cd $(BACKEND) && npm run start:dev & cd $(FRONTEND) && npm run dev & wait)
 
 up: ## despliegue prod detached (compose up --build -d)
 	$(COMPOSE) up --build -d $(ARGS)

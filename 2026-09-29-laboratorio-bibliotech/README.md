@@ -65,8 +65,8 @@ make check      # lint + tests + cobertura con gate 80%
 make up         # prod detached (imágenes multi-stage)
 ```
 
-El `.env` raíz alimenta a compose; `backend/.env` solo lo usa `dev-local`
-(ambos los crea `make init`). Ver `make help` para todos los targets
+Un único `.env` en la raíz alimenta a compose y a `dev-local`
+(lo crea `make init`; `backend/.env.example` es solo la plantilla de variables). Ver `make help` para todos los targets
 (`test`, `seed-admin`, `token`, `docs`, `perf`, `clean`, `destroy`, …).
 
 ## Layout
