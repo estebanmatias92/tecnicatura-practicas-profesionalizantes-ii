@@ -3,7 +3,7 @@
 Inspección del analista sobre `raw-needs.md`, `SRS.md`, `UC-001..006`, `conceptual-model.puml`, `context.puml`, `crc-cards.md`, `RTM.csv`, `CONTEXT.md`. Checklist: complete, consistent, unambiguous, verifiable, traceable, correct, boundary defined.
 
 Hallazgos v0.2.0: OQ-03 sin objeto (visibilidades eliminadas por decisión stakeholder Login-para-todo + enmienda del charter); BR-001/BR-005 y FR-005 eliminadas con IDs estables sin renumerar; FR-007/BR-002 reescritas (todo exige JWT); FR-013 (professor edita lo propio) con caso positivo. Cada FR/NFR tiene ID y criterio medible; cada UC trae Gherkin;
-RTM cubre PRD→FR→UC→clase (19 filas); glosario en `CONTEXT.md` sin sinónimos en conflicto. Modelos re-renderizan con `plantuml -tsvg` (svg actualizados). Defectos Fagan abiertos: 0.
+RTM cubre PRD→FR→UC→clase (19 filas); glosario en `CONTEXT.md` sin sinónimos en conflicto. Modelos re-renderizan con `make docs` (`plantuml -tsvg -pipe`, svg actualizados). Defectos Fagan abiertos: 0.
 
 ## Re-inspección v0.3.0 (metadatos + filtros, hash-dedup, descarga sin cap)
 

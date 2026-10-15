@@ -6,7 +6,7 @@ Pirámide 80/15/5 adaptada al stack (Jest + Vitest, sin pytest/behave): unit col
 
 ## Ejecución
 
-`npx jest --coverage`: 15 suites verdes, 144 PASS + 3 todo, 0 FAIL. Frontend `vitest`: 2 PASS. Cobertura: entities 94%, usecases 93,5%, validators 90,7%, security 100%, adapters/http 84% (guards ~100%, mapper 86%). En cero: `persistence/typeorm`, `disk-file-storage` y `app.module` — requieren MariaDB/Nest reales (GAP-002/GAP-001). Global 64%: el núcleo testeable sin DB supera el 80%; el gate total queda parcial. k6 pendiente (GAP-003). UAT manual por `docs/uso-por-rol.md` pendiente de credenciales seed.
+`make test-cov`: 15 suites verdes, 157 PASS + 3 todo, 0 FAIL (gate 80% enforced en `backend/jest.config.js` para capas testeables sin DB). `make test` suma Vitest: 2 PASS. Cobertura: entities 94%, usecases 93,5%, validators 90,7%, security 100%, adapters/http 84%+. En cero: `persistence/typeorm`, `disk-file-storage` y `app.module` — requieren MariaDB/Nest reales (GAP-002/GAP-001). Global 67,5%: el gate por capas está verde; el global queda pendiente del port DB-backed. k6 pendiente (GAP-003, `make perf`). UAT manual por `docs/uso-por-rol.md` pendiente de credenciales seed (`make seed-admin`).
 
 ## Trazabilidad
 

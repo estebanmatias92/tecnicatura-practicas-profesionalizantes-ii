@@ -24,8 +24,8 @@
 | ID | Severidad | Detalle | Cierre |
 |----|-----------|---------|--------|
 | GAP-001 | major | Sin `supertest` + app Nest: headers reales (`Content-Disposition`), `FileInterceptor` (50MB/415 en el borde HTTP), `ValidationPipe` de DTOs. Controller directo cubre el mapeo usecase→HTTP. | Añadir `@nestjs/testing` + `test/e2e/*.app-spec.ts` |
-| GAP-002 | major | Sin DB-backed: filtros UC-005 contra MariaDB real (índices, collation insensitive) y cascada transaccional (criterio BUG-001). | `docker compose up -d db` + portar `cascade.spec.ts` a TypeOrm |
-| GAP-003 | major | k6 sin ejecutar (NFR-001 p95<200ms, NFR-002 50MB<60s). Scripts listos en `tests/perf/k6/`. | API + seed 100 + `k6 run` en verify-2 |
+| GAP-002 | major | Sin DB-backed: filtros UC-005 contra MariaDB real (índices, collation insensitive) y cascada transaccional (criterio BUG-001). | `make test-db` + portar `cascade.spec.ts` a TypeOrm |
+| GAP-003 | major | k6 sin ejecutar (NFR-001 p95<200ms, NFR-002 50MB<60s). Scripts listos en `tests/perf/k6/`. | `make perf JWT=$(make token EMAIL=p PASSWORD=...)` en verify-2 |
 | GAP-004 | minor | Frontend: solo `api.test.ts`; sin tests de guards de ruta ni filtros de catálogo. | Vitest por rol (Student/Professor/Admin) |
 
 Bloqueantes: **0**. La suite automatizada está verde; BUG-001/002 y GAP-001..003 deben cerrarse antes de `ooad-ship`.

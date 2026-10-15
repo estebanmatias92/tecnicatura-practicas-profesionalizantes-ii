@@ -4,7 +4,8 @@
 > `PASS` = escenario `.feature` con test Jest verde mismo nombre. `DIVERGENT` = el código
 > no cumple el spec (bug en `bug-report.md`, el test documenta el comportamiento real).
 > `PENDING` = `it.todo` o script sin ejecutar (gap en `bug-report.md`).
-> Suite 2026-10-14: **15 suites, 144 PASS + 3 todo, 0 FAIL** (`npx jest --coverage`).
+> Suite 2026-10-14: **15 suites, 157 PASS + 3 todo, 0 FAIL** (`make test-cov`;
+> gate 80% verde en capas testeables sin DB; global 67.5% stmts / 68.3% líneas).
 
 ## UC-001 auth — `backend/tests/cases/UC-001.feature` → `backend/test/e2e/auth-matrix.spec.ts`
 
@@ -34,16 +35,16 @@
 
 | FR/BR | Escenarios | Resultado |
 |-------|------------|-----------|
-| FR-011 | cambia rol / crea con rol / sin requestedRole 400 / no-Admin 403 / sin passwordHash en lista / borra inexistente 404 / C-2 con y sin material | PASS |
+| FR-011 | cambia rol / rol inválido 400 / cambia inexistente 404 / crea con rol / sin requestedRole 400 / no-Admin 403 / sin passwordHash en lista / borra inexistente 404 / C-2 con y sin material + superficie HTTP UsersController (list/create/changeRole/remove, 401 sin user) | PASS |
 | FR-012 | C-3 Admin borra ajeno + blob + archivo | PASS |
-| FR-013 | edita propio 200 / edita ajeno 403 intacto / elimina ajeno 403 / C-1 elimina propio + blob | PASS |
+| FR-013 | edita propio 200 (incl. opcionales) / edita inexistente 404 / borra inexistente 404 / edita ajeno 403 intacto / elimina ajeno 403 / C-1 elimina propio + blob + borde HTTP updateOne/deleteOne/upload-sin-file | PASS |
 | BR-004 E-001 | fallo FS en borrado material y en borrado cuenta | DIVERGENT → BUG-001 (la DB ya mutó; el test lo documenta en verde) |
 
 ## UC-005 búsqueda — `tests/cases/UC-005.feature` → `materials-flow.spec.ts`
 
 | FR | Escenarios | Resultado |
 |----|------------|-----------|
-| FR-009 | q título / q vacío 200 / autor parcial insensitive / tags AND / rango inclusivo / rango inválido 400 | PASS |
+| FR-009 | q título / q vacío 200 / autor parcial insensitive / tags AND / rango inclusivo / rango inválido 400 / parsing controller (tag simple vs repetido, num inválido→defaults) | PASS |
 | FR-010 | página 2/10 de 25 / defaults 1/10 / page 0 400 / limit 1000 400 | PASS |
 
 ## UC-006 descarga — `tests/cases/UC-006.feature` → `materials-flow.spec.ts`
@@ -67,7 +68,7 @@
 
 | NFR | Escenarios | Resultado |
 |-----|------------|-----------|
-| NFR-001 | catálogo y getById p95<200ms (20/10 VUs) | PENDING → GAP-003 (requiere API+seed+k6) |
+| NFR-001 | catálogo y getById p95<200ms (20/10 VUs) | PENDING → GAP-003 (`make perf`, requiere API + k6) |
 | NFR-002 | PDF 50MB <60s inicio→201 | PENDING → GAP-003 |
 
 ## Pendientes estructurales
@@ -75,5 +76,5 @@
 | ID | Alcance | Estado |
 |----|---------|--------|
 | GAP-001 | `supertest` + app Nest (headers `Content-Disposition`, `FileInterceptor` 50MB/415 reales, `ValidationPipe` DTO) | `describe` ausente; controller directo cubre el mapeo |
-| GAP-002 | DB-backed TypeORM + MariaDB 11 (filtros UC-005 reales, cascada transaccional) | 3 × `it.todo` en `cascade.spec.ts` |
+| GAP-002 | DB-backed TypeORM + MariaDB 11 (filtros UC-005 reales, cascada transaccional) | 3 × `it.todo` en `cascade.spec.ts`; correr con `make test-db` |
 | GAP-004 | Vitest guards de ruta y filtros de catálogo frontend | solo `api.test.ts` (2 tests) |

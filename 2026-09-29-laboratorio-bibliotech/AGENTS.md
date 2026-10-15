@@ -12,7 +12,7 @@ Greenfield lab. Only verified source is `docs/bibliotech.md` — read it before 
 ## Current state — almost nothing exists
 
 - This dir has docs + OOAD config only (`docs/bibliotech.md`, `docs/agents/`, `docs/01-discovery/`, `docs/02-requirements/`, `CONTEXT.md`). No `backend/`, `frontend/`, `package.json`, `docker-compose.yaml`, tests, linter, or CI yet.
-- Do NOT assume sibling-lab details (stored procedures, DOM-button tests, seed users like `admin/12345`, `make up`) exist here — they are unverified for this lab.
+- Do NOT assume sibling-lab details (stored procedures, DOM-button tests, seed users like `admin/12345`) exist here — they are unverified for this lab. (Local `make up`/`Makefile` tooling does exist here; see root `README.md`.)
 - Planned stack (decided, not yet installed): Node 22 + TypeScript, NestJS backend (`@nestjs/jwt` + `bcrypt`, Multer `FileInterceptor`, `class-validator`, TypeORM on MariaDB 11), React + TS frontend (Vite build, Vitest). Scaffold only when `ooad-architect`/`ooad-build` says so.
 
 ## OOAD order — do not skip
