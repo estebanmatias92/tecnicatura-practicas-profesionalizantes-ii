@@ -22,6 +22,7 @@ import { LoginUseCase } from '../../usecases/login.usecase';
 import { UploadMaterialUseCase } from '../../usecases/upload-material.usecase';
 import { SearchCatalogUseCase } from '../../usecases/search-catalog.usecase';
 import { ManageMaterialUseCase } from '../../usecases/manage-material.usecase';
+import { ManageUsersUseCase } from '../../usecases/manage-users.usecase';
 import { DownloadFileUseCase } from '../../usecases/download-file.usecase';
 import { AuthController } from '../../adapters/http/auth.controller';
 import { MaterialsController } from '../../adapters/http/materials.controller';
@@ -99,6 +100,11 @@ import { JwtAuthGuard, RolesGuard } from '../../adapters/http/guards';
       provide: SearchCatalogUseCase,
       useFactory: (m: TypeOrmMaterialRepository) => new SearchCatalogUseCase(m),
       inject: [TypeOrmMaterialRepository],
+    },
+    {
+      provide: ManageUsersUseCase,
+      useFactory: (u: TypeOrmUserRepository, s: DiskFileStorage) => new ManageUsersUseCase(u, s),
+      inject: [TypeOrmUserRepository, 'FileStoragePort'],
     },
     {
       provide: ManageMaterialUseCase,

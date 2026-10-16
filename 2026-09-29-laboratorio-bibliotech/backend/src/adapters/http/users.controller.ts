@@ -3,7 +3,7 @@
 // baja via ManageMaterialUseCase. Solo delega.
 import { Controller, Get, Post, Patch, Delete, Param, Body, Req, ParseIntPipe, HttpCode } from '@nestjs/common';
 import { RegisterUserUseCase } from '../../usecases/register-user.usecase';
-import { ManageMaterialUseCase } from '../../usecases/manage-material.usecase';
+import { ManageUsersUseCase } from '../../usecases/manage-users.usecase';
 import { Role } from '../../entities/role';
 import { DomainError } from '../../usecases/errors';
 import { toHttp } from './domain-error.mapper';
@@ -15,7 +15,7 @@ import { RegisterDto, ChangeRoleDto } from './dtos';
 export class UsersController {
   constructor(
     private readonly register: RegisterUserUseCase,
-    private readonly manage: ManageMaterialUseCase,
+    private readonly manageUsers: ManageUsersUseCase,
   ) {}
 
   private adminOf(req: AuthenticatedRequest): Role {
@@ -26,7 +26,7 @@ export class UsersController {
   @Get()
   async list(@Req() req: AuthenticatedRequest): Promise<unknown> {
     try {
-      return await this.manage.listUsers(this.adminOf(req));
+      return await this.manageUsers.listUsers(this.adminOf(req));
     } catch (e) {
       toHttp(e);
     }
@@ -54,7 +54,7 @@ export class UsersController {
     @Body() body: ChangeRoleDto,
   ): Promise<unknown> {
     try {
-      return await this.manage.changeUserRole({ callerRole: this.adminOf(req), userId: id, role: body.role as Role });
+      return await this.manageUsers.changeUserRole({ callerRole: this.adminOf(req), userId: id, role: body.role as Role });
     } catch (e) {
       toHttp(e);
     }
@@ -65,7 +65,7 @@ export class UsersController {
   async remove(@Req() req: AuthenticatedRequest, @Param('id', ParseIntPipe) id: number): Promise<void> {
     try {
       if (!req.user) throw new DomainError('UNAUTHORIZED', 'sin JWT');
-      await this.manage.deleteUser({ callerId: req.user.userId, callerRole: req.user.role, userId: id });
+      await this.manageUsers.deleteUser({ callerRole: req.user.role, userId: id });
     } catch (e) {
       toHttp(e);
     }
