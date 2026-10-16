@@ -1,6 +1,6 @@
 // RST-004 / todas UC [Indirection] — ORM entities TypeORM (MariaDB 11).
 // El dominio (entities/) nunca importa esto; los repos adaptan ORM <-> dominio.
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 
 @Entity('users')
 export class UserOrm {
@@ -48,6 +48,9 @@ export class FileBlobOrm {
 }
 
 @Entity('materials')
+@Index('FULLTEXT_idx', ['title', 'author', 'subject'], { fulltext: true })
+@Index('BTREE_year', ['year'], { using: 'BTREE' })
+@Index('BTREE_created_at', ['createdAt'], { using: 'BTREE' })
 export class MaterialOrm {
   @PrimaryGeneratedColumn()
   id!: number;
