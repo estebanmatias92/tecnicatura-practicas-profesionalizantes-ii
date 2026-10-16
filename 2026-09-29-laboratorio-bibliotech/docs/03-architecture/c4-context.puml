@@ -2,7 +2,7 @@
 !theme plain
 skinparam linetype ortho
 
-title C4 L1 — Context — BiblioTech (aprobado: Clean 4 Layers)
+title C4 L1 — Context — BiblioTech (Clean 4 Layers, v0.5.1)
 
 actor Admin as admin
 actor Professor as professor
@@ -13,14 +13,17 @@ rectangle "BiblioTech\nNestJS + React + TS\nUC-001..UC-006" as boundary
 database "MariaDB 11\nRST-003, via Repository (RST-004)" as mariadb
 folder "File storage\nUploads Multer (NFR-005)" as fs
 
-admin --> boundary : "UC-001, UC-004"
-professor --> boundary : "UC-001, UC-002"
-student --> boundary : "UC-001, UC-003, UC-005, UC-006"
+' Mapeo actor -> UC (BT-06 §6): todo rol autenticado lee todo; el rol solo restringe mutación
+admin --> boundary : "UC-001, UC-002 (sube), UC-003, UC-004, UC-005, UC-006"
+professor --> boundary : "UC-001, UC-002 (sube), UC-003, UC-004 (propios), UC-005, UC-006"
+student --> boundary : "UC-001, UC-003, UC-005, UC-006 (solo lectura)"
 boundary --> mariadb : "TypeORM repositories"
 boundary --> fs : "FileInterceptor"
 
 note right of boundary
-  BR-002: toda lectura/busqueda exige JWT
-  BR-004 v0.4.0: cascada dura 1:1
+  BR-002: toda lectura/búsqueda exige JWT;
+  el rol solo restringe mutación.
+  BR-004 v0.4.0: cascada dura 1:1 (material -> blob).
+  NFR-006: cambio de rol/borrado invalida tokens (token_version).
 end note
 @enduml

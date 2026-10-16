@@ -17,9 +17,9 @@ api --> mariadb : "TypeORM Repository\n(RST-004, unica salida a DB)"
 api --> fs : "Multer FileInterceptor\n(RST-005: PDF/EPUB <= 50MB)"
 
 note right of api
-  NFR-001: p95 lecturas <200ms
-  NFR-003: BCrypt >= 10, JWT <= 24h
+  NFR-001: p95 lecturas <200ms (FULLTEXT+BTREE, ADR-0006)
+  NFR-003: BCrypt >= 10, JWT <= 24h (ADR-0004)
   NFR-004: 0 secretos en claro/logs
-  NFR-006: 0 accesos sin token
+  NFR-006: 0 accesos sin token + revocación (token_version, ADR-0004)
 end note
 @enduml

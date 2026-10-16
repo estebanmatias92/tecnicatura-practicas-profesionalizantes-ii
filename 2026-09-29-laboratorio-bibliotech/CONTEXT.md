@@ -6,12 +6,12 @@
 |------|------------|-------------------|---------|------------|--------|
 | Biblioteca | Colección de material digital publicado en BiblioTech | Librería (física) | Material | — | PRD F-003 |
 | Material bibliográfico | Publicación con dueño (metadatos: título/autor obligatorios; subject/year/edition/tags opcionales; ownerId + blobId) + un FileBlob 1:1 | Libro (papel), Sample | FileBlob, Biblioteca | RST-005; BR-002 todo logueado lee todo; BR-004 cascada | FR-004/FR-007, UC-002/UC-003/UC-004 |
-| FileBlob | Binario PDF/EPUB ≤50MB (storageKey, mime, sizeBytes; contentHash informativo no-único). Sin dueño propio; nace y muere con su Material (1:1, sin refCount, sin compartir); duplicados permitidos, cada POST crea uno nuevo | Blob compartido, Archivo (solo) | Material, FileStorage | BR-004 cascada; RST-005 | FR-004/FR-008, UC-002/UC-006 |
+| FileBlob | Binario PDF/EPUB ≤50MB (storageKey, fileName normalizado, mime, sizeBytes; contentHash informativo no-único). Sin dueño propio; nace y muere con su Material (1:1, sin refCount, sin compartir); duplicados permitidos, cada POST crea uno nuevo | Blob compartido, Archivo (solo) | Material, FileStorage | BR-004 cascada; RST-005; NFR-005 (fileName sin path/CRLF) | FR-004/FR-008, UC-002/UC-006 |
 | Admin | Rol con acceso total a usuarios y material + blobs | Administrador genérico | Usuario | BR-004 | FR-011/FR-012, UC-004 |
 | Professor | Rol que sube material; edita/elimina solo el propio + su blob; su borrado arrastra materials + blobs | Docente, Maestro | Material | BR-004 | FR-004/FR-013, UC-002/UC-004 |
 | Student | Rol lector (toda lectura exige JWT) | Alumno | Material | BR-002 | FR-001/FR-007, UC-001/UC-003 |
-| Usuario | Cuenta con email + password + rol (Admin/Professor/Student) | Cuenta | Sesión JWT | BR-003 | FR-001, UC-001/UC-004 |
-| Sesión JWT | Token firmado (expira ≤24h) tras credenciales BCrypt (cost ≥10) | Token (solo) | Validator | NFR-003/NFR-004 | FR-002, UC-001 |
+| Usuario | Cuenta con email (único, 409 si duplicado) + password + rol (Admin/Professor/Student); auto-registro siempre Student | Cuenta | Sesión JWT | BR-003 | FR-001, UC-001/UC-004 |
+| Sesión JWT | Token firmado (expira ≤24h) tras credenciales BCrypt (cost ≥10); cambio de rol/borrado de cuenta invalida los tokens vigentes | Token (solo) | Validator | NFR-003/NFR-004/NFR-006 | FR-002, UC-001/UC-004 |
 | Validator | Módulo central de reglas (email, password, …) vía `class-validator` | Validador | Sesión, Usuario | BR-003 | FR-001/FR-002, UC-001 |
 | Repository | Patrón de acceso a datos (TypeORM); sin SQL en controladores | DAO | MariaDB | RST-004 | FR-004/FR-006, todas UC |
 | Upload | Ingesta Multer (`FileInterceptor`) con filtro MIME + límite; cada POST crea Material + FileBlob 1:1 nuevos, duplicados → 201 | Carga, Subida | Material, FileBlob | NFR-005, RST-005, BR-004 | FR-004, UC-002 |
@@ -35,3 +35,4 @@
 
 - RUP: vivir por iteración; cambios vía `docs/02-requirements/CHANGELOG-RE.md`.
 - v0.4.0: split Material/FileBlob 1:1 cascada dura; BR-004 reescrita; FR-014/BR-007 eliminadas; BR-006 → RST-004.
+- v0.5.0 (2026-10-16): cierre CCB; `fileName` en FileBlob; email único (BR-003); revocación de tokens (NFR-006); sanitización de filename (NFR-005).

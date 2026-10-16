@@ -36,14 +36,14 @@
 - **Role stereotype**: Information holder
 - **Source**: UC-002, UC-006, UC-004 (FR-004/FR-008, BR-004 cascada)
 - **Responsibilities — doing**: guarda bytes vía Multer/FileStorage; muere con su Material (sin refCount, sin compartir)
-- **Responsibilities — knowing**: conoce storageKey, mime, sizeBytes, contentHash informativo no-único, createdAt
+- **Responsibilities — knowing**: conoce storageKey, mime, sizeBytes, fileName (normalizado), contentHash informativo no-único, createdAt
 - **Collaborators**: Material (1:1), FileStorage, FileBlobRepository
 - **GRASP (architect)**: Information Expert → pendiente
 
 ### Walkthrough
 
 - UC-002 paso 4 → crea blob nuevo por cada POST (duplicados → 201) → FileStorage
-- UC-006 paso 3 → sirve bytes por storageKey → FileStorage
+- UC-006 paso 3 → sirve bytes + fileName normalizado por storageKey → FileStorage
 - UC-004 C-1/C-2/C-3 → cascada borra blob con su material/cuenta → FileBlobRepository
 
 ## AuthSession (Service provider)
@@ -57,8 +57,8 @@
 
 ### Walkthrough
 
-- UC-001 paso 4 → compara hash → User.passwordHash
-- UC-001 paso 5 → firma JWT ≤24h → caller
+- UC-001 paso 3 → compara hash (login) / hashea (registro) → User.passwordHash
+- UC-001 paso 4 → firma JWT ≤24h → caller
 
 ## UserRepository (Interfacer)
 
@@ -91,7 +91,7 @@
 
 - **Role stereotype**: Service provider
 - **Source**: UC-001, UC-002 (BR-003, NFR-005)
-- **Responsibilities — doing**: valida email/password (class-validator); valida MIME/tamaño; valida subject/year/edition/tags (v0.3.0)
+- **Responsibilities — doing**: valida email/password (class-validator); valida MIME/tamaño; valida subject/year/edition/tags (v0.3.0); normaliza `file_name` (basename, sin path/CRLF, v0.5.0)
 - **Responsibilities — knowing**: conoce reglas, no datos
 - **Collaborators**: User, Material (candidatos a validar)
 - **GRASP (architect)**: Pure Fabrication → pendiente

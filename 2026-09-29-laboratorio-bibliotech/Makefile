@@ -28,7 +28,10 @@ PUML := docs/02-requirements/conceptual-model.puml \
 	docs/03-architecture/data-model-er.puml \
 	docs/03-architecture/sequence-diagram-UC-001.puml \
 	docs/03-architecture/sequence-diagram-UC-002.puml \
-	docs/03-architecture/sequence-diagram-UC-004.puml
+	docs/03-architecture/sequence-diagram-UC-003.puml \
+	docs/03-architecture/sequence-diagram-UC-004.puml \
+	docs/03-architecture/sequence-diagram-UC-005.puml \
+	docs/03-architecture/sequence-diagram-UC-006.puml
 
 .PHONY: help doctor init dev dev-local wait-db up down stop destroy restart ps logs test test-cov test-db lint check build build-local seed-admin token docs perf clean
 

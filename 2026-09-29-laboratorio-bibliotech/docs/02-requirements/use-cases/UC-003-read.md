@@ -26,7 +26,7 @@
 
 | ID | Error | Handling |
 |----|-------|----------|
-| — | — | — |
+| E-001 | Token expirado/manipulado | 401; frontend redirige a login |
 
 ## Associated Business Rules
 
@@ -50,6 +50,16 @@ Feature: UC-003 Leer material
     Given JWT expirado
     When GET /material
     Then 401
+
+  Scenario: material inexistente
+    Given JWT válido e id inexistente
+    When GET /material/:id
+    Then 404
+
+  Scenario: catálogo vacío
+    Given JWT válido y ningún material cargado
+    When GET /material
+    Then 200 con lista vacía (sin error)
 ```
 
 ## Sequence Diagram

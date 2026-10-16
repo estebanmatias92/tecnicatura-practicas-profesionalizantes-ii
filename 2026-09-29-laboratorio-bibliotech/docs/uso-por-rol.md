@@ -10,7 +10,9 @@
 
 - Sesión JWT (expira ≤ 24h). El rol viaja en el token: tras un cambio de rol
   hay que **volver a hacer login** para que la UI y el backend vean el rol nuevo
-  (UC-004).
+  (UC-004). Además, el cambio de rol **revoca los tokens vigentes** (sube
+  `token_version`): el token viejo deja de ser válido y el backend responde `401`,
+  por lo que el re-login es obligatorio, no solo una comodidad de UI (NFR-006/ADR-0004).
 - Registro público = siempre **Student**, aunque se intente pedir otro rol
   (decisión OQ-01, FR-001/UC-001).
 - Password ≥ 8 caracteres; email con formato válido (BR-003). Email duplicado

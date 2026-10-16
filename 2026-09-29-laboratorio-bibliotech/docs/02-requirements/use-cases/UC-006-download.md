@@ -24,6 +24,8 @@
 | `.epub` | `application/epub+zip` | `inline; filename="…"` |
 
 > v0.4.1: `file_name` persiste el nombre original en `file_blobs` para el `Content-Disposition` (decisión stakeholder 2026-10-14: el filename es el nombre del recurso para el usuario; metadato UX, nunca clave — BR-004).
+>
+> v0.5.0 (BT-10): `file_name` se persiste **normalizado** (basename; sin separadores de ruta `/\`, sin `..`, sin caracteres de control/CRLF) y así se sirve. El nombre crudo del cliente nunca se refleja ni se usa como clave de storage. La normalización es responsabilidad del Validator (NFR-005).
 
 Sin `Range`/`ETag`/`Last-Modified`/`HEAD` en v1 (supuesto escrito, revalidable).
 
@@ -77,6 +79,21 @@ Feature: UC-006 Descargar archivo
     Given id inexistente
     When GET /material/:id/file sin token
     Then 401 (auth primero)
+
+  Scenario: binario huérfano
+    Given material con metadatos pero sin blob y JWT válido
+    When GET /material/:id/file
+    Then 500 + log de inconsistencia
+
+  Scenario: storage caído
+    Given material con binario y JWT válido, y FileStorage que falla
+    When GET /material/:id/file
+    Then 503
+
+  Scenario: nombre de archivo sanitizado
+    Given material subido con nombre "../../etc/passwd\r\nX: y"
+    When GET /material/:id/file con JWT
+    Then 200 y Content-Disposition con nombre normalizado (basename, sin path/CRLF)
 ```
 
 ## Sequence Diagram

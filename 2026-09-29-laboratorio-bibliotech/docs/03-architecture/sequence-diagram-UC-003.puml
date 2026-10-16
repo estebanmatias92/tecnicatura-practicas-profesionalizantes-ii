@@ -1,0 +1,28 @@
+@startuml sequence-diagram-UC-003
+title Sequence UC-003 Consultar catálogo y leer material — FR-006/FR-007 / BR-002
+actor "Student / Professor / Admin" as Actor
+participant "JwtAuthGuard\n(Adapter)" as Guard
+participant "MaterialsController\n(Adapter)" as Ctrl
+participant "SearchCatalogUseCase\n(Controller)" as UC
+participant "MaterialRepository\n(port)" as Repo
+database MariaDB as DB
+
+Actor -> Ctrl : GET /material | GET /material/:id (JWT)
+' GRASP Indirection — Mission: both sides depend on something stable
+Guard -> Ctrl : verify(token) [sin token/inválido -> 401 primero, BR-002]
+Ctrl -> UC : execute(query) | getById(id)
+' GRASP Controller — Mission: single entry point per system operation, UI stays thin
+' GRASP Indirection — Mission: both sides depend on something stable
+UC -> Repo : search(filters,page,limit) | findById(id)
+Repo -> DB : SELECT materials (RST-004)
+DB --> Repo : rows / none
+alt material inexistente (por id)
+  Repo --> UC : null -> NOT_FOUND -> 404
+else ok
+  Repo --> UC : Material / Page<Material>
+  UC --> Ctrl : Material / Page
+  Ctrl --> Actor : 200 (todo rol autenticado ve todo, FR-007)
+end
+
+note over Actor, UC : Lectura delgada: sin lógica de dominio; el rol no restringe lectura (BR-002)
+@enduml

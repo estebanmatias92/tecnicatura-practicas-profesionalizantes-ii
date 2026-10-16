@@ -11,7 +11,7 @@
 
 ## Main Flow (happy path)
 
-1. Actor envía email + password (+ rol si lo crea Admin).
+1. Actor envía email + password. (El auto-registro público fuerza `Student` e **ignora** cualquier `requestedRole` provisto por el cliente; solo un Admin autenticado fija otro rol vía `POST /users`.)
 2. Sistema valida formato vía Validator.
 3. Sistema verifica credencial (registro: email único + hash BCrypt; login: compara hash).
 4. Sistema emite JWT con `userId` + `role`.
@@ -21,7 +21,9 @@
 
 | Step | Condition | Action |
 |------|-----------|--------|
+| 1a | Auto-registro con `requestedRole` ≠ Student (p. ej. `Admin`/`Professor`) | se ignora → 201 con rol `Student` (sin escalada) |
 | 2a | Email/password inválidos | 400 con mensaje de Validator |
+| 2a | `requestedRole` inválido en `POST /users` (Admin) | 400 |
 | 3a | Email duplicado (registro) | 409 |
 | 3a | Credencial incorrecta (login) | 401 sin distinguir usuario/existe |
 
@@ -33,7 +35,7 @@
 
 ## Associated Business Rules
 
-- BR-003: email válido, password ≥ 8 (Validator central).
+- BR-003: email válido y único (duplicado → 409), password ≥ 8 (Validator central).
 - BR-002: rutas protegidas exigen `Authorization: Bearer`; guard de rol tras verificar token.
 
 ## Acceptance Criteria (Gherkin)
@@ -45,10 +47,30 @@ Feature: UC-001 Autenticarse
     When POST /auth/register con email válido y password ≥ 8
     Then 201 con JWT y sin password en respuesta
 
+  Scenario: auto-registro no escala privilegios
+    Given reglas BR-003 activas
+    When POST /auth/register con email válido y requestedRole=Admin
+    Then 201 y el rol del token es Student
+
+  Scenario: email duplicado
+    Given usuario existente con email "a@b.com"
+    When POST /auth/register con email "a@b.com"
+    Then 409 y nada persistido
+
+  Scenario: credenciales con formato inválido
+    Given reglas BR-003 activas
+    When POST /auth/register con email sin @ o password < 8
+    Then 400 con mensaje de Validator
+
   Scenario: login con password incorrecta
     Given usuario existente
     When POST /auth/login con password errónea
     Then 401 sin indicar si el email existe
+
+  Scenario: token expirado
+    Given JWT expirado
+    When GET /material con el JWT expirado
+    Then 401 y frontend redirige a login
 
   Scenario: acceso con rol insuficiente
     Given JWT válido de Student

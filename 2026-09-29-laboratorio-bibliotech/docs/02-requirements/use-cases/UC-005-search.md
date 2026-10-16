@@ -1,7 +1,7 @@
 # UC-005: Buscar, filtrar y paginar catálogo
 
 - **ID**: UC-005
-- **Traced FRs**: FR-009, FR-010 (apoya FR-006)
+- **Traced FRs**: FR-009, FR-010 (opera sobre el catálogo de FR-006/UC-003)
 - **Primary Actor**: cualquier lector autenticado
 - **Secondary Actors**: —
 - **Precondition**: JWT válido
@@ -39,7 +39,7 @@
 
 | ID  | Error | Handling |
 | --- | ----- | -------- |
-| —   | —     | —        |
+| E-001 | Fallo de consulta en Repository | 500 (no se expone detalle) |
 
 ## Associated Business Rules
 
@@ -68,6 +68,11 @@ Feature: UC-005 Buscar catálogo
     Given materiales existentes y JWT válido
     When GET /material?q=
     Then 200 con envelope y total consistente
+
+  Scenario: búsqueda sin coincidencias
+    Given materiales existentes y JWT válido
+    When GET /material?q=zzz-inexistente
+    Then 200 con items vacío y total 0 (sin error)
 
   Scenario: filtro por tags múltiples (AND)
     Given materiales con tags variados y JWT válido

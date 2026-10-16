@@ -68,6 +68,16 @@ Feature: UC-002 Subir material
     When POST /material
     Then 403
 
+  Scenario: admin sube material
+    Given JWT Admin
+    When POST /material con PDF + metadatos válidos
+    Then 201 y material consultable
+
+  Scenario: archivo con MIME no permitido
+    Given JWT Professor
+    When POST /material con archivo .zip (application/zip)
+    Then 415 y nada persistido
+
   Scenario: archivo excede límite
     Given JWT Professor
     When POST /material con binario >50MB

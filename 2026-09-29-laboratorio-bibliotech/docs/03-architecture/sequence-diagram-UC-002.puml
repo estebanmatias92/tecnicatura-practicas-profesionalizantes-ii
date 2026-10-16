@@ -1,37 +1,56 @@
 @startuml sequence-diagram-UC-002
-title Sequence UC-002 Subir material — FR-004 / BR-004 v0.4.0
+title Sequence UC-002 Subir material — FR-004 / BR-004 v0.4.0 / NFR-005 / RST-005
 actor Professor
-participant "MaterialController\n(Adapter, FileInterceptor)" as Ctrl
-participant "UploadMaterialUseCase" as UC
-participant "Validator\n(Pure Fabrication)" as Val
-participant "FileStorage\n(port, Multer detras)" as FS
-participant "Material / FileBlob\n(Entities)" as Ent
-participant "MaterialRepository\n+ FileBlobRepository" as Repo
+participant "MaterialsController\n(Adapter)\nFileInterceptor" as Ctrl
+participant "UploadMaterialUseCase\n(Controller)" as UC
+participant "ValidatorPort\n(Pure Fabrication)" as Val
+participant "FileStorage\n(port)" as FS
+participant "FileBlob / Material\n(Entities, Creator)" as Ent
+participant "FileBlobRepository\n+ MaterialRepository" as Repo
 database MariaDB as DB
 
 Professor -> Ctrl : POST /material {file + meta} (JWT Professor/Admin)
+note over Ctrl
+  NFR-005/BT-11: FileInterceptor corre ANTES del usecase —
+  memoryStorage (nada persistido), limits.fileSize=50MB -> 413,
+  fileFilter MIME PDF/EPUB -> 415. El borde rechaza primero.
+end note
 ' GRASP Controller — Mission: single entry point per system operation, UI stays thin
-Ctrl -> UC : execute(professorId, file, meta)
-' Paso 2: rol verificado con lo que el caller conoce — Information Expert
-UC -> UC : checkRole(caller) [403 si Student, FR-003/NFR-006]
-' Paso 3: MIME + tamano ANTES de persistir — Pure Fabrication + Information Expert
-UC -> Val : validateFile(mime, sizeBytes) [413/415, NFR-005/RST-005]
+Ctrl -> UC : execute(callerId, callerRole, file, meta)
+' Paso 2: rol con lo que el caller conoce — Information Expert
+' GRASP Information Expert — Mission: co-locate behavior with information (rol del JWT)
+UC -> UC : assertCanUpload(callerRole) [403 si Student, FR-003/NFR-006]
+' Paso 3: re-validación defensiva ANTES de persistir (NFR-005)
+UC -> Val : validateFile(mime, sizeBytes) [413/415]
 Val --> UC : ok
-UC -> Val : validateMetadata(title/author/ subject/year/edition/tags) [400]
+UC -> Val : validateMetadata(title/author/…/tags) [400]
 Val --> UC : ok
 ' Paso 4: cada POST crea Material + FileBlob 1:1 nuevos — Creator
 ' GRASP Creator — Mission: one stable owner per lifecycle, no scattered new
-UC -> FS : store(bytes) -> storageKey [duplicados -> 201, BR-004]
-FS --> UC : storageKey
-UC -> Ent : FileBlob.create(storageKey, mime, size) + Material.create(meta, ownerId, blobId)
-Ent --> UC : material + blob nuevos
+UC -> Val : normalizeFileName(originalName) [basename, sin path/CRLF, NFR-005/BT-10]
+Val --> UC : safeName
 ' GRASP Indirection — Mission: both sides depend on something stable
-UC -> Repo : save(blob) + save(material) [transaccion; E-001 -> rollback + 500]
-Repo -> DB : INSERT file_blobs + INSERT materials (RST-004)
-DB --> Repo : ok
-Repo --> UC : ids
-UC --> Ctrl : MaterialDTO (sin bytes)
-Ctrl --> Professor : 201 consultable
+UC -> FS : store(buffer, safeName) -> storageKey [duplicados -> 201, BR-004]
+FS --> UC : storageKey
+UC -> Ent : FileBlob.create({storageKey, fileName: safeName, mime, sizeBytes, contentHash})
+Ent --> UC : blob
+UC -> Repo : FileBlobRepository.save(blob)
+Repo -> DB : INSERT file_blobs (RST-004)
+Repo --> UC : blob (id)
+UC -> Ent : Material.create({meta, ownerId, blobId})
+Ent --> UC : material
+UC -> Repo : MaterialRepository.save(material)
+Repo -> DB : INSERT materials
+Repo --> UC : material (id)
+alt E-001 fallo tardío al persistir material
+  UC -> FS : remove(storageKey) [compensación]
+  UC -> Repo : FileBlobRepository.delete(blob.id) [compensación]
+  Repo --> UC : ok
+  UC --> Ctrl : DomainError INTERNAL -> 500 (nada persistido)
+else ok
+  UC --> Ctrl : MaterialDTO (sin bytes)
+  Ctrl --> Professor : 201 consultable
+end
 
-note over Ctrl, UC : Clean 4: Controller solo delega; sin SQL en controllers (RST-004)
+note over Ctrl, UC : Controller solo delega; sin SQL en controllers (RST-004)
 @enduml

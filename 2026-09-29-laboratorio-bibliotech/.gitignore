@@ -1,0 +1,43 @@
+# BiblioTech — ignores locales del proyecto.
+# Duplica a proposito parte del .gitignore de la raiz para que este subdir
+# sea portable (extraible como repo propio). Nunca commitear secretos (NFR-004).
+
+# --- Deps ---
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# --- Build (backend/tsconfig.json outDir ./dist; vite build -> frontend/dist) ---
+dist/
+backend/dist/
+frontend/dist/
+*.tsbuildinfo
+
+# --- Coverage (backend/jest.config.js coverageDirectory; vitest) ---
+coverage/
+backend/coverage/
+frontend/coverage/
+
+# --- Uploads (RST-005; UPLOAD_DIR default ./uploads; make clean/destroy) ---
+uploads/
+backend/uploads/
+
+# --- Env (rige .env en raiz; backend/.env legacy queda inerte) ---
+.env*
+!*.example
+
+# --- Logs ---
+*.log
+npm-debug.log*
+
+# --- Lint cache ---
+.eslintcache
+
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

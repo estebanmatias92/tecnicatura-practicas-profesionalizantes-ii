@@ -1,4 +1,4 @@
-# Validation — Fagan Inspection (RE baseline v0.4.0)
+# Validation — Fagan Inspection (RE baseline v0.5.0)
 
 Inspección del analista sobre `raw-needs.md`, `SRS.md`, `UC-001..006`, `conceptual-model.puml`, `context.puml`, `crc-cards.md`, `RTM.csv`, `CONTEXT.md`. Checklist: complete, consistent, unambiguous, verifiable, traceable, correct, boundary defined.
 
@@ -42,9 +42,24 @@ Alcance: UC-002 (sin BR-007, duplicados → 201+201), UC-004 (flujos C-1..C-3, E
 
 Defectos Fagan abiertos v0.4.0: 0.
 
-Proceso pendiente (no defecto del contenido): firmas formales de PRD y SRS siguen abiertas; el avance fue por decisión explícita del usuario (2026-10-03), registrada en `CHANGELOG-RE.md`. Puerta RUP: requerir firmas antes de `ooad-architect`.
+## Re-inspección v0.5.0 (cierre CCB post-challenge, 2026-10-16)
+
+Alcance: CCB `BT-01..BT-04` y `BT-07..BT-10` (`delta-spec → ooad-requirements`) aprobados y baselinados. `BT-05`/`BT-06`/`BT-11` (`delta-arch`) permanecen abiertos para `ooad-architect` (no son defectos RE).
+
+- Complete: BR-002 restaurada en SRS §3.1 + fila RTM (BT-01); `file_name` (v0.4.1) baselinado en SRS §5/§6, CRC, conceptual-model y CONTEXT (BT-02); filas RTM de NFR-002/004 y métricas medibles en NFR-004/005 (BT-03); Gherkin de las ramas declaradas (409/415/404/500/503) + dimensión vacía (BT-04); auto-registro fuerza Student (BT-07); 403 de edición ajena (BT-08); invalidación de tokens por cambio de rol/borrado (BT-09); sanitización de `file_name` (BT-10).
+- Consistent: BR-002/003/004 presentes en SRS y `raw-needs`; unicidad de email codificada en BR-003 (409); trazas corregidas — UC-005 ya no reclama FR-006, BR-003→UC-002 removida, procedencia FR-013 = OQ-04; SRS §1.2/§2.2 sin "lectura pública/privada" ni "por visibilidad".
+- Unambiguous: `requestedRole` del cliente se ignora en auto-registro; revocación de tokens definida como ventana objetivo 0 (NFR-006); `file_name` normalizado (basename, sin CRLF).
+- Verifiable: 15 escenarios Gherkin nuevos (UC-001 ×4, UC-002 ×1, UC-003 ×2, UC-004 ×4, UC-005 ×1, UC-006 ×3); NFR-004/005 con métrica/target reales (antes métodos).
+- Traceable: RTM 23 filas (nuevas BR-002, NFR-002, NFR-004; cobertura NFR-001/006 ampliada a UC-005/006). Las filas con ticket `delta-arch` abierto siguen `Blocked`; el resto `Designed`.
+- Correct/boundary: `conceptual-model.svg` re-renderizado (contiene `fileName`); FR-005/FR-014 y BR-001/005/006/007 documentadas como eliminadas con ID estable.
+
+Defectos Fagan abiertos RE v0.5.0: 0.
+
+Proceso pendiente (no defecto del contenido): firmas formales de PRD y SRS siguen abiertas; el avance fue por decisión explícita del usuario (2026-10-03 y 2026-10-16), registrado en `CHANGELOG-RE.md`. Aprobación humana requerida antes de continuar `ooad-architect` para los tickets `delta-arch`.
+
 | Role | Date | Signature |
 |------|------|-----------|
-| Analyst (agent) | 2026-10-03 | Fagan passed, 0 open defects |
+| Analyst (agent) | 2026-10-03 | Fagan passed v0.4.0 |
+| Analyst (agent) | 2026-10-16 | Fagan passed v0.5.0 (CCB BT-01/02/03/04/07/08/09/10), 0 open RE defects |
 | Stakeholder | | |
 | Tech Lead | | |

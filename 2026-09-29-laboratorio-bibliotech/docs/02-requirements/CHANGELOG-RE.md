@@ -1,5 +1,48 @@
 # CHANGELOG-RE — BiblioTech
 
+## v0.5.1 — 2026-10-16 (cierre CCB architect post-challenge)
+
+**Aprobados y baselinados** (`delta-arch → ooad-architect`), back-edge resuelto (aprobación de usuario 2026-10-16):
+
+- **BT-05** modelo de diseño completado: operaciones faltantes (`findByEmail`, `User/Material/FileBlob.create`, `SearchCatalogUseCase.getById`, `updateMaterial`, `changeUserRole`, `listUsers`), orden verify/load corregido, UseCase por agregado (`ManageMaterialUseCase` + `ManageUsersUseCase`, no God-controller), rollback E-001 con compensación, realización de ADR-0002 (Strategy `Rule` + guards), ADR-0004 auth (JWT/BCrypt), `file_name` en FileBlob/FileStorage (normalizado).
+- **BT-06** integridad arquitectónica: `ValidatorPort` en UseCases (Dependency Rule); crypto tras `PasswordHasher`/`TokenSigner` (Entities sin imports framework); FK de cascada corregida + **ADR-0005** (cascada/consistencia); índices `FULLTEXT`/`BTREE` + **ADR-0006**; claim 3NF calificado; C4 actors→UC; re-aprobación README (v0.5.1).
+- **BT-11** NFR-005: `FileInterceptor` (memoryStorage + `limits` + `fileFilter`) valida en el borde antes del UseCase; secuencia UC-002 actualizada.
+- **BT-09** (realización de diseño): revocación de tokens por `users.token_version` (`ver` en JWT) → **ADR-0004** (NFR-006, ventana 0).
+
+- Impacto: `docs/03-architecture/` (`class-diagram`, `data-model-er`, `sequence-diagram-UC-001..006`, `c4-context`, `c4-container`, README, ADR-0001..0006), `RTM.csv` (filas desbloqueadas: `Designed`), `Makefile` (lista PUML).
+- Verificación: `make docs` verde (todos los PUML → SVG); challenge fresco de arquitectura → `.scratch/challenge-architecture-2026-10-16.md` (re-ejecutado v0.5.1).
+
+## CCB Requests — 2026-10-16 (`delta-spec`, resueltos en v0.5.0)
+
+> Breakout tickets BT-01..BT-04 y BT-07..BT-10 en `.scratch/ccb-post-challenge/issues/`; aprobados y baselinados en v0.5.0 (abajo). BT-05/BT-06/BT-11 (`delta-arch`) resueltos en v0.5.1 (arriba).
+
+## v0.5.0 — 2026-10-16 (cierre CCB RE post-challenge)
+
+**Aprobados y baselinados** (`delta-spec → ooad-requirements`), tras `/ooad-challenge` (2026-10-16):
+
+- **BT-01** BR-002 restaurada en `SRS.md` §3.1 (Business Rules) + fila RTM `BR-002`; coherencia con UC-001/003/005/006.
+- **BT-02** `file_name` (v0.4.1) baselinado: `SRS.md` §5/§6, `crc-cards.md` (FileBlob/Validator), `conceptual-model.puml`(+svg), `CONTEXT.md`; reinspección Fagan v0.5.0.
+- **BT-03** filas RTM `NFR-002`/`NFR-004`; métricas medibles en NFR-004/005; cobertura `NFR-001`/`NFR-006` ampliada a UC-005/006; wording `raw-needs` NFR-001 ("autenticada").
+- **BT-04** Gherkin de ramas declaradas (409/E-001/415/404/500/503) + resultado vacío; trazas FR-006↔UC-005 y BR-003→UC-002 corregidas; unicidad de email en BR-003 (409); paso CRC corregido; procedencia FR-013 = OQ-04; texto SRS §1.2/§2.2 saneado; ADR reales en §3.2; FR-005/FR-014 y BR eliminadas documentadas.
+- **BT-07** auto-registro fuerza `Student` e ignora `requestedRole` provisto por el cliente; Gherkin de no-escalada.
+- **BT-08** 403 declarado para edición de material ajeno + escenario Gherkin `PATCH`.
+- **BT-09** invalidación de tokens por cambio de rol/borrado de cuenta (NFR-006); realización de diseño en `ooad-architect`.
+- **BT-10** sanitización de `file_name` (persistencia + `Content-Disposition`, basename sin CRLF); Gherkin.
+
+**Pendientes** (`delta-arch → ooad-architect`, sin aprobar): BT-05, BT-06, BT-11.
+
+- Impacto: `SRS.md`, `raw-needs.md`, `RTM.csv` (23 filas), `use-cases/UC-001..006`, `crc-cards.md`, `conceptual-model.puml/.svg`, `CONTEXT.md`, `validation.md`.
+- Verificación: Fagan v0.5.0, 0 defectos RE abiertos (`validation.md`).
+
+## CCB Requests cerrados — 2026-10-16 (`delta-arch`, resueltos en v0.5.1)
+
+> Breakout tickets BT-05/BT-06/BT-11 en `.scratch/ccb-post-challenge/issues/`. **Aprobados por el usuario y baselinados en `ooad-architect` (v0.5.1, arriba).**
+> BT-01..BT-04 y BT-07..BT-10 fueron aprobados y baselinados en v0.5.0.
+
+- **BT-05** **Resuelto** — modelo de diseño completado (operaciones faltantes; orden verify/load; UseCase por agregado; rollback/compensación E-001; realización ADR-0002; ADR-0004 auth; `file_name` normalizado) → impacto: `class-diagram.puml`, `sequence-diagram-UC-*.puml`, `adrs/0004`.
+- **BT-06** **Resuelto** — integridad: `ValidatorPort` en UseCases; crypto tras puertos; FK de cascada + `ADR-0005`; índices `FULLTEXT`/`BTREE` + `ADR-0006`; claim 3NF calificado; C4 actors→UC; re-aprobación README v0.5.1.
+- **BT-11** **Resuelto** — orden interceptor→validación fijado (NFR-005): `sequence-diagram-UC-002.puml` + `class-diagram.puml`.
+
 ## v0.4.1 — 2026-10-14 (file_name UX para descarga)
 
 - Nueva columna `file_blobs.file_name VARCHAR(255) NOT NULL`: persiste el nombre original del upload para `Content-Disposition: inline; filename="…"` (UC-006). Aditiva, sin renumerar: ningún FR/NFR cambia de sentido; la cascada 1:1 no se toca; RTM sin cambios.

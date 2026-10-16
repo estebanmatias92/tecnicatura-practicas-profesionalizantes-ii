@@ -31,6 +31,7 @@ class Material {
 class FileBlob {
   id : number
   storageKey : string
+  fileName : string
   mimeType : string
   sizeBytes : number
   contentHash : string <<informativo, no-unico>>
@@ -59,6 +60,8 @@ note right of FileBlob
   1:1 con Material, sin dueno propio,
   sin refCount, sin compartir.
   Nace y muere con su Material.
+  v0.4.1: fileName (normalizado,
+  v0.5.0) para Content-Disposition.
 end note
 
 note right of User
