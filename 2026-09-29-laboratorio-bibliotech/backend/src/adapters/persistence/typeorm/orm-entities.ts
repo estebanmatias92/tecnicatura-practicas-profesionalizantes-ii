@@ -49,8 +49,8 @@ export class FileBlobOrm {
 
 @Entity('materials')
 @Index('FULLTEXT_idx', ['title', 'author', 'subject'], { fulltext: true })
-@Index('BTREE_year', ['year'], { using: 'BTREE' })
-@Index('BTREE_created_at', ['createdAt'], { using: 'BTREE' })
+@Index('BTREE_year', ['year'])
+@Index('BTREE_created_at', ['createdAt'])
 export class MaterialOrm {
   @PrimaryGeneratedColumn()
   id!: number;

@@ -55,7 +55,7 @@ Ctrl -> MU : changeUserRole({callerRole, userId, role})
 MU -> Repo : UserRepository.findById(userId) [-> 404]
 Repo --> MU : user
 ' GRASP Information Expert — Mission: co-locate behavior with information
-MU -> Ent : user.role = role; user.tokenVersion += 1 [revoca tokens vigentes]
+MU -> Ent : user.updateRole(role); user.bumpVersion() [revoca tokens vigentes; ops declaradas en class-diagram.puml:22-23]
 MU -> Repo : save(user)
 Repo -> DB : UPDATE users SET role, token_version = token_version + 1
 Repo --> MU : user (ver nuevo)

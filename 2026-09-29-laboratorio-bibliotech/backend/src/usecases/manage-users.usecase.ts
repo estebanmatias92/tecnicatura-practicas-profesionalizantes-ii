@@ -18,8 +18,10 @@ export class ManageUsersUseCase {
     this.assertAdmin(input.callerRole);
     const target = await this.users.findById(input.userId);
     if (!target) throw new DomainError('NOT_FOUND', 'usuario inexistente');
-    const keys = await this.users.deleteCascade(input.userId);
+    // ADR-0005 / E-001: FS-primero (idempotente) antes de mutar DB.
+    const keys = await this.users.findCascadeKeys(input.userId);
     await Promise.all(keys.map((k) => this.storage.remove(k)));
+    await this.users.deleteCascade(input.userId);
   }
 
   async listUsers(callerRole: Role): Promise<Record<string, unknown>[]> {

@@ -44,10 +44,10 @@ describe('NFR-003 hash + expiracion de sesion', () => {
     expect(hours).toBeLessThanOrEqual(24);
     const jwt = new JwtService({ secret: 'test-only', signOptions: { expiresIn: `${hours}h` } });
     const signer = new JwtTokenSigner(jwt);
-    const token = signer.sign({ userId: 1, role: Role.Student });
+    const token = signer.sign({ userId: 1, role: Role.Student, ver: 0 });
     const decoded = jwt.decode(token) as { exp: number; iat: number };
     expect(decoded.exp - decoded.iat).toBeLessThanOrEqual(24 * 3600);
-    expect(signer.verify(token)).toEqual({ userId: 1, role: Role.Student });
+    expect(signer.verify(token)).toEqual({ userId: 1, role: Role.Student, ver: 0 });
   });
 });
 

@@ -87,14 +87,20 @@ export class TypeOrmUserRepository implements UserRepository {
     return toUser(row);
   }
 
+  async findCascadeKeys(userId: number): Promise<string[]> {
+    const mats = await this.repo.manager.find(MaterialOrm, { where: { ownerId: userId }, relations: { blob: true } });
+    return mats.map((m) => m.blob.storageKey);
+  }
+
   async deleteCascade(userId: number): Promise<string[]> {
     return this.db.transaction(async (tx) => {
       const mats = await tx.find(MaterialOrm, { where: { ownerId: userId }, relations: { blob: true } });
       const keys = mats.map((m) => m.blob.storageKey);
       const ids = mats.map((m) => m.id);
+      const blobIds = mats.map((m) => m.blobId);
       if (ids.length > 0) {
         await tx.delete(MaterialOrm, ids);
-        await tx.delete(FileBlobOrm, mats.map((m) => m.blobId));
+        await tx.delete(FileBlobOrm, blobIds);
       }
       await tx.delete(UserOrm, userId);
       return keys;

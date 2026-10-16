@@ -9,7 +9,7 @@ F-003,FR-007,UC-003;UC-006,Material,ADR-0001;ADR-0003,features/UC-003.feature,De
 F-009,FR-008,UC-006,FileBlob;Material,ADR-0001;ADR-0003;ADR-0005,features/UC-006.feature,Designed
 F-008,FR-009,UC-005,Material,ADR-0001;ADR-0002;ADR-0003;ADR-0006,features/UC-005.feature,Designed
 F-010,FR-010,UC-005,Material,ADR-0001;ADR-0002;ADR-0003;ADR-0006,features/UC-005.feature,Designed
-F-004,FR-011,UC-004,User,ADR-0001;ADR-0003;ADR-0004,features/UC-004.feature,Blocked:.scratch/bug-001/issues/01-fs-primero.md
+F-004,FR-011,UC-004,User,ADR-0001;ADR-0003;ADR-0004,features/UC-004.feature,Blocked(code-fix):.scratch/bug-001/issues/01-fs-primero.md
 F-004,FR-012,UC-004,Material;User,ADR-0001;ADR-0003;ADR-0005,features/UC-004.feature,Designed
 OQ-04,FR-013,UC-004,Material;FileBlob;User,ADR-0001;ADR-0003;ADR-0005,features/UC-004.feature,Designed
 F-005,RST-004,UC-001;UC-002;UC-003;UC-004;UC-005,UserRepository;MaterialRepository;FileBlobRepository,ADR-0001;ADR-0003,features/UC-002.feature,Designed

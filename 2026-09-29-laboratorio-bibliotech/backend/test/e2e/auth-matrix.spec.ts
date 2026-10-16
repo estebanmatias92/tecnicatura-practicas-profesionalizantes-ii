@@ -148,42 +148,42 @@ describe('UC-001 registro/login (FR-001/FR-002 + BR-003)', () => {
 describe('guards + mapper (FR-003 + BR-002 + NFR-006)', () => {
   it('acceso sin token a ruta protegida', () => {
     const { signer } = createWorld();
-    const guard = new JwtAuthGuard(signer, reflectorReturning(false));
+    const guard = new JwtAuthGuard(signer, reflectorReturning(false), ({ findById: jest.fn().mockResolvedValue({ id: 7, tokenVersion: 0, role: 'Student' }) }) as never);
     expect(httpStatusOf(() => void guard.canActivate(httpCtx({})))).toBe(401);
   });
 
   it('acceso con JWT expirado o manipulado', () => {
     const { signer } = createWorld();
-    const guard = new JwtAuthGuard(signer, reflectorReturning(false));
+    const guard = new JwtAuthGuard(signer, reflectorReturning(false), ({ findById: jest.fn().mockResolvedValue({ id: 7, tokenVersion: 0, role: "Student" }) }) as never);
     expect(httpStatusOf(() => void guard.canActivate(httpCtx({ authorization: 'Bearer roto' })))).toBe(401);
   });
 
   it('ruta publica pasa sin token (solo /auth/*)', () => {
     const { signer } = createWorld();
-    const guard = new JwtAuthGuard(signer, reflectorReturning(true));
+    const guard = new JwtAuthGuard(signer, reflectorReturning(true), ({ findById: jest.fn().mockResolvedValue({ id: 7, tokenVersion: 0, role: 'Student' }) }) as never);
     expect(guard.canActivate(httpCtx({}))).toBe(true);
   });
 
   it('JWT valido fija user para el resto de la cadena', () => {
     const { signer } = createWorld();
-    const guard = new JwtAuthGuard(signer, reflectorReturning(false));
+    const guard = new JwtAuthGuard(signer, reflectorReturning(false), ({ findById: jest.fn().mockResolvedValue({ id: 7, tokenVersion: 0, role: "Student" }) }) as never);
     const ctx = httpCtx({ authorization: 'Bearer jwt.7.Student' });
     expect(guard.canActivate(ctx)).toBe(true);
     const req = ctx.switchToHttp().getRequest() as { user?: unknown };
-    expect(req.user).toEqual({ userId: 7, role: Role.Student });
+    expect(req.user).toEqual({ userId: 7, role: Role.Student, ver: 0 });
   });
 
   it('acceso con rol insuficiente a subida', () => {
     const guard = new RolesGuard(reflectorReturning([Role.Professor, Role.Admin]));
     const ctx = httpCtx({ authorization: 'Bearer jwt.7.Student' });
-    (ctx.switchToHttp().getRequest() as { user?: unknown }).user = { userId: 7, role: Role.Student };
+    (ctx.switchToHttp().getRequest() as { user?: unknown }).user = { userId: 7, role: Role.Student, ver: 0 };
     expect(httpStatusOf(() => void guard.canActivate(ctx))).toBe(403);
   });
 
   it('rol suficiente pasa (Professor sube)', () => {
     const guard = new RolesGuard(reflectorReturning([Role.Professor, Role.Admin]));
     const ctx = httpCtx({ authorization: 'Bearer jwt.3.Professor' });
-    (ctx.switchToHttp().getRequest() as { user?: unknown }).user = { userId: 3, role: Role.Professor };
+    (ctx.switchToHttp().getRequest() as { user?: unknown }).user = { userId: 3, role: Role.Professor, ver: 0 };
     expect(guard.canActivate(ctx)).toBe(true);
   });
 

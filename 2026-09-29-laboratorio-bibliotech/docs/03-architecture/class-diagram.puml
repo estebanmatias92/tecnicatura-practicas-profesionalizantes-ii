@@ -3,10 +3,10 @@ skinparam classAttributeIconSize 0
 skinparam linetype ortho
 skinparam packageStyle rectangle
 
-title Class Diagram — BiblioTech (Clean 4 Layers, v0.5.1)
+title Class Diagram — BiblioTech (MVC Reenskaug, v0.6.0)
 
-' ===================== Entities (Clean core, cero imports framework) =====================
-package "Entities (Enterprise Business Rules — Dependency Rule: nada externo)" {
+' ===================== Model (MVC Model — reglas de empresa puras, cero imports framework) =====================
+package "Model (MVC Model — cero imports framework)" {
   enum Role {
     Admin
     Professor
@@ -21,6 +21,8 @@ package "Entities (Enterprise Business Rules — Dependency Rule: nada externo)"
     + tokenVersion: number
     + create(data): User
     + toPublic(): {id,email,role}
+    + updateRole(role): void
+    + bumpVersion(): void
   }
 
   class Material {
@@ -61,8 +63,8 @@ package "Entities (Enterprise Business Rules — Dependency Rule: nada externo)"
   }
 }
 
-' ===================== Use Cases (Application Business Rules = Controller de eventos) =====================
-package "Use Cases (Application Rules — un punto de entrada por evento de sistema)" {
+' ===================== Controllers (MVC Controller — punto de entrada por evento) =====================
+package "Controllers (MVC — un punto de entrada por evento de sistema)" {
   class RegisterUserUseCase {
     + execute(input): AuthResult
   }
@@ -93,8 +95,8 @@ package "Use Cases (Application Rules — un punto de entrada por evento de sist
   }
 }
 
-' ===================== Ports (owned by Use Cases; Dependency Inversion) =====================
-package "Ports (interfaces en la capa Use Cases — Indirection/DIP)" {
+' ===================== Ports (interfaces en la capa Controllers / Model — Indirection/DIP) =====================
+package "Ports (interfaces en Controllers / Model — Indirection/DIP)" {
   interface UserRepository {
     + findByEmail(email): User
     + findById(id): User
@@ -258,8 +260,9 @@ note bottom of AppModule
   son detalle reemplazable.
 end note
 note bottom of UserRepository
-  [Indirection] UseCases y adapters dependen de
-  interfaces, no entre si. Dependency Rule:
-  Frameworks -> Adapters -> UseCases -> Entities.
+  [Indirection] Controllers y adapters dependen de
+  interfaces; no entre sí. Dependency Rule MVC:
+  Controllers -> Model; Views -> Controllers; Model
+  independiente de Controllers y View.
 end note
 @enduml

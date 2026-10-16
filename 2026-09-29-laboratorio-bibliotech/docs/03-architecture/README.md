@@ -1,10 +1,10 @@
-# Architecture — BiblioTech (v0.5.1, aprobado 2026-10-16)
+# Architecture — BiblioTech (v0.6.0, MVC — aprobado 2026-10-16)
 
-Estilo: **Clean 4 Layers** ([ADR-0001](adrs/0001-clean-4-layer-architecture.md)). Reglas vía Strategy ([ADR-0002](adrs/0002-strategy-for-rules.md)). Persistencia TypeORM + storage local tras puertos ([ADR-0003](adrs/0003-orm-vs-sql.md)). Auth JWT/BCrypt con revocación por `token_version` ([ADR-0004](adrs/0004-auth-jwt-revocation.md)). Cascada dura y consistencia DB/FS ([ADR-0005](adrs/0005-cascade-consistency.md)). Índices para UC-005 ([ADR-0006](adrs/0006-search-indexing.md)).
+Estilo: **MVC (Reenskaug)** ([ADR-0001](adrs/0001-clean-4-layer-architecture.md) — reemplaza Clean 4 Layers). Reglas vía Strategy ([ADR-0002](adrs/0002-strategy-for-rules.md)). Persistencia TypeORM + storage local tras puertos ([ADR-0003](adrs/0003-orm-vs-sql.md)). Auth JWT/BCrypt con revocación por `token_version` ([ADR-0004](adrs/0004-auth-jwt-revocation.md)). Cascada dura y consistencia DB/FS ([ADR-0005](adrs/0005-cascade-consistency.md)). Índices para UC-005 ([ADR-0006](adrs/0006-search-indexing.md)).
 
 > Rev. v0.5.1 (2026-10-16): back-edge del CCB post-challenge — resuelve **BT-05** (modelo de diseño), **BT-06** (integridad arquitectónica) y **BT-11** (orden Multer/NFR-005). Reconcilia el diseño con el baseline RE v0.5.0 y registra los **follow-ups** (código y RE) que aún deben converger; **no** afirma que el código ya iguale el diseño.
 
-## C4
+## C4 (sin cambios — actores/sistemas iguales)
 
 ![C4 Context](c4-context.svg)
 ![C4 Container](c4-container.svg)
@@ -23,24 +23,28 @@ Estilo: **Clean 4 Layers** ([ADR-0001](adrs/0001-clean-4-layer-architecture.md))
 - UC-005 búsqueda: `sequence-diagram-UC-005.puml` — Strategy de filtros + FULLTEXT/BTREE (ADR-0006), paginación normalizada.
 - UC-006 descarga: `sequence-diagram-UC-006.puml` — 401-primero (BR-002), stream + `fileName` normalizado (NFR-005).
 
-## Capas (responsabilidad en 3 líneas por capa)
+## Capas — MVC (Reenskaug): Model / View / Controller
 
-- **Entities** (User, Material, FileBlob, AuthSession): reglas de empresa puras, cero imports framework. Saben sus datos y su creación/ownership (Information Expert + Creator); `AuthSession` es un Value Object transitorio, sin crypto.
-- **Use Cases** (7 `*UseCase`, ports propios): un punto de entrada por evento de sistema (Controller/Command), agrupado por agregado (Material vs Users). Orquestan validación, persistencia y cascada; sin SQL ni HTTP. Expresan sus dependencias como **puertos** (`ValidatorPort`, `PasswordHasher`, `TokenSigner`, `FileStorage`, `*Repository`).
-- **Interface Adapters** (controllers, guards, repos TypeORM, Multer storage, `BiblioValidator`): traducen HTTP/DB/FS a los puertos estables (Adapter + Indirection + Pure Fabrication). Toda la variación predicha (reglas, filtros, filename) vive tras Strategy.
-- **Frameworks & Drivers** (módulos Nest, `AppModule`, config, `BcryptHasher`, `JwtTokenSigner`, migraciones, SPA React): cableado DI/Factory, JWT/BCrypt configurados (NFR-003/0004). Detalle reemplazable sin tocar el core.
+- **Model** (`User`, `Material`, `FileBlob`, `AuthSession`, repositorios `*Repository`, `FileStorage`, `PasswordHasher`, `TokenSigner`, `ValidatorPort`): datos + reglas de empresa puras; cero imports framework (`@nestjs/*`). Sabe sus datos y su creación/ownership (Information Expert + Creator). `AuthSession` es Value Object transitorio, sin crypto. Es independiente de Controllers y View.
+- **Controller** (`AuthController`, `MaterialsController`, `UsersController`, `JwtAuthGuard`, `RolesGuard`, `DomainErrorMapper`): punto de entrada por evento de sistema (MVC Controller), agrupado por agregado (`MaterialsController` para material, `UsersController` para cuenta/rol). Recibe eventos desde la View, orquesta interacción con el Model, y devuelve respuesta. Depende del Model; no tiene reglas de dominio propias más allá de la coordinación.
+- **View** (`React SPA`, componentes de lectura/búsqueda/subida, interfaces de usuario): presenta datos y captura eventos; no contiene reglas de negocio ni acceso directo al Model. Solo interactúa con Controllers (HTTP/REST). Reemplaza la capa de presentación separada sin romper la separación FE/BE.
+- **Adapters / Ports** (`BiblioValidator`, `TypeOrm*Repository`, `DiskFileStorage`, `BcryptHasher`, `JwtTokenSigner`, `AppModule`): traducen entre Controllers/Model y detalles externos (DB, FS, HTTP, validación). El Model y los Controllers dependen de interfaces (`ValidatorPort`, repositorios, etc.), no de implementaciones concretas.
 
-## Dependency Rule
+## Dependency Rule (cambio respecto a Clean 4 Layers)
 
-Imports solo hacia adentro (`Frameworks → Adapters → UseCases → Entities`). Los UseCases dependen de **puertos** (interfaces), no de adapters. Gate: 0 imports `@nestjs/*`/typeorm en `entities/` + `usecases/` (review o `dependency-cruiser`).
+- **Controllers dependen del Model** (llaman a repositorios, entidades y servicios internos como `PasswordHasher`, `TokenSigner`, `FileStorage`).
+- **Views interactúan con Controllers** (HTTP/REST o eventos); no acceden al Model directamente.
+- **No hay regla de dependencia "solo hacia adentro"** como en Clean 4 Layers: los Controllers son el punto de conexión explícito entre la capa de presentación (View) y el dominio (Model). El Model sigue sin depender de Controllers ni de Views.
+- **Adapters** implementan los puertos que usa el Model; el Model no conoce los detalles de DB/FS/HTTP.
+- Gate (actualizado): 0 imports `@nestjs/*` en `entities/` (Model puro); Controllers importan los puertos y servicios del Model; Views no importan el Model.
 
 ## Resolución del back-edge CCB (v0.5.1)
 
 | Ticket | Fix arquitectónico |
 |--------|--------------------|
-| **BT-05** modelo de diseño | `findByEmail`/`create`/`update`/`getById` modelados; orden verify/load corregido; UseCase por agregado (no God-controller); E-001 con **orden FS-primero** (ADR-0005); realización de Strategy/guards; `file_name` en FileBlob/FileStorage; ADR-0004 auth. |
-| **BT-06** integridad | `ValidatorPort` en UseCases (no adapter→core); crypto tras `PasswordHasher`/`TokenSigner` (Entities sin framework); FK de cascada corregida + ADR-0005; índices FULLTEXT/BTREE + ADR-0006; claim 3NF calificado; C4 actors→UC; re-aprobación. |
-| **BT-11** NFR-005 | `FileInterceptor` (memory + `limits` + `fileFilter`) valida en el borde antes del UseCase; secuencia UC-002 lo fija. |
+| **BT-05** modelo de diseño | `findByEmail`/`create`/`update`/`getById` modelados en `User` (`updateRole`, `bumpVersion`); orden verify/load corregido; Controller por agregado (no God-controller); E-001 con **orden FS-primero** (ADR-0005); `file_name` en FileBlob/FileStorage; ADR-0004 auth. MVC reemplaza Use Cases por Controllers. |
+| **BT-06** integridad | `ValidatorPort` usado por Controllers (no adapter→core); crypto tras `PasswordHasher`/`TokenSigner` (Model sin framework); FK de cascada corregida + ADR-0005; índices FULLTEXT/BTREE + ADR-0006; claim 3NF calificado; C4 actors→UC; MVC aprobado (ADR-0001); `crc-cards.md` actualizado; `class-diagram.puml` con `User.updateRole`/`bumpVersion`. |
+| **BT-11** NFR-005 | `FileInterceptor` (memory + `limits` + `fileFilter`) valida en el borde antes del Controller (`MaterialsController`); MVC mantiene separación Controller→Model. |
 
 ## Follow-ups abiertos (NO parte del gate architect; trazados para build/RE)
 

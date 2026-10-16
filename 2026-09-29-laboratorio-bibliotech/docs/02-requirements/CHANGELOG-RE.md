@@ -36,7 +36,7 @@
 
 ## CCB Request — 2026-10-16 (`delta-arch`, pendiente de aprobación por `ooad-architect`)
 
-- **BUG-001** (`.scratch/bug-001/issues/01-fs-primero.md`): `deleteUser` (UC-004 E-001) borra DB antes que FS; `ADR-0005` requiere FS-primero idempotente. **Impacto**: `docs/03-architecture/README.md` (B-3 pendiente), `docs/02-requirements/RTM.csv` (`FR-011` → `Blocked`). No code work-around introducido (`manage-users.usecase.ts` mantiene orden actual). **Clasificación confirmada**: `delta-arch` (ADR-0005) + `delta-spec` (UC-004 E-001). **Aprobación/rechazo pendiente** (`ooad-architect`). Ticket `.scratch/bug-001/issues/01-fs-primero.md` presentado 2026-10-16.
+- **BUG-001** (`.scratch/bug-001/issues/01-fs-primero.md`): `deleteUser` (UC-004 E-001) borra DB antes que FS; `ADR-0005` confirma FS-primero (`§Decision`), `UC-004` E-001 confirma rollback con "nada eliminado". **Reclasificado 2026-10-16 a `code-fix`** (`ooad-architect` verificado: diseño no cambia). **Impacto**: `backend/src/adapters/persistence/typeorm/typeorm-repositories.ts:89-100` (`deleteCascade` debe hacer `find` + `remove` primero + `tx.delete` después). `docs/02-requirements/RTM.csv` (`FR-011` pasa de `Blocked` a `Designed` cuando el fix se implemente). No work-around. **Estado**: pendiente `ooad-build`.
 
 ## v0.5.0 — 2026-10-16 (cierre CCB RE post-challenge)
 

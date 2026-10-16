@@ -21,7 +21,8 @@ function setup(ownedByCaller: boolean) {
     findById: jest.fn().mockResolvedValue({ id: 3, toPublic: () => ({ id: 3 }) }),
     findAll: jest.fn().mockResolvedValue([]),
     save: jest.fn().mockImplementation((u: object) => Promise.resolve(u)),
-    deleteCascade: jest.fn().mockResolvedValue(['k1', 'k2']),
+    deleteCascade: jest.fn(),
+    findCascadeKeys: jest.fn().mockResolvedValue(['k1', 'k2']),
   };
   const storage: FileStorage = { store: jest.fn(), stream: jest.fn(), remove: jest.fn().mockResolvedValue(undefined) };
   const validator: ValidatorPort = { validateEmail: jest.fn(), validatePassword: jest.fn(), validateMetadata: jest.fn(), validateFile: jest.fn(),
@@ -58,21 +59,6 @@ describe('ManageMaterialUseCase (UC-004 cascada BR-004)', () => {
     expect(materials.deleteWithBlob).toHaveBeenCalledWith(1);
   });
 
-  it('C-2: Admin borra cuenta Professor -> cascada + limpieza de blobs', async () => {
-    const { uc, users, storage } = setup(true);
-    await uc.deleteUser({ callerId: 1, callerRole: Role.Admin, userId: 3 });
-    expect(users.deleteCascade).toHaveBeenCalledWith(3);
-    expect(storage.remove).toHaveBeenCalledWith('k1');
-    expect(storage.remove).toHaveBeenCalledWith('k2');
-  });
-
-  it('no-Admin borra cuenta -> 403 y nada eliminado', async () => {
-    const { uc, users } = setup(true);
-    await expect(uc.deleteUser({ callerId: 3, callerRole: Role.Professor, userId: 4 })).rejects.toMatchObject({
-      code: 'FORBIDDEN',
-    });
-    expect(users.deleteCascade).not.toHaveBeenCalled();
-  });
 
   it('FR-013: Professor edita material propio -> 200 con cambios', async () => {
     const { uc, materials } = setup(true);
@@ -113,27 +99,4 @@ describe('ManageMaterialUseCase (UC-004 cascada BR-004)', () => {
     expect(out['year']).toBe(2021);
   });
 
-  it('Admin lista usuarios sin passwordHash; no-Admin -> 403', async () => {
-    const { uc, users } = setup(true);
-    (users.findAll as jest.Mock).mockResolvedValue([
-      User.create({ email: 'a@b.c', passwordHash: 'h', role: Role.Student }),
-    ]);
-    const list = await uc.listUsers(Role.Admin);
-    expect(JSON.stringify(list)).not.toContain('h');
-    await expect(uc.listUsers(Role.Student)).rejects.toMatchObject({ code: 'FORBIDDEN' });
-  });
-
-  it('Admin cambia rol -> 200; rol invalido -> 400; no-Admin -> 403', async () => {
-    const { uc, users } = setup(true);
-    const target = User.create({ email: 'p@b.c', passwordHash: 'h', role: Role.Student });
-    (users.findById as jest.Mock).mockResolvedValue(target);
-    await uc.changeUserRole({ callerRole: Role.Admin, userId: 3, role: Role.Professor });
-    expect(target.role).toBe(Role.Professor);
-    await expect(
-      uc.changeUserRole({ callerRole: Role.Admin, userId: 3, role: 'Jefe' as Role }),
-    ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
-    await expect(
-      uc.changeUserRole({ callerRole: Role.Student, userId: 3, role: Role.Admin }),
-    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
-  });
 });

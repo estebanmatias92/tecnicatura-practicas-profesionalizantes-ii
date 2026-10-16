@@ -44,6 +44,19 @@ export class FakeUsers implements UserRepository {
     this.rows.set(user.id, user);
     return user;
   }
+  async findCascadeKeys(userId: number): Promise<string[]> {
+    const keys: string[] = [];
+    if (this.materials && this.blobs) {
+      for (const m of [...this.materials.rows.values()]) {
+        if (m.ownerId === userId) {
+          const b = m.blobId !== undefined ? await this.blobs.findById(m.blobId) : null;
+          if (b) keys.push(b.storageKey);
+        }
+      }
+    }
+    return keys;
+  }
+
   /** C-2: borra cuenta + sus materials + blobs; retorna storageKeys a limpiar. */
   async deleteCascade(userId: number): Promise<string[]> {
     const keys: string[] = [];
@@ -174,7 +187,7 @@ export class FakeSigner implements TokenSigner {
     if (parts[0] !== 'jwt' || !Number.isInteger(userId) || (role !== Role.Admin && role !== Role.Professor && role !== Role.Student)) {
       throw new Error('FakeSigner.verify: token invalido o expirado');
     }
-    return { userId, role };
+    return { userId, role, ver: 0 };
   }
 }
 

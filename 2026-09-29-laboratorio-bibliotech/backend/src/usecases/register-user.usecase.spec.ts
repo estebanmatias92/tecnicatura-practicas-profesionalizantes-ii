@@ -21,6 +21,7 @@ function setup(existing: { email: string } | null = null) {
     findAll: jest.fn(),
     save: jest.fn().mockImplementation((u: unknown) => Promise.resolve({ ...(u as object), id: 1 })),
     deleteCascade: jest.fn(),
+    findCascadeKeys: jest.fn(),
   };
   const hasher: PasswordHasher = {
     hash: jest.fn().mockResolvedValue('hashed-cost10'),

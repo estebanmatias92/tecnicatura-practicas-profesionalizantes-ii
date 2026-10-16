@@ -18,6 +18,7 @@ function setup(user: { passwordHash: string } | null, compareResult: boolean) {
     findAll: jest.fn(),
     save: jest.fn(),
     deleteCascade: jest.fn(),
+    findCascadeKeys: jest.fn(),
   };
   const hasher: PasswordHasher = {
     hash: jest.fn(),

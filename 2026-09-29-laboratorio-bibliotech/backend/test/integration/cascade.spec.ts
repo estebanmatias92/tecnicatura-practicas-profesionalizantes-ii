@@ -3,6 +3,7 @@
 // Fakes transaccionales en memoria. Variante DB-backed (TypeOrm + MariaDB 11)
 // pendiente como todos explícitos (GAP-002) — misma matriz contra el driver real.
 import { ManageMaterialUseCase } from '../../src/usecases/manage-material.usecase';
+import { ManageUsersUseCase } from '../../src/usecases/manage-users.usecase';
 import { User } from '../../src/entities/user.entity';
 import { Role } from '../../src/entities/role';
 import { createWorld, type World } from '../helpers/fakes';
@@ -24,7 +25,7 @@ async function seedProfessorWithMaterials(w: World, email: string, n: number) {
 
 function setupCascade() {
   const w = createWorld();
-  return { w, manage: new ManageMaterialUseCase(w.users, w.materials, w.storage, w.validator) };
+  return { w, manage: new ManageMaterialUseCase(w.users, w.materials, w.storage, w.validator), manageUsers: new ManageUsersUseCase(w.users, w.storage) };
 }
 
 describe('UC-004 cascada en memoria (BR-004 C-1/C-2/C-3)', () => {
@@ -62,9 +63,9 @@ describe('UC-004 cascada en memoria (BR-004 C-1/C-2/C-3)', () => {
   });
 
   it('C-2: borrado de cuenta Professor con 2 materiales arrastra todo', async () => {
-    const { w, manage } = setupCascade();
+    const { w, manageUsers } = setupCascade();
     const { user } = await seedProfessorWithMaterials(w, 'p@biblio.tech', 2);
-    await manage.deleteUser({ callerId: 1, callerRole: Role.Admin, userId: user.id as number });
+    await manageUsers.deleteUser({ callerRole: Role.Admin, userId: user.id as number });
     expect(await w.users.findById(user.id as number)).toBeNull();
     expect((await w.materials.search({}, 1, 10)).total).toBe(0);
     expect(w.blobs.rows.size).toBe(0);
@@ -72,10 +73,10 @@ describe('UC-004 cascada en memoria (BR-004 C-1/C-2/C-3)', () => {
   });
 
   it('C-2: borrado de cuenta Professor sin material', async () => {
-    const { w, manage } = setupCascade();
+    const { w, manageUsers } = setupCascade();
     const user = await w.users.save(User.create({ email: 'solo@biblio.tech', passwordHash: 'h', role: Role.Professor }));
     await expect(
-      manage.deleteUser({ callerId: 1, callerRole: Role.Admin, userId: user.id as number }),
+      manageUsers.deleteUser({ callerRole: Role.Admin, userId: user.id as number }),
     ).resolves.toBeUndefined();
     expect(await w.users.findById(user.id as number)).toBeNull();
   });
@@ -92,13 +93,14 @@ describe('UC-004 cascada en memoria (BR-004 C-1/C-2/C-3)', () => {
   });
 
   it('E-001 usuario: fallo al limpiar FS propaga el error (gap: la DB ya muto — sin rollback, ver BUG-001)', async () => {
-    const { w, manage } = setupCascade();
+    const { w, manageUsers } = setupCascade();
     const { user } = await seedProfessorWithMaterials(w, 'p@biblio.tech', 1);
     w.storage.failOnRemove = true;
     await expect(
-      manage.deleteUser({ callerId: 1, callerRole: Role.Admin, userId: user.id as number }),
+      manageUsers.deleteUser({ callerRole: Role.Admin, userId: user.id as number }),
     ).rejects.toThrow(/EIO/);
-    expect(await w.users.findById(user.id as number)).toBeNull();
+    // FS-primero (ADR-0005): si storage.remove lanza, deleteCascade no se ejecuta; DB intacta.
+    expect(await w.users.findById(user.id as number)).not.toBeNull();
   });
 });
 

@@ -2,7 +2,7 @@
 !theme plain
 skinparam linetype ortho
 
-title ER — BiblioTech (MariaDB 11, RST-003) — relación normalizada salvo `tags` JSON (tradeoff, ADR-0005)
+title ER — BiblioTech (MariaDB 11, RST-003) — relación normalizada salvo `tags` JSON (tradeoff, ADR-0003)
 
 entity "users" as users {
   * id : INT PK <<auto>>

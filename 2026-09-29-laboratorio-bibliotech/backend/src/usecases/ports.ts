@@ -52,6 +52,8 @@ export interface UserRepository {
   findById(id: number): Promise<User | null>;
   findAll(): Promise<User[]>;
   save(user: User): Promise<User>;
+  /** Encuentra los storageKeys de los materiales del usuario (C-2, FS-primero, ADR-0005). */
+  findCascadeKeys(userId: number): Promise<string[]>;
   /** Borra cuenta + materials + blobs; retorna storageKeys a limpiar en FS (C-2). */
   deleteCascade(userId: number): Promise<string[]>;
 }
