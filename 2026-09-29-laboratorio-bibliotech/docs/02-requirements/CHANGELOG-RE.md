@@ -34,6 +34,10 @@
 
 > Breakout tickets BT-01..BT-04 y BT-07..BT-10 en `.scratch/ccb-post-challenge/issues/`; aprobados y baselinados en v0.5.0 (abajo). BT-05/BT-06/BT-11 (`delta-arch`) resueltos en v0.5.1 (arriba).
 
+## CCB Request — 2026-10-16 (`delta-arch`, pendiente de aprobación por `ooad-architect`)
+
+- **BUG-001** (`.scratch/bug-001/issues/01-fs-primero.md`): `deleteUser` (UC-004 E-001) borra DB antes que FS; `ADR-0005` requiere FS-primero idempotente. **Impacto**: `docs/03-architecture/README.md` (B-3 pendiente), `docs/02-requirements/RTM.csv` (`FR-011` → `Blocked`). No code work-around introducido (`manage-users.usecase.ts` mantiene orden actual). **Clasificación confirmada**: `delta-arch` (ADR-0005) + `delta-spec` (UC-004 E-001). **Aprobación/rechazo pendiente** (`ooad-architect`). Ticket `.scratch/bug-001/issues/01-fs-primero.md` presentado 2026-10-16.
+
 ## v0.5.0 — 2026-10-16 (cierre CCB RE post-challenge)
 
 **Aprobados y baselinados** (`delta-spec → ooad-requirements`), tras `/ooad-challenge` (2026-10-16):
