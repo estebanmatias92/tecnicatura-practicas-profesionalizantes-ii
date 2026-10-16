@@ -44,9 +44,9 @@ class AuthSession {
   expiresAt : datetime
 }
 
-User "1" -- "*" Material : uploads (ownerId) <<ON DELETE CASCADE>>
-Material "1" -- "1" FileBlob : stores (blobId) <<ON DELETE CASCADE>>
-User "1" -- "*" AuthSession : holds
+User "1" -- "*" Material : uploads (ownerId) <<cascade delete, DB FK (ADR-0005)>>
+Material "1" -- "1" FileBlob : stores (blobId) <<cascade delete, app transaction (ADR-0005)>>
+User "1" -- "*" AuthSession : holds <<transient VO, no persistido>>
 
 note right of Material
   RST-005: PDF/EPUB <= 50MB

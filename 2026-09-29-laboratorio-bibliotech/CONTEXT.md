@@ -15,7 +15,7 @@
 | Validator | Módulo central de reglas (email, password, …) vía `class-validator` | Validador | Sesión, Usuario | BR-003 | FR-001/FR-002, UC-001 |
 | Repository | Patrón de acceso a datos (TypeORM); sin SQL en controladores | DAO | MariaDB | RST-004 | FR-004/FR-006, todas UC |
 | Upload | Ingesta Multer (`FileInterceptor`) con filtro MIME + límite; cada POST crea Material + FileBlob 1:1 nuevos, duplicados → 201 | Carga, Subida | Material, FileBlob | NFR-005, RST-005, BR-004 | FR-004, UC-002 |
-| Catálogo | Vista consultable/paginable del material (todo logueado ve todo; exige JWT). Filtros: q (título+autor+subject) + author/subject/year/rango/edition/tag, AND; envelope items/total/page/limit (defaults 1/10, máx 50) | Listado | Material | BR-002 | FR-006/FR-009/FR-010, UC-003/UC-005 |
+| Catálogo | Vista consultable/paginable del material (todo logueado ve todo; exige JWT). Filtros: q (token/prefijo sobre título+autor+subject, FULLTEXT, ADR-0006) + author/subject/year/rango/edition/tag, AND; envelope items/total/page/limit (defaults 1/10, máx 50) | Listado | Material | BR-002 | FR-006/FR-009/FR-010, UC-003/UC-005 |
 
 ## Discarded Terms
 

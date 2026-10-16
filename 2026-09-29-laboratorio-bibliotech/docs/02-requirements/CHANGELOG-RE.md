@@ -1,6 +1,18 @@
 # CHANGELOG-RE — BiblioTech
 
-## v0.5.1 — 2026-10-16 (cierre CCB architect post-challenge)
+## v0.5.2 — 2026-10-16 (cierre CCB RE post-arch, back-edge `ooad-requirements`)
+
+**Aprobados y baselinados** (`delta-spec → ooad-requirements`), tras `/ooad-challenge` phase `requirements` (2026-10-16) y aprobación de usuario (2026-10-16):
+
+- **BT-12** `q` de `UC-005` redefinido como **token/prefijo case-insensitive** (`FULLTEXT MATCH ... AGAINST('término*' IN BOOLEAN MODE)`, ADR-0006) — se descarta el substring infijo (`LIKE '%q%'`), que ningún BTREE/FULLTEXT puede servir y que dejaba NFR-001 sin respaldo. **Impacto**: `use-cases/UC-005-search.md` (Query Semantics v0.5.2 + 2 Gherkin de token/prefijo), `raw-needs.md` (FR-009), `SRS.md` (FR-009), `RTM.csv` (`FR-009`, `NFR-001` → `Designed`), `CONTEXT.md` (Catálogo). Gated code-fix B-5 (`FULLTEXT`/`BTREE`) desbloqueado.
+- **R-2** `conceptual-model.puml` alineado a ADR-0005/ADR-0004: los estereotipos de cascada dejan de ser `<<ON DELETE CASCADE>>` (SQL) → `<<cascade delete, DB FK (ADR-0005)>>` (User→Material) y `<<cascade delete, app transaction (ADR-0005)>>` (Material→FileBlob); `AuthSession` ya no es `holds` persistente → `<<transient VO, no persistido>>`. SVG re-renderizado.
+- **R-3** `crc-cards.md` `AuthSession`: sus responsabilidades delegan crypto a `PasswordHasher`/`TokenSigner` (ADR-0004, Indirection + Adapter), ya no verifica BCrypt/emite JWT directamente.
+- **R-4** `UC-003`/`UC-005`/`UC-006` "Sequence Diagram … pendiente" corregidos: los diagramas existen en `docs/03-architecture/`; las secciones ahora los citan con su contenido real.
+
+- Impacto: `docs/02-requirements/` (`UC-003`, `UC-005`, `UC-006`, `raw-needs.md`, `SRS.md`, `RTM.csv`, `conceptual-model.puml/.svg`, `crc-cards.md`, `validation.md`, `CONTEXT.md`), `docs/03-architecture/README.md` (R-1..R-4 marcados resueltos).
+- Verificación: `make docs` verde; Fagan v0.5.2 (`validation.md`); challenge fresco de RE → `.scratch/challenge-requirements-2026-10-16b.md`.
+
+## CCB Request — 2026-10-16 (`delta-spec`, pendiente de aprobación)
 
 **Aprobados y baselinados** (`delta-arch → ooad-architect`), back-edge resuelto (aprobación de usuario 2026-10-16):
 
@@ -11,6 +23,12 @@
 
 - Impacto: `docs/03-architecture/` (`class-diagram`, `data-model-er`, `sequence-diagram-UC-001..006`, `c4-context`, `c4-container`, README, ADR-0001..0006), `RTM.csv` (filas desbloqueadas: `Designed`), `Makefile` (lista PUML).
 - Verificación: `make docs` verde (todos los PUML → SVG); challenge fresco de arquitectura → `.scratch/challenge-architecture-2026-10-16.md` (re-ejecutado v0.5.1).
+
+## CCB Request — 2026-10-16 (`delta-spec`, resuelto en v0.5.2)
+
+> `/ooad-challenge` phase `build` (`.scratch/challenge-build-2026-10-16.md`).
+
+- **BT-12** `q` de `UC-005:20` (substring **infijo**, `LIKE '%q%'`) contradice `ADR-0006:14` (token/prefijo `FULLTEXT`); el build (`typeorm-repositories.ts:133-134`) cumple UC-005 pero dejaba NFR-001 sin índices. **Request**: redefinir `q` en UC-005 como token/prefijo (o aceptar el scan como caso degradado y recalificar la nota de índices). **Impacto**: `use-cases/UC-005-search.md`, `RTM.csv` (`FR-009`, `NFR-001` → `Blocked`); gated code-fix B-5 (`FULLTEXT`/`BTREE`). **Aprobación/rechazo**: **aprobado por usuario (2026-10-16)** — opción token/prefijo (alinear RE a ADR-0006). **Nueva baseline**: v0.5.2.
 
 ## CCB Requests — 2026-10-16 (`delta-spec`, resueltos en v0.5.0)
 

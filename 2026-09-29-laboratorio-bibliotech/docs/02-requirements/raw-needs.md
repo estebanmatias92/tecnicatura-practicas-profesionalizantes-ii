@@ -13,7 +13,7 @@
 | FR-006 | El sistema expone catálogo consultable (exige JWT) | PRD F-003 |
 | FR-007 | Lectura de material: exige JWT; todos los roles ven todo | PRD F-003 enmendado |
 | FR-008 | Descarga del archivo original (exige JWT; 401 antes que 404; inline con filename; MIME pdf/epub; sin cap global v1 → streaming + rate-limit, ADR en architect) | PRD F-009 (Should), v0.3.0 |
-| FR-009 | Búsqueda/filtrado de catálogo (q general + author/subject/year/rango/edition/tag; AND entre params; envelope items/total/page/limit, defaults page=1 limit=10 max=50) | PRD F-008 (Should), v0.3.0 |
+| FR-009 | Búsqueda/filtrado de catálogo (q general **token/prefijo case-insensitive** sobre título+autor+subject, FULLTEXT; + author/subject/year/rango/edition/tag; AND entre params; envelope items/total/page/limit, defaults page=1 limit=10 max=50) | PRD F-008 (Should), v0.5.2 (BT-12) |
 | FR-010 | Paginación de catálogo | PRD F-010 (Could) |
 | FR-011 | Admin gestiona usuarios (alta/baja/cambio de rol) | PRD F-004, OQ-04 |
 | FR-012 | Admin edita/elimina cualquier material | PRD F-004, OQ-04 |

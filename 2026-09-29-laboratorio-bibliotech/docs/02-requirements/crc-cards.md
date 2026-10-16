@@ -50,15 +50,15 @@
 
 - **Role stereotype**: Service provider
 - **Source**: UC-001 (FR-002)
-- **Responsibilities — doing**: verifica BCrypt; emite y valida JWT
+- **Responsibilities — doing**: delega verificación BCrypt a PasswordHasher; delega emisión/validación JWT a TokenSigner
 - **Responsibilities — knowing**: conoce token, userId, expiración
 - **Collaborators**: User, UserRepository
 - **GRASP (architect)**: Controller/Indirection → pendiente
 
 ### Walkthrough
 
-- UC-001 paso 3 → compara hash (login) / hashea (registro) → User.passwordHash
-- UC-001 paso 4 → firma JWT ≤24h → caller
+- UC-001 paso 3 → PasswordHasher.compare/hash → User.passwordHash (ADR-0004)
+- UC-001 paso 4 → TokenSigner.sign ≤24h → caller
 
 ## UserRepository (Interfacer)
 

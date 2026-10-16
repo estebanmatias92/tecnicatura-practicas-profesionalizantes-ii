@@ -15,13 +15,13 @@
 2. Sistema verifica token (sin token → 401) y aplica filtros + paginación.
 3. Sistema responde 200 con envelope `{items, total, page, limit}`.
 
-## Query Semantics (v0.3.0)
+## Query Semantics (v0.5.2, reconcilia ADR-0006)
 
-- `q`: texto general sobre título+autor+subject; parcial, case-insensitive; `q` vacío/ausente = sin filtro de texto (no 400).
+- `q`: texto general sobre título+autor+subject; **token/prefijo**, case-insensitive (FULLTEXT `MATCH(...) AGAINST('término*' IN BOOLEAN MODE)`); `q` vacío/ausente = sin filtro de texto (no 400). No es substring infijo: `LIKE '%q%'` no es indexable (ADR-0006, NFR-001).
 - Filtros de campo: `author`/`subject` parcial case-insensitive; `year` exacto; `yearFrom`/`yearTo` rango inclusivo (`yearFrom > yearTo` → 400); `edition` exacto case-insensitive; `tag` repetible (`?tag=a&tag=b` = contiene ambas).
 - Combinación: AND entre params distintos. `similar_resources` no es campo almacenado: se deriva con estos filtros (mismo autor/subject).
 - Paginación: defaults `page=1`, `limit=10`, `maxLimit=50`; `page < 1`, `limit < 1` o `limit > 50` → 400. Orden v1: más reciente primero; sin `sort` custom.
-- Nota architect: índices en (title, author, subject, year, tags); NFR-001 p95 <200ms aplica.
+- Nota architect: `FULLTEXT INDEX (title, author, subject)` para `q` (token/prefijo) + `BTREE(year)` + `BTREE(created_at)` para orden v1 (ADR-0006); `tags` vía `JSON_CONTAINS` (scan best-effort, ADR-0006); NFR-001 p95 <200ms aplica a `q` token/prefijo y orden.
 
 ## Alternative Flows
 
@@ -69,6 +69,16 @@ Feature: UC-005 Buscar catálogo
     When GET /material?q=
     Then 200 con envelope y total consistente
 
+  Scenario: q es token/prefijo (no substring infijo)
+    Given materiales "Redes de computadoras" y "Sistemas" y JWT válido
+    When GET /material?q=ed
+    Then 200 con items vacío (ningún token empieza por "ed"; "Redes" no coincide por substring interno)
+
+  Scenario: q coincide como prefijo token
+    Given material "Redes de computadoras" y JWT válido
+    When GET /material?q=red
+    Then 200 con "Redes de computadoras" (token "red" coincide)
+
   Scenario: búsqueda sin coincidencias
     Given materiales existentes y JWT válido
     When GET /material?q=zzz-inexistente
@@ -92,9 +102,10 @@ Feature: UC-005 Buscar catálogo
 
 ## Sequence Diagram
 
-See `../../03-architecture/sequence-diagram-UC-005.puml` (pendiente en `ooad-architect` — solo existen UC-001/002/004).
+See `../../03-architecture/sequence-diagram-UC-005.puml` (Strategy de filtros + FULLTEXT/BTREE, ADR-0006; paginación normalizada).
 
 ## Notes / Open
 
 - Prioridad: FR-009 Should, FR-010 Could (paginación Could dentro de UC Should).
 - v0.3.0: `category` fuera (solapa con `subject`); `similar_resources` derivado, no almacenado.
+- v0.5.2 (BT-12): `q` redefinido como **token/prefijo** (no substring infijo) para indexar FULLTEXT; NFR-001 respaldada; coherente con ADR-0006.

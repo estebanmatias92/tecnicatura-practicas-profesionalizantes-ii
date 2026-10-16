@@ -64,7 +64,7 @@ Feature: UC-003 Leer material
 
 ## Sequence Diagram
 
-See `../../03-architecture/sequence-diagram-UC-003.puml` (pendiente en `ooad-architect` — solo existen UC-001/002/004).
+See `../../03-architecture/sequence-diagram-UC-003.puml` (lectura delgada: 404 por id, todo rol ve todo, token_version bump NFR-006).
 
 ## Notes / Open
 

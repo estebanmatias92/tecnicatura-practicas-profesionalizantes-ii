@@ -56,10 +56,10 @@ Tras `/ooad-challenge` (fresh-context, v0.5.1) quedan divergencias que el diseñ
 | B-5 | Índices `FULLTEXT(title,author,subject)` + `BTREE(year)` + `BTREE(created_at)` (ADR-0006) | migraciones/ORM |
 | B-6 | UC-006 storage caído → 503 (`DomainErrorCode.SERVICE_UNAVAILABLE`, BUG-002) | `download-file.usecase.ts` |
 
-**RE (`ooad-requirements`, delta-spec)** — contradicen el diseño aprobado:
-| # | Delta | Evidencia |
-|---|-------|-----------|
-| R-1 | `q` de UC-005 declarado "parcial infijo"; FULLTEXT sirve token/prefijo → redefinir `q` (ADR-0006) | `UC-005-search.md:20` |
-| R-2 | `conceptual-model.puml` aún marca cascada `<<ON DELETE CASCADE>>` y `AuthSession holds` (diseño: NO ACTION / VO transitorio) | `conceptual-model.puml:48-49` |
-| R-3 | `crc-cards.md` describe `AuthSession` como "verifica BCrypt; emite/valida JWT" (diseño: crypto tras puertos) | `crc-cards.md:49-56` |
-| R-4 | UC-003/005/006 "Sequence Diagram … pendiente" ya existen | `UC-003:57`, `UC-005:95`, `UC-006:101` |
+**RE (`ooad-requirements`, delta-spec)** — contradicen el diseño aprobado. **Resueltos en RE v0.5.2 (2026-10-16)**:
+| # | Delta | Evidencia | Cierre |
+|---|-------|-----------|--------|
+| R-1 | `q` de UC-005 declarado "parcial infijo"; FULLTEXT sirve token/prefijo → redefinir `q` (ADR-0006) | `UC-005-search.md:20` | **Resuelto** — `q` redefinido token/prefijo (UC-005 Query Semantics v0.5.2); RTM `FR-009`/`NFR-001` → `Designed`; B-5 desbloqueado. |
+| R-2 | `conceptual-model.puml` aún marca cascada `<<ON DELETE CASCADE>>` y `AuthSession holds` (diseño: NO ACTION / VO transitorio) | `conceptual-model.puml:47-49` | **Resuelto** — estereotipos de cascada (DB FK vs app transaction, ADR-0005) + `AuthSession` VO transitorio (ADR-0004); SVG re-renderizado. |
+| R-3 | `crc-cards.md` describe `AuthSession` como "verifica BCrypt; emite/valida JWT" (diseño: crypto tras puertos) | `crc-cards.md:49-56` | **Resuelto** — delega a `PasswordHasher`/`TokenSigner` (ADR-0004). |
+| R-4 | UC-003/005/006 "Sequence Diagram … pendiente" ya existen | `UC-003:67`, `UC-005:105`, `UC-006:101` | **Resuelto** — secciones actualizadas con el contenido real de cada diagrama. |

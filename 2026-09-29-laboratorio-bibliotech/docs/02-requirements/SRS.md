@@ -45,7 +45,7 @@ Auth JWT+BCrypt (UC-001), subida Professor (UC-002), lectura autenticada (UC-003
 | FR-006 | Catálogo consultable (exige JWT) | F-003 / UC-003 | Must | FR-003 |
 | FR-007 | Lectura exige JWT; todos los roles ven todo | F-003 / UC-003 | Must | FR-003 |
 | FR-008 | Descarga del original (exige JWT; 401 primero; inline; sin cap global v1) | F-009 / UC-006 | Should | FR-007 |
-| FR-009 | Búsqueda/filtrado (q + campos, AND, envelope paginado) | F-008 / UC-005 | Should | FR-006 |
+| FR-009 | Búsqueda/filtrado de catálogo (q **token/prefijo** vía FULLTEXT + campos, AND, envelope paginado) | F-008 / UC-005 | Should | FR-006 |
 | FR-010 | Paginación de catálogo | F-010 / UC-005 | Could | FR-006 |
 | FR-011 | Admin CRUD usuarios (borrar Professor borra en cascada sus materials + blobs) | F-004 / UC-004 | Must | FR-003 |
 | FR-012 | Admin CRUD cualquier material (borrar material borra su blob) | F-004 / UC-004 | Must | FR-003 |
@@ -105,4 +105,4 @@ Clean 4 Layers, dependencia hacia adentro; Repository (TypeORM) como única sali
 | Stakeholder | | |
 | Tech Lead | | |
 
-> Validado en `validation.md` (Fagan). Baseline `v0.5.0` en `CHANGELOG-RE.md`.
+> Validado en `validation.md` (Fagan). Baseline `v0.5.2` en `CHANGELOG-RE.md`.

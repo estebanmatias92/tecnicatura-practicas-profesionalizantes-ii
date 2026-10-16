@@ -57,9 +57,27 @@ Defectos Fagan abiertos RE v0.5.0: 0.
 
 Proceso pendiente (no defecto del contenido): firmas formales de PRD y SRS siguen abiertas; el avance fue por decisión explícita del usuario (2026-10-03 y 2026-10-16), registrado en `CHANGELOG-RE.md`. Aprobación humana requerida antes de continuar `ooad-architect` para los tickets `delta-arch`.
 
+## Re-inspección v0.5.2 (cierre CCB RE post-arch, 2026-10-16)
+
+Alcance: CCB `BT-12` (`delta-spec → ooad-requirements`, aprobado usuario 2026-10-16) + los follow-ups `R-1..R-4` del diseño aprobado (`docs/03-architecture/README.md`).
+
+- **BT-12**: `q` de UC-005 redefinido como **token/prefijo case-insensitive** (`FULLTEXT MATCH ... AGAINST('término*' IN BOOLEAN MODE)`, ADR-0006); se descarta el substring infijo `LIKE '%q%'` (no indexable, dejaba NFR-001 sin respaldo). UC-005 Query Semantics v0.5.2 + 2 Gherkin de token/prefijo (prefijo coincide; substring interno no coincide). `raw-needs` FR-009, `SRS` FR-009 y `CONTEXT` Catálogo actualizados. RTM `FR-009`/`NFR-001` → `Designed`.
+- **R-2**: `conceptual-model.puml` estereotipos de cascada → `<<cascade delete, DB FK (ADR-0005)>>` y `<<cascade delete, app transaction (ADR-0005)>>`; `AuthSession` → `<<transient VO, no persistido>>` (ADR-0004). SVG re-renderizado (`make docs` verde).
+- **R-3**: `crc-cards.md` `AuthSession` delega crypto a `PasswordHasher`/`TokenSigner` (ADR-0004).
+- **R-4**: UC-003/005/006 "Sequence Diagram … pendiente" corregidos (los diagramas existen y se citan con su contenido).
+- Complete: cada delta tiene Gherkin/observación verificable; UC-005 conserva todos los escenarios previos (sin coincidencias, tags AND, rango, límite).
+- Consistent: `q` token/prefijo en UC-005, FR-009, `raw-needs`, `SRS`, `CONTEXT`, ADR-0006 y B-5 (índices FULLTEXT/BTREE); cascada en conceptual-model y ADR-0005 dicen lo mismo (DB FK para user→material, transacción de app para material→blob).
+- Unambiguous: FULLTEXT ≠ infijo; la diferencia queda documentada en UC-005 y ADR-0006.
+- Verifiable: 2 escenarios Gherkin nuevos de `q` (prefijo sí / substring interno no).
+- Traceable: RTM 23 filas (0 `Blocked`); cada FR/NFR toca su UC y ADR.
+- Correct/boundary: `conceptual-model.svg` re-renderizado; `make docs` verde.
+
+Defectos Fagan abiertos RE v0.5.2: 0.
+
 | Role | Date | Signature |
 |------|------|-----------|
 | Analyst (agent) | 2026-10-03 | Fagan passed v0.4.0 |
 | Analyst (agent) | 2026-10-16 | Fagan passed v0.5.0 (CCB BT-01/02/03/04/07/08/09/10), 0 open RE defects |
+| Analyst (agent) | 2026-10-16 | Fagan passed v0.5.2 (CCB BT-12 + R-1..R-4), 0 open RE defects |
 | Stakeholder | | |
 | Tech Lead | | |
