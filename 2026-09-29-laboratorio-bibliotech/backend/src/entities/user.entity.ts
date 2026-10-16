@@ -7,6 +7,7 @@ export interface NewUser {
   email: string;
   passwordHash: string;
   role: Role;
+  tokenVersion?: number;
 }
 
 export class User {
@@ -14,11 +15,13 @@ export class User {
   email: string;
   passwordHash: string;
   role: Role;
+  tokenVersion: number;
 
-  private constructor(data: NewUser) {
+  private constructor(data: NewUser & { tokenVersion?: number }) {
     this.email = data.email.trim().toLowerCase();
     this.passwordHash = data.passwordHash;
     this.role = data.role;
+    this.tokenVersion = data.tokenVersion ?? 0;
   }
 
   static create(data: NewUser): User {
@@ -26,6 +29,10 @@ export class User {
     if (!data.passwordHash) throw new Error('User.create: passwordHash requerido (nunca en claro)');
     if (!isRole(data.role)) throw new Error(`User.create: rol invalido (${String(data.role)})`);
     return new User(data);
+  }
+
+  bumpVersion(): void {
+    this.tokenVersion += 1;
   }
 
   toPublic(): { id?: number; email: string; role: Role } {

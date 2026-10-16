@@ -39,7 +39,7 @@ export class RegisterUserUseCase {
         ? input.requestedRole
         : Role.Student;
     const saved = await this.users.save(User.create({ email, passwordHash: await this.hasher.hash(input.password), role }));
-    const token = this.signer.sign({ userId: saved.id as number, role: saved.role });
+    const token = this.signer.sign({ userId: saved.id as number, role: saved.role, ver: saved.tokenVersion });
     return { token, userId: saved.id as number, role: saved.role };
   }
 }

@@ -84,6 +84,7 @@ export interface PasswordHasher {
 export interface TokenPayload {
   userId: number;
   role: Role;
+  ver: number;
 }
 
 export interface TokenSigner {

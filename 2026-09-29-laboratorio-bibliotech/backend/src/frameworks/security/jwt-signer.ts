@@ -8,11 +8,11 @@ export class JwtTokenSigner implements TokenSigner {
   constructor(private readonly jwt: JwtService) {}
 
   sign(payload: TokenPayload): string {
-    return this.jwt.sign({ sub: payload.userId, role: payload.role });
+    return this.jwt.sign({ sub: payload.userId, role: payload.role, ver: payload.ver });
   }
 
   verify(token: string): TokenPayload {
-    const decoded = this.jwt.verify<{ sub: number; role: TokenPayload['role'] }>(token);
-    return { userId: decoded.sub, role: decoded.role };
+    const decoded = this.jwt.verify<{ sub: number; role: TokenPayload['role']; ver?: number }>(token);
+    return { userId: decoded.sub, role: decoded.role, ver: decoded.ver ?? 0 };
   }
 }

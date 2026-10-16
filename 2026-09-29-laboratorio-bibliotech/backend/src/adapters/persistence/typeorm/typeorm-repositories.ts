@@ -20,8 +20,9 @@ import type {
 } from '../../../usecases/ports';
 
 function toUser(row: UserOrm): User {
-  const u = User.create({ email: row.email, passwordHash: row.passwordHash, role: row.role as Role });
+  const u = User.create({ email: row.email, passwordHash: row.passwordHash, role: row.role as Role, tokenVersion: row.tokenVersion });
   u.id = row.id;
+  u.tokenVersion = row.tokenVersion;
   return u;
 }
 
@@ -81,6 +82,7 @@ export class TypeOrmUserRepository implements UserRepository {
       email: user.email,
       passwordHash: user.passwordHash,
       role: user.role,
+      tokenVersion: user.tokenVersion,
     });
     return toUser(row);
   }

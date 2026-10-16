@@ -72,6 +72,7 @@ export class ManageMaterialUseCase {
     const target = await this.users.findById(input.userId);
     if (!target) throw new DomainError('NOT_FOUND', 'usuario inexistente');
     target.role = input.role;
+    target.bumpVersion();
     return (await this.users.save(target)).toPublic();
   }
 }

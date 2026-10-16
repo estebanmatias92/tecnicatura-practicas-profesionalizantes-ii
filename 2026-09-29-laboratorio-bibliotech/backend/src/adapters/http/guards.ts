@@ -5,6 +5,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Forbi
 import { Reflector } from '@nestjs/core';
 import type { TokenSigner } from '../../usecases/ports';
 import { Role } from '../../entities/role';
+import { TypeOrmUserRepository } from '../persistence/typeorm/typeorm-repositories';
 
 export const ROLES_KEY = 'bibliotech_roles';
 export const RequireRoles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
@@ -23,9 +24,10 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly signer: TokenSigner,
     private readonly reflector: Reflector,
+    private readonly users: TypeOrmUserRepository,
   ) {}
 
-  canActivate(ctx: ExecutionContext): boolean {
+  async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [ctx.getHandler(), ctx.getClass()]);
     if (isPublic) return true;
     const req = ctx.switchToHttp().getRequest<AuthenticatedRequest>();
@@ -33,9 +35,14 @@ export class JwtAuthGuard implements CanActivate {
     const token = Array.isArray(header) ? header[0] : header?.replace(/^Bearer\s+/i, '');
     if (!token) throw new UnauthorizedException('falta Authorization Bearer (BR-002)');
     try {
-      req.user = this.signer.verify(token);
+      const payload = this.signer.verify(token);
+      const user = await this.users.findById(payload.userId);
+      if (!user) throw new UnauthorizedException('usuario no encontrado');
+      if (user.tokenVersion !== payload.ver) throw new UnauthorizedException('token revocado (token_version desactualizado)');
+      req.user = { userId: payload.userId, role: payload.role };
       return true;
-    } catch {
+    } catch (e) {
+      if (e instanceof UnauthorizedException) throw e;
       throw new UnauthorizedException('JWT invalido o expirado');
     }
   }

@@ -114,8 +114,8 @@ import { JwtAuthGuard, RolesGuard } from '../../adapters/http/guards';
     },
     {
       provide: APP_GUARD,
-      useFactory: (s: JwtTokenSigner, r: Reflector) => new JwtAuthGuard(s, r),
-      inject: ['TokenSignerPort', Reflector],
+      useFactory: (s: JwtTokenSigner, r: Reflector, u: TypeOrmUserRepository) => new JwtAuthGuard(s, r, u),
+      inject: ['TokenSignerPort', Reflector, TypeOrmUserRepository],
     },
     {
       provide: APP_GUARD,

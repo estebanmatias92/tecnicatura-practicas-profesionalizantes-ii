@@ -19,7 +19,7 @@ export class LoginUseCase {
     if (!(await this.hasher.compare(input.password, user.passwordHash))) {
       throw new DomainError('UNAUTHORIZED', 'credencial incorrecta');
     }
-    const token = this.signer.sign({ userId: user.id as number, role: user.role });
+    const token = this.signer.sign({ userId: user.id as number, role: user.role, ver: user.tokenVersion });
     return { token, userId: user.id as number, role: user.role };
   }
 }

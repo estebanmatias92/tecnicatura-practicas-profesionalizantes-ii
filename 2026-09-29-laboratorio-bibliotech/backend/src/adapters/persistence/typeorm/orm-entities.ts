@@ -16,6 +16,9 @@ export class UserOrm {
   @Column({ type: 'enum', enum: ['Admin', 'Professor', 'Student'] })
   role!: string;
 
+  @Column({ name: 'token_version', type: 'int', default: 0 })
+  tokenVersion!: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 }
