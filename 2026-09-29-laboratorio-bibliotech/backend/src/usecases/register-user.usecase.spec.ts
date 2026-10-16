@@ -11,6 +11,7 @@ const fakeValidator: ValidatorPort = {
   validatePassword: jest.fn(),
   validateMetadata: jest.fn(),
   validateFile: jest.fn(),
+    normalizeFileName: jest.fn(),
 };
 
 function setup(existing: { email: string } | null = null) {

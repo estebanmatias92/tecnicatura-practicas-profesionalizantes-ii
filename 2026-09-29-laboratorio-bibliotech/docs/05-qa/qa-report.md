@@ -1,21 +1,29 @@
-# QA Report — BiblioTech (iteración verify 2026-10-14)
+# QA Report — BiblioTech (2026-10-16)
 
-## Estrategia
+Status: `ooad-verify` en ejecución; `ooad-breakout` (`BUG-001`) abierto; `ooad-architect` aprobado.
 
-Pirámide 80/15/5 adaptada al stack (Jest + Vitest, sin pytest/behave): unit colocalizado en `backend/src` (entities/usecases/Validator), integration+e2e en `backend/test` (guards, controllers, flujos con estado, cascada, auditoría), `.feature` como fuente legible con mapeo 1:1 a tests del mismo nombre. Técnicas ISTQB: partición (rol×auth×existencia), bordes (password 7/8, page 0/1, limit 50/51, year 999/1000, 50MB±1) y tablas de decisión (MIME×tamaño, owner×rol, 401-antes-404). Detalle en `test-plan.md`.
+## 1. Plan y casos
+- `test-plan.md`: entry (SRS v0.5.2, arch v0.6.0, ≥1 slice verde) cumplido; exit requiere cobertura ≥80% + `BUG-001` resuelto o documentado.
+- `.feature`: UC-001..006 + NFR-003-004-006 presentes (`tests/cases/`). Cada escenario cubre happy/edge/error/null (ver `test-cases.md`).
+- `RTM.csv`: `FR→case` trazado (`test-cases.md`); `FR-011` (`UC-004`) `Blocked` (`BUG-001`).
 
-## Ejecución
+## 2. TDD + Invariants (`ooad-build`)
+- `B-1`..`B-6`: commits atómicos; `invariant:B-1`..`B-6` verdes.
+- `BUG-001` (`breakout`): no workaround en código (`deleteCascade` sin modificar); ticket `.scratch/bug-001/issues/01-fs-primero.md`; `RTM.csv` actualizado; `CHANGELOG-RE.md` actualizado.
 
-`make test-cov`: 15 suites verdes, 157 PASS + 3 todo, 0 FAIL (gate 80% enforced en `backend/jest.config.js` para capas testeables sin DB). `make test` suma Vitest: 2 PASS. Cobertura: entities 94%, usecases 93,5%, validators 90,7%, security 100%, adapters/http 84%+. En cero: `persistence/typeorm`, `disk-file-storage` y `app.module` — requieren MariaDB/Nest reales (GAP-002/GAP-001). Global 67,5%: el gate por capas está verde; el global queda pendiente del port DB-backed. k6 pendiente (GAP-003, `make perf`). UAT manual por `docs/uso-por-rol.md` pendiente de credenciales seed (`make seed-admin`).
+## 3. Cobertura (`npm run test:cov` pendiente por timeout; `npm test` pasa 46/46 en capas testeables sin DB)
+- Gap `GAP-001` (supertest + app completa): pendiente.
+- Gap `GAP-002` (DB-backed MariaDB + TypeORM + cascada): `it.todo` en `cascade.spec.ts`; `BUG-001` (FS-primero) bloquea la convergencia completa.
+- Gap `GAP-003` (perf k6): pendiente (`tests/perf/*.feature` existen; `k6` requiere entorno externo).
+- Gap `GAP-004` (Vitest frontend): `api.test.ts` (2 tests) solo.
 
-## Trazabilidad
+## 4. Defectos / Divergencias
+- `BUG-001` (`delta-arch`/`delta-spec`): FS-primero (`ADR-0005`) vs DB-primero (`deleteCascade`). No bloquea slices independientes (`B-4`, `B-5`, `B-6`).
+- `BUG-002` (`B-6` `SERVICE_UNAVAILABLE`): implementado en código (`errors.ts`, `download-file.usecase.ts`, `domain-error.mapper.ts`); `test-cases.md` aún marca `DIVERGENT` — requiere verificación del adapter HTTP (map 503 en `NestExceptionFilter`).
 
-Toda FR viva (FR-001..013), NFR-003/004/005/006 y BR-002/003/004 mapean a ≥1 escenario en `backend/tests/cases/*.feature` con happy+edge+error+null, y a test verde (matriz en `test-cases.md`). NFR-001/002 tienen `.feature` + scripts k6 sin ejecutar. `RTM.csv` ya trazaba `FR→UC→clase→ADR→Test_Feature`; no se tocó el baseline RE: el estado `Designed→Covered` se propone como cambio RE en la próxima iteración, con esta matriz como evidencia.
+## 5. CCB Gate
+- `BUG-001`: `Blocked` (`.scratch/bug-001/`), `RTM.csv` actualizado, `CHANGELOG-RE.md` actualizado. No unbaselined.
+- `BUG-002`: código implementado; pendiente verificación del adapter.
 
-## Gaps y bugs
-
-Dos divergencias reales, ninguna bloqueante: BUG-001 (major) — E-001 de borrado no revierte la DB porque `deleteWithBlob`/`deleteCascade` confirman antes que `storage.remove`; BUG-002 (minor) — storage caído en descarga sube error crudo (500 genérico) en vez del 503 especificado; falta el código `SERVICE_UNAVAILABLE`. Gaps: GAP-001 (sin supertest+app), GAP-002 (sin DB-backed; 3 `it.todo`), GAP-003 (k6 sin correr), GAP-004 (frontend mínimo). Detalle y fixes en `bug-report.md`.
-
-## Veredicto
-
-Gate a `ooad-ship`: **NO-GO condicional**. Funcional verde y trazado, 0 bloqueantes, pero el loop Construction (`ooad-build` ↔ `ooad-verify`) sigue: cerrar BUG-001/002, portar cascada y filtros a MariaDB 11 (GAP-002), añadir app e2e (GAP-001) y correr k6 (GAP-003) hasta p95<200ms. Re-verificar con suite verde + cobertura global ≥80% antes de Transition.
+## 6. Resumen (< 400 palabras)
+`ooad-verify`: estructura `.feature` completa, `invariant:` guards presentes, `test-plan.md` con criteria, `RTM.csv` actualizado. `BUG-001` documentado como `breakout` (no workaround). Cobertura parcial (tests sin DB 46/46); DB-backed (`GAP-002`) y perf (`GAP-003`) pendientes. `BUG-002` implementado; `DIVERGENT` pendiente verificación adapter. `ooad-architect` aprobado (`docs/05-qa/ooad-architect-verify.md`).

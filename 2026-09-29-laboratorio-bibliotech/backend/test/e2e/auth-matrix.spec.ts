@@ -11,7 +11,7 @@ import { toHttp } from '../../src/adapters/http/domain-error.mapper';
 import { DomainError } from '../../src/usecases/errors';
 import { RegisterUserUseCase } from '../../src/usecases/register-user.usecase';
 import { LoginUseCase } from '../../src/usecases/login.usecase';
-import { ManageMaterialUseCase } from '../../src/usecases/manage-material.usecase';
+import { ManageUsersUseCase } from '../../src/usecases/manage-users.usecase';
 import { Role } from '../../src/entities/role';
 import { User } from '../../src/entities/user.entity';
 import { createWorld } from '../helpers/fakes';
@@ -42,7 +42,7 @@ function setupAuth() {
   const w = createWorld();
   const register = new RegisterUserUseCase(w.users, w.hasher, w.signer, w.validator);
   const login = new LoginUseCase(w.users, w.hasher, w.signer, w.validator);
-  const manage = new ManageMaterialUseCase(w.users, w.materials, w.storage, w.validator);
+  const manage = new ManageUsersUseCase(w.users, w.storage);
   return { w, register, login, manage };
 }
 

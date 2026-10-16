@@ -24,7 +24,8 @@ function setup(ownedByCaller: boolean) {
     deleteCascade: jest.fn().mockResolvedValue(['k1', 'k2']),
   };
   const storage: FileStorage = { store: jest.fn(), stream: jest.fn(), remove: jest.fn().mockResolvedValue(undefined) };
-  const validator: ValidatorPort = { validateEmail: jest.fn(), validatePassword: jest.fn(), validateMetadata: jest.fn(), validateFile: jest.fn() };
+  const validator: ValidatorPort = { validateEmail: jest.fn(), validatePassword: jest.fn(), validateMetadata: jest.fn(), validateFile: jest.fn(),
+    normalizeFileName: jest.fn() };
   return { uc: new ManageMaterialUseCase(users, materials, storage, validator), users, materials, storage, validator };
 }
 

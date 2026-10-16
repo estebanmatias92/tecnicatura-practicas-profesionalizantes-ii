@@ -8,6 +8,7 @@ const validator: ValidatorPort = {
   validatePassword: jest.fn(),
   validateMetadata: jest.fn(),
   validateFile: jest.fn(),
+    normalizeFileName: jest.fn(),
 };
 
 function setup(user: { passwordHash: string } | null, compareResult: boolean) {

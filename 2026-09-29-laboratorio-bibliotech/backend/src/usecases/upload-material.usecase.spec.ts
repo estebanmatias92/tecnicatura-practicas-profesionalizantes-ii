@@ -16,6 +16,7 @@ function setup() {
     validatePassword: jest.fn(),
     validateMetadata: jest.fn(),
     validateFile: jest.fn(),
+    normalizeFileName: jest.fn(),
   };
   const storage: FileStorage = {
     store: jest.fn().mockResolvedValue('stored-key-1'),

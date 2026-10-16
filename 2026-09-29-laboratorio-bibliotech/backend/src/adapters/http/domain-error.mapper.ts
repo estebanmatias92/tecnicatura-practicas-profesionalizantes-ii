@@ -12,6 +12,7 @@ const STATUS: Record<DomainError['code'], number> = {
   PAYLOAD_TOO_LARGE: 413,
   UNSUPPORTED_MEDIA: 415,
   INTERNAL: 500,
+  SERVICE_UNAVAILABLE: 503,
 };
 
 export function toHttp(e: unknown): never {
