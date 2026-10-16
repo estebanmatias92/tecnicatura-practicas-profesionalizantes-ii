@@ -77,7 +77,7 @@ export class MaterialOrm {
   @Column({ name: 'blob_id', unique: true })
   blobId!: number;
 
-  @ManyToOne(() => FileBlobOrm, { onDelete: 'CASCADE' })
+  @ManyToOne(() => FileBlobOrm, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'blob_id' })
   blob!: FileBlobOrm;
 
