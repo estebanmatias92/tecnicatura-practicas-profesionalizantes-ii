@@ -99,4 +99,5 @@ export interface ValidatorPort {
   validatePassword(password: string): void;
   validateMetadata(meta: MaterialMeta | Patch): void;
   validateFile(mime: string, sizeBytes: number): void;
+  normalizeFileName(name: string): string;
 }

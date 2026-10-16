@@ -92,4 +92,10 @@ export class BiblioValidator implements ValidatorPort {
   validateFile(mime: string, sizeBytes: number): void {
     new FileRule(mime, sizeBytes).check();
   }
+  normalizeFileName(name: string): string {
+    // Basename, sin CRLF (NFR-005, BT-10).
+    const base = name.replace(/\r\n|\r|\n/g, '').trim();
+    const parts = base.split(/[\\/]/);
+    return parts[parts.length - 1] || base;
+  }
 }

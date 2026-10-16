@@ -30,10 +30,12 @@ export class FileBlob {
 
   static create(data: NewFileBlob): FileBlob {
     if (!data.storageKey) throw new Error('FileBlob.create: storageKey requerido');
-    if (!data.fileName || data.fileName.trim().length === 0) {
+    const fileName = (data.fileName ?? '').replace(/\r\n|\r|\n/g, '').trim();
+    if (fileName.length === 0) {
       throw new Error('FileBlob.create: fileName requerido (nombre del recurso para el usuario)');
     }
+    const basename = fileName.split(/[\\/]/).pop() || fileName;
     if (data.sizeBytes <= 0) throw new Error('FileBlob.create: sizeBytes debe ser > 0');
-    return new FileBlob(data);
+    return new FileBlob({ ...data, fileName: basename });
   }
 }
