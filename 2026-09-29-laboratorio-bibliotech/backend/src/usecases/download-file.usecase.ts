@@ -23,6 +23,10 @@ export class DownloadFileUseCase {
     if (!material || material.blobId === undefined) throw new DomainError('NOT_FOUND', 'material inexistente');
     const blob = await this.blobs.findById(material.blobId);
     if (!blob) throw new DomainError('INTERNAL', 'binario huerfano (inconsistencia)');
-    return { stream: this.storage.stream(blob.storageKey), mime: blob.mime, fileName: blob.fileName };
+    try {
+      return { stream: this.storage.stream(blob.storageKey), mime: blob.mime, fileName: blob.fileName };
+    } catch {
+      throw new DomainError('SERVICE_UNAVAILABLE', 'storage caido (BUG-002)');
+    }
   }
 }

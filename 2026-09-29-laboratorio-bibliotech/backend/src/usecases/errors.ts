@@ -8,7 +8,8 @@ export type DomainErrorCode =
   | 'CONFLICT'
   | 'PAYLOAD_TOO_LARGE'
   | 'UNSUPPORTED_MEDIA'
-  | 'INTERNAL';
+  | 'INTERNAL'
+  | 'SERVICE_UNAVAILABLE';
 
 export class DomainError extends Error {
   constructor(
