@@ -35,7 +35,7 @@ services:
       JWT_EXPIRES_H: "24"
       UPLOAD_DIR: /app/uploads
     ports:
-      - "${API_PORT:-3000}:3000"
+      - "${PORT:-3000}:3000"
     volumes:
       - bibliotech-uploads:/app/uploads
 
