@@ -1,0 +1,52 @@
+services:
+  db:
+    ports:
+      - "${DB_PORT_HOST:-3306}:3306"
+
+  backend:
+    build:
+      context: ./backend
+      target: development
+    command: >
+      sh -c "npm run migration:run &&
+             npm run seed:dev &&
+             npm run start:dev"
+    environment:
+      NODE_ENV: development
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/test:/app/test
+      - uploads:/app/uploads
+    healthcheck:
+      start_period: 90s
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    command: npm run dev -- --host 0.0.0.0
+    environment:
+      VITE_PROXY_TARGET: http://backend:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -qO- http://127.0.0.1:5173/ >/dev/null || exit 1"]
+
+  adminer:
+    image: adminer:5
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "8081:8080"

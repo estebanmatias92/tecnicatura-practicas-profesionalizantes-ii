@@ -1,0 +1,28 @@
+@startuml
+title Secuencia — Login y sesión JWT
+
+actor Usuario
+participant "View (React)" as View
+participant "AuthController" as Ctrl
+participant "AuthService" as Auth
+participant "UserRepository" as Repo
+database "MariaDB" as DB
+
+Usuario -> View : email + contraseña
+View -> Ctrl : POST /api/auth/login
+Ctrl -> Auth : login(email, password)
+Auth -> Repo : findByEmail(email)
+Repo -> DB : SELECT user
+DB --> Repo : user
+Repo --> Auth : User
+Auth -> Auth : BCrypt.compare(password, hash)
+alt credenciales inválidas
+  Auth --> Ctrl : UnauthorizedError
+  Ctrl --> View : 401
+else credenciales válidas
+  Auth -> Auth : sign({sub, role, ver})
+  Auth --> Ctrl : {accessToken, user}
+  Ctrl --> View : 200
+  View -> View : guarda token y usuario
+end
+@enduml

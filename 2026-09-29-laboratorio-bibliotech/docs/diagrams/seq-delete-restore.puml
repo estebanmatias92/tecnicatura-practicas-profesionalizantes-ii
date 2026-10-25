@@ -1,0 +1,46 @@
+@startuml
+title Secuencia — Eliminación lógica y restauración
+
+actor Professor
+actor Admin
+participant "View (React)" as View
+participant "MaterialsController" as Ctrl
+participant "MaterialService" as Svc
+participant "MaterialRepository" as Repo
+database "MariaDB" as DB
+participant "Disco" as Disk
+
+Professor -> View : click "Eliminar"
+View -> Ctrl : DELETE /api/materials/:id
+Ctrl -> Svc : softDelete(id, user)
+Svc -> Repo : findById(id)
+Repo -> DB : SELECT material
+Svc -> Svc : assertOwnerOrAdmin(user)
+Svc -> Svc : material.softDelete(now)
+Svc -> Repo : save(material)
+Repo -> DB : UPDATE deleted_at
+Svc --> Ctrl : ok
+Ctrl --> View : 204
+Note over Disk : el archivo permanece en disco
+
+Admin -> View : abre Papelera
+View -> Ctrl : GET /api/materials/admin?includeDeleted=true
+Ctrl -> Svc : listAdmin(true)
+Svc -> Repo : listAll(true)
+Repo -> DB : SELECT ... incluyendo eliminados
+Repo --> Svc : materiales
+Svc --> Ctrl : página
+Ctrl --> View : 200
+
+Admin -> View : click "Restaurar"
+View -> Ctrl : POST /api/materials/:id/restore
+Ctrl -> Svc : restore(id, admin)
+Svc -> Repo : findById(id, withDeleted=true)
+Repo -> DB : SELECT material eliminado
+Svc -> Svc : material.restore()
+Svc -> Repo : save(material)
+Repo -> DB : UPDATE deleted_at = NULL
+Svc --> Ctrl : material restaurado
+Ctrl --> View : 200
+Note over View : conserva la visibilidad previa
+@enduml

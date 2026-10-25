@@ -1,0 +1,16 @@
+name: bibliotech-prod
+
+services:
+  backend:
+    build:
+      context: ./backend
+      target: production
+    environment:
+      NODE_ENV: production
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"

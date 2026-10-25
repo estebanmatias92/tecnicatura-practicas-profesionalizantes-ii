@@ -1,0 +1,50 @@
+@startuml
+title Secuencia — Borrador automático, archivo y publicación
+
+actor Professor
+participant "View (React)" as View
+participant "MaterialsController" as Ctrl
+participant "MaterialService" as Svc
+participant "MaterialValidator" as Val
+participant "FileValidator" as FVal
+participant "MaterialRepository" as Repo
+participant "FileStorage" as FS
+database "MariaDB" as DB
+participant "Disco" as Disk
+
+Professor -> View : escribe el primer campo
+View -> Ctrl : POST /api/materials
+Ctrl -> Svc : createDraft(input, user)
+Svc -> Val : assertAtLeastOneField(input)
+Val --> Svc : ok
+Svc -> Repo : save(Material oculto)
+Repo -> DB : INSERT material
+DB --> Repo : material
+Repo --> Svc : material
+Svc --> Ctrl : material
+Ctrl --> View : 201 borrador
+
+Professor -> View : selecciona archivo
+View -> Ctrl : POST /api/materials/:id/file (multipart)
+Ctrl -> FVal : validate(mime, ext, magic, size)
+FVal --> Ctrl : ok
+Ctrl -> Svc : attachFile(id, file, user)
+Svc -> Repo : findById(id)
+Svc -> FS : save(buffer, nombre saneado)
+FS -> Disk : escribe archivo
+FS --> Svc : storageKey
+Svc -> Repo : save(material con FileBlob)
+Repo -> DB : INSERT file_blob + UPDATE material
+Svc --> Ctrl : material
+Ctrl --> View : 200
+
+Professor -> View : click "Publicar"
+View -> Ctrl : POST /api/materials/:id/publish
+Ctrl -> Svc : publish(id, user)
+Svc -> Val : assertCanPublish(material)
+Val --> Svc : ok
+Svc -> Repo : save(material público + publishedAt)
+Repo -> DB : UPDATE material
+Svc --> Ctrl : material público
+Ctrl --> View : 200
+@enduml

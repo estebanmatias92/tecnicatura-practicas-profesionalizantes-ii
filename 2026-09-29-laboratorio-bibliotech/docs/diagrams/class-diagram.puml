@@ -1,0 +1,146 @@
+@startuml
+title BiblioTech — Diagrama de clases (MVC distribuido)
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "Model (dominio)" as Model {
+  enum Role {
+    ADMIN
+    PROFESSOR
+    STUDENT
+  }
+
+  enum Visibility {
+    OCULTO
+    PUBLICO
+  }
+
+  class User {
+    -id: UUID
+    -email: string
+    -passwordHash: string
+    -role: Role
+    -tokenVersion: number
+    +isAdmin(): boolean
+    +isProfessor(): boolean
+    +canManage(material: Material): boolean
+  }
+
+  class Material {
+    -id: UUID
+    -title: string | null
+    -author: string | null
+    -description: string | null
+    -subject: string | null
+    -year: number | null
+    -ownerId: UUID
+    -file: FileBlob | null
+    -visibility: Visibility
+    -publishedAt: Date | null
+    -deletedAt: Date | null
+    +isDraft(): boolean
+    +isPublic(): boolean
+    +canBePublished(): boolean
+    +publish(now: Date): void
+    +hide(): void
+    +softDelete(now: Date): void
+    +restore(): void
+    +attachFile(file: FileBlob): void
+    +isVisibleTo(user: User): boolean
+  }
+
+  class FileBlob {
+    -id: UUID
+    -storageKey: string
+    -originalName: string
+    -mimeType: string
+    -sizeBytes: number
+  }
+
+  interface UserRepository {
+    +findById(id): User | null
+    +findByEmail(email): User | null
+    +save(user): User
+    +list(): User[]
+  }
+
+  interface MaterialRepository {
+    +findById(id, withDeleted): Material | null
+    +save(material): Material
+    +listCatalog(filter): MaterialPage
+    +listByOwner(ownerId): Material[]
+    +listAll(includeDeleted): MaterialPage
+    +deleteFileBlob(blobId): void
+  }
+
+  interface FileStorage {
+    +save(buffer, name, mime): StoredFile
+    +read(storageKey): ReadStream
+    +delete(storageKey): void
+  }
+
+  interface PasswordHasher {
+    +hash(plain): string
+    +compare(plain, hash): boolean
+  }
+
+  interface TokenService {
+    +sign(payload): string
+    +verify(token): TokenPayload
+  }
+
+  class AuthService
+  class UserService
+  class MaterialService
+  class MaterialValidator
+  class FileValidator
+  class UserValidator
+
+  User --> Role
+  Material --> Visibility
+  Material "1" o-- "0..1" FileBlob : file
+  Material --> User : ownerId
+  MaterialService --> MaterialRepository
+  MaterialService --> FileStorage
+  MaterialService --> MaterialValidator
+  MaterialService --> FileValidator
+  AuthService --> UserRepository
+  AuthService --> PasswordHasher
+  AuthService --> TokenService
+  AuthService --> UserValidator
+  UserService --> UserRepository
+  UserService --> UserValidator
+}
+
+package "Controller (REST)" as Controller {
+  class AuthController
+  class MaterialsController
+  class UsersController
+  class JwtAuthGuard
+  class RolesGuard
+  class DomainExceptionFilter
+  class MulterExceptionFilter
+}
+
+package "Infrastructure (detalles)" as Infra {
+  class TypeOrmUserRepository
+  class TypeOrmMaterialRepository
+  class DiskFileStorage
+  class BcryptPasswordHasher
+  class JwtTokenService
+}
+
+Controller --> Model : usa servicios
+Infra ..|> Model : implementa puertos
+MaterialsController --> MaterialService
+AuthController --> AuthService
+UsersController --> UserService
+JwtAuthGuard --> TokenService
+TypeOrmUserRepository ..|> UserRepository
+TypeOrmMaterialRepository ..|> MaterialRepository
+DiskFileStorage ..|> FileStorage
+BcryptPasswordHasher ..|> PasswordHasher
+JwtTokenService ..|> TokenService
+
+@enduml
