@@ -15,7 +15,7 @@ services:
       NODE_ENV: development
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
-      - "3000:3000"
+      - "${API_PORT_HOST:-3000}:3000"
     volumes:
       - ./backend/src:/app/src
       - ./backend/test:/app/test

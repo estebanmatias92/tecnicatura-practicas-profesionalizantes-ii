@@ -20,6 +20,8 @@ El target `init` genera `.env.dev` con secretos aleatorios (no se commitea). Lue
 | Adminer | http://localhost:8081 |
 | MariaDB | localhost:3306 |
 
+Los puertos publicados en el host se configuran en `.env.dev` con el sufijo `*_PORT_HOST` (`FRONTEND_PORT`, `API_PORT_HOST`, `DB_PORT_HOST`); los puertos internos de cada servicio son fijos.
+
 El arranque de desarrollo ejecuta migraciones y un seed idempotente con usuarios y materiales de demostración.
 
 ### Credenciales demo
