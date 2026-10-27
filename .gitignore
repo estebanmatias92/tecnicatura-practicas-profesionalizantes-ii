@@ -22,7 +22,6 @@ compile_commands.json
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
-Makefile
 
 # --- IDE ---
 .vscode/
