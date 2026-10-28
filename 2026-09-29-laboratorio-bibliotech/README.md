@@ -138,7 +138,7 @@ Cobertura configurada:
 - `GLOSSARY.md` — vocabulario canónico.
 - `docs/requirements.md` — requisitos funcionales, no funcionales, reglas e historias Gherkin.
 - `docs/adr/` — decisiones de arquitectura y modelo.
-- `docs/diagrams/` — clases, ER y secuencias (`.puml` + `.svg`).
+- `docs/diagrams/` — casos de uso, clases, ER y secuencias (`.puml` + `.svg`).
 - `api/openapi.yaml` — contrato REST.
 - `docs/agents/` — guías de operación para agentes.
 
