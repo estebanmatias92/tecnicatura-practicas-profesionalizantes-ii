@@ -3,8 +3,8 @@ SHELL := /bin/bash
 COMPOSE_DEV := docker compose -f compose.yaml -f compose.dev.yaml --env-file .env.dev
 COMPOSE_PROD := docker compose -f compose.yaml -f compose.prod.yaml --env-file .env.prod
 
-.PHONY: init dev dev-detached down logs ps adminer test test-backend test-frontend test-e2e \
-	prod-check prod prod-migrate prod-seed-admin prod-down prod-logs
+.PHONY: init dev dev-detached down destroy logs ps adminer test test-backend test-frontend test-e2e \
+	prod-check prod prod-migrate prod-seed-admin prod-down prod-destroy prod-logs
 
 init:
 	@./scripts/init-env.sh
@@ -17,6 +17,10 @@ dev-detached: init
 
 down:
 	$(COMPOSE_DEV) down
+
+destroy:
+	@echo >&2 "WARNING: destroying dev volumes (db-data, uploads/blobs)..."
+	$(COMPOSE_DEV) down -v
 
 logs:
 	$(COMPOSE_DEV) logs -f
@@ -58,6 +62,10 @@ prod: prod-check
 
 prod-down:
 	$(COMPOSE_PROD) down
+
+prod-destroy:
+	@echo >&2 "WARNING: destroying prod volumes (db-data, uploads/blobs)..."
+	$(COMPOSE_PROD) down -v
 
 prod-logs:
 	$(COMPOSE_PROD) logs -f
