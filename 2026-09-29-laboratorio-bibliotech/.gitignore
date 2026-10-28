@@ -25,6 +25,7 @@ backend/uploads/
 # --- Env (rige .env en raiz; backend/.env legacy queda inerte) ---
 .env*
 !*.example
+!Makefile
 
 # --- Logs ---
 *.log
