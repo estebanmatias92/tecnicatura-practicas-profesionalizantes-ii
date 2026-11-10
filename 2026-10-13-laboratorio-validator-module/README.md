@@ -92,7 +92,7 @@ El idioma activo se elige por proceso con `APP_LANGUAGE` (valores `es`/`en`, por
 
 1. Agregar la clave en `backend/src/model/messages/catalog.ts` bajo `es` y bajo `en` con el **mismo conjunto de claves**.
 2. Usar la clave en el validador o en el `@Is*Message` del DTO. Ejemplo: `'validation.password.too-short'`.
-3. Si el mensaje necesita valores numéricos, usar marcadores `{param}` e pasarlos desde el validador o desde `context` del decorator, p. ej. `resolveMessage('validation.email.too-long', { max: 255 })`.
+3. Si el mensaje necesita valores numéricos, usar marcadores `{param}` y pasarlos desde el validador o desde `context` del decorator, p. ej. `resolveMessage('validation.email.too-long', { max: 255 })`.
 4. El test de paridad `messages.spec.ts` exige el mismo set de claves en `es` y en `en`; si falta una traducción, el test falla.
 
 ### Cómo agregar un idioma nuevo

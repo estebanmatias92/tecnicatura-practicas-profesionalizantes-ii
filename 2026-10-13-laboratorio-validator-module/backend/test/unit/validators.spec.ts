@@ -9,6 +9,10 @@ import { UserValidator } from '../../src/model/validators/user.validator';
 import { makeFile, makeMaterial, makeUser } from '../fakes';
 
 describe('EmailValidator', () => {
+  afterEach(() => {
+    setLanguage('es');
+  });
+
   it('normalizes and accepts valid emails', () => {
     expect(EmailValidator.normalize('  A@B.COM ')).toBe('a@b.com');
     expect(EmailValidator.assertValid('  A@B.COM ')).toBe('a@b.com');
@@ -33,6 +37,10 @@ describe('EmailValidator', () => {
 });
 
 describe('PasswordValidator', () => {
+  afterEach(() => {
+    setLanguage('es');
+  });
+
   it('accepts a valid password', () => {
     expect(() => PasswordValidator.assertValid('Secret1234!')).not.toThrow();
   });
@@ -42,9 +50,11 @@ describe('PasswordValidator', () => {
   });
 
   it('resolves its messages from the catalog in the active language', () => {
+    expect(() => PasswordValidator.assertValid('')).toThrow('La contraseña no puede ser vacía');
     expect(() => PasswordValidator.assertValid('short')).toThrow('al menos 8');
 
     setLanguage('en');
+    expect(() => PasswordValidator.assertValid('')).toThrow('must not be empty');
     expect(() => PasswordValidator.assertValid('short')).toThrow('at least 8');
     expect(() => PasswordValidator.assertValid(' '.repeat(8))).toThrow('must not be empty');
     expect(() => PasswordValidator.assertValid('x'.repeat(73))).toThrow('cannot exceed 72');

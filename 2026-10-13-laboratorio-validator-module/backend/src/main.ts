@@ -6,15 +6,11 @@ import { createValidationPipe } from './validation-pipe';
 import { setLanguage } from './model/messages';
 
 async function bootstrap(): Promise<void> {
-  // Set the language before creating any Nest module so the whole process
-  // uses a single locale. Fails fast on invalid APP_LANGUAGE values.
+  // Joi already validated APP_LANGUAGE when AppModule was created. We just
+  // activate it for the process; the default is 'es'.
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
-  if (!setLanguage(config.get<string>('APP_LANGUAGE') ?? 'es')) {
-    throw new Error(
-      `APP_LANGUAGE inválido: ${config.get<string>('APP_LANGUAGE') ?? 'es'} (valores soportados: es, en)`,
-    );
-  }
+  setLanguage(config.get<string>('APP_LANGUAGE') ?? 'es');
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(createValidationPipe());

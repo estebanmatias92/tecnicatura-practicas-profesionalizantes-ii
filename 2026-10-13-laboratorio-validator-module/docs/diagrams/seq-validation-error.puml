@@ -30,7 +30,7 @@ else dominio inválido (email o contraseña)
   Ctrl -> Auth : register(email, password)
   Auth -> UVal : assertValidRegistration(email, password)
   UVal -> EVal : assertValid(email)
-  EVal -> LM : resolve('validation.email.invalid', { … })
+  EVal -> LM : resolve('validation.email.invalid')
   LM --> EVal : texto localizado
   EVal --> UVal : email normalizado
   UVal --> Auth : ok

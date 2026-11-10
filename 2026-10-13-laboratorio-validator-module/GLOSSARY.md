@@ -90,6 +90,20 @@ _Avoid_: Ver, previsualizar
 Obtener una copia del archivo del material.
 _Avoid_: Bajar, exportar
 
+## Mensajes de validación
+
+**Catálogo de mensajes de validación**:
+Conjunto declarativo de cadenas de error localizadas (`es`/`en`), indexables por clave estable (`validation.<recurso>.<regla>`). Se distingue del **Catálogo** (vista de materiales públicos); siempre se dice "catálogo de mensajes" o "catálogo de mensajes de validación".
+_Avoid_: Diccionario de errores, i18n messages, locales
+
+**Manejador de lenguaje**:
+Componente de proceso único que carga el catálogo, reporta el idioma activo, permite cambiarlo en caliente (`setLanguage`) y resuelve una clave con fallback: idioma activo → `es` → `validation.resource.invalid`. En prosa siempre se usa "manejador de lenguaje"; en código se llama `LanguageManager`.
+_Avoid_: i18n service, traductor, localizador
+
+**Idioma activo**:
+Locale único por proceso con el que se resuelven los mensajes (`es` por defecto). Se fija con `APP_LANGUAGE` al iniciar y puede cambiarse en caliente con `setLanguage`.
+_Avoid_: Idioma del usuario, idioma de la sesión
+
 ## Términos descartados
 
 | Término evitado | Usar en su lugar | Motivo |

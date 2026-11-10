@@ -13,15 +13,16 @@ export function createValidationPipe(): ValidationPipe {
   return new ValidationPipe(options);
 }
 
-function resolveMessages(errors: ValidationError[], params?: MessageParams): string[] {
+function resolveMessages(errors: ValidationError[]): string[] {
   const messages: string[] = [];
 
   const walk = (errs: ValidationError[]) => {
     for (const error of errs) {
       if (error.constraints) {
         for (const [constraint, constraintMessage] of Object.entries(error.constraints)) {
-          const context = resolveContext(error, constraint);
-          messages.push(languageManager.resolve(constraintMessage as string, context ?? params));
+          messages.push(
+            languageManager.resolve(constraintMessage as string, resolveContext(error, constraint)),
+          );
         }
       }
       if (error.children?.length) walk(error.children);

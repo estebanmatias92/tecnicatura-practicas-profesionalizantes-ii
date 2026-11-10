@@ -31,6 +31,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
+      APP_LANGUAGE: ${APP_LANGUAGE:-es}
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: ${DB_NAME}

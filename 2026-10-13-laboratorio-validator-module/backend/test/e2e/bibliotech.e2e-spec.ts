@@ -26,6 +26,10 @@ const emails = {
 const pdf = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF\n', 'utf8');
 
 describe('BiblioTech API (e2e)', () => {
+  afterEach(() => {
+    setLanguage('es');
+  });
+
   let app: INestApplication;
   let dataSource: DataSource;
   let users: UserService;

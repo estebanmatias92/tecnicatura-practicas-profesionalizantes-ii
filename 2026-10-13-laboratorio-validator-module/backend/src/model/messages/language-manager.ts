@@ -9,8 +9,6 @@ import {
 
 export type MessageParams = Readonly<Record<string, string | number>>;
 
-const LAST_RESORT_MESSAGE = 'Recurso inválido';
-
 function isSupportedLocale(value: string): value is Locale {
   return SUPPORTED_LOCALES.includes(value as Locale);
 }
@@ -55,8 +53,13 @@ export class LanguageManager {
 
     const lastResort =
       this.messages[this.language]?.[RESOURCE_INVALID_KEY] ??
-      this.messages[DEFAULT_LOCALE]?.[RESOURCE_INVALID_KEY] ??
-      LAST_RESORT_MESSAGE;
+      this.messages[DEFAULT_LOCALE]?.[RESOURCE_INVALID_KEY];
+    // The parity test guarantees the es catalog carries this sentinel. If it is
+    // missing, the catalog is broken — fail loudly instead of returning Spanish
+    // text while an English-active process is running.
+    if (lastResort === undefined) {
+      throw new Error(`Catalog missing ${RESOURCE_INVALID_KEY} for both active language and es`);
+    }
     return interpolate(lastResort, params);
   }
 }
