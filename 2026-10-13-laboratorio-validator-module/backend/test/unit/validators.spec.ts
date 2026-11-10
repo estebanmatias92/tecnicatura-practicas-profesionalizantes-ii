@@ -1,5 +1,6 @@
 import { Role } from '../../src/model/entities/enums';
 import { ForbiddenError, ValidationError } from '../../src/model/errors';
+import { setLanguage } from '../../src/model/messages';
 import { EmailValidator } from '../../src/model/validators/email.validator';
 import { FileValidator } from '../../src/model/validators/file.validator';
 import { MaterialValidator } from '../../src/model/validators/material.validator';
@@ -15,6 +16,19 @@ describe('EmailValidator', () => {
 
   it.each(['', 'sin-arroba', 'a@b', 'a@b.c'.repeat(60)])('rejects %s', (email) => {
     expect(() => EmailValidator.assertValid(email)).toThrow(ValidationError);
+  });
+
+  it('resolves its message from the catalog in the active language', () => {
+    expect(() => EmailValidator.assertValid('sin-arroba')).toThrow(
+      'El email no tiene un formato válido',
+    );
+
+    setLanguage('en');
+    expect(() => EmailValidator.assertValid('sin-arroba')).toThrow(
+      'The email address is not valid',
+    );
+
+    setLanguage('es');
   });
 });
 

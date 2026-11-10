@@ -42,6 +42,12 @@ Todo acceso a material exige autenticación.
 | FR-014 | Cualquier usuario autenticado descarga el archivo de un material visible. |
 | FR-015 | Professor/Admin elimina lógicamente un material; Admin lo restaura desde la papelera. |
 | FR-016 | Logout del cliente que descarta la sesión local. |
+| FR-017 | Los mensajes de validación se declaran en un catálogo único, identificado por claves estables y con soporte de parámetros; no hay textos hardcodeados en la lógica. |
+| FR-018 | El catálogo incluye español (`es`) e inglés (`en`) con exactamente el mismo conjunto de claves; `es` es el idioma por defecto. |
+| FR-019 | El manejador de lenguaje carga los catálogos, informa el idioma activo, permite cambiarlo y resuelve una clave con fallback: idioma activo → `es` → mensaje de recurso inválido. |
+| FR-020 | Los validadores de email y contraseña resuelven sus mensajes desde el catálogo y no contienen texto de error propio. |
+| FR-021 | Los errores de validación de los DTOs de autenticación usan el mismo catálogo, de modo que un 400 nunca mezcla idiomas ni expone los mensajes por defecto de `class-validator`. |
+| FR-022 | La API conserva el contrato `{ statusCode, message, error }`; `message` es localizado y `error` sigue siendo un código estable no traducido. |
 
 ## Requerimientos no funcionales
 
@@ -59,6 +65,9 @@ Todo acceso a material exige autenticación.
 | NFR-010 | Endpoint de salud con verificación de base de datos. |
 | NFR-011 | Nombres de archivo saneados; nunca se usa el nombre original como ruta de almacenamiento. |
 | NFR-012 | Cambiar el rol de un usuario invalida sus sesiones JWT vigentes. |
+| NFR-013 | El idioma de validación es global por proceso y se elige con `APP_LANGUAGE` (por defecto `es`); no se resuelve por request ni se persiste por usuario. |
+| NFR-014 | La resolución de mensajes nunca devuelve `undefined`: aplica el fallback completo y el módulo de mensajes tiene cobertura de al menos 80%, con pruebas en `es` y `en`. |
+| NFR-015 | El README documenta cómo agregar una clave, cómo agregar un idioma y cómo se elige el idioma activo; los diagramas y el ADR de la iteración quedan actualizados. |
 
 ## Reglas de negocio
 
@@ -225,4 +234,52 @@ Escenario: producción
   Entonces tengo db, api y web con imágenes multi-stage
   Y no hay tests, mocks ni Adminer
   Y solo se expone el puerto 8080
+```
+
+### US-009 — Mensajes de validación localizados
+
+Como visitante y como equipo quiero que los errores de validación se resuelvan desde un catálogo único y respeten el idioma activo, para no recibir mensajes mezclados ni textos hardcodeados.
+
+```gherkin
+Escenario: email inválido en español
+  Dado el idioma activo "es"
+  Cuando me registro con un email sin formato válido
+  Entonces recibo 400 con statusCode, message y error
+  Y el message es el texto en español del catálogo
+  Y no aparece ningún mensaje por defecto de class-validator
+
+Escenario: email inválido en inglés
+  Dado el idioma activo "en"
+  Cuando me registro con un email sin formato válido
+  Entonces recibo 400 con el texto en inglés del catálogo
+  Y el código de error no está traducido
+
+Escenario: contraseña inválida
+  Dado el idioma activo "es" o "en"
+  Cuando me registro con una contraseña corta, larga o vacía
+  Entonces recibo 400 con el mensaje localizado correspondiente
+
+Escenario: cambio de idioma
+  Dado el idioma activo "es"
+  Cuando se ejecuta setLanguage("en")
+  Entonces getLanguage devuelve "en"
+  Y las validaciones siguientes responden en inglés sin cambiar los validadores
+
+Escenario: idioma no soportado
+  Dado el idioma activo "es"
+  Cuando se intenta setLanguage("fr")
+  Entonces el idioma activo sigue siendo "es"
+  Y la aplicación no falla
+
+Escenario: clave faltante
+  Dada una clave ausente en el idioma activo
+  Cuando se resuelve esa clave
+  Entonces se usa el mensaje en español
+  Y si también falta en español se devuelve el mensaje de recurso inválido
+  Y nunca se devuelve undefined
+
+Escenario: registro válido sin cambios
+  Dado un email no registrado y una contraseña válida
+  Cuando me registro con cualquier idioma activo
+  Entonces la cuenta se crea y recibo una sesión JWT
 ```

@@ -11,6 +11,8 @@ module.exports = {
     'src/model/entities/**/*.ts',
     'src/model/validators/**/*.ts',
     'src/model/services/**/*.ts',
+    'src/model/messages/**/*.ts',
+    '!src/model/messages/**/*.spec.ts',
     'src/model/errors.ts',
     'src/controller/guards/**/*.ts',
     'src/controller/filters/**/*.ts',

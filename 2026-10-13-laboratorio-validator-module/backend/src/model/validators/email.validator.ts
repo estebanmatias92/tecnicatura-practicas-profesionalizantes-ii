@@ -1,4 +1,5 @@
 import { ValidationError } from '../errors';
+import { resolveMessage } from '../messages';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -10,7 +11,7 @@ export class EmailValidator {
   static assertValid(email: string): string {
     const normalized = EmailValidator.normalize(email ?? '');
     if (normalized.length === 0 || normalized.length > 255 || !EMAIL_PATTERN.test(normalized)) {
-      throw new ValidationError('El email no tiene un formato válido');
+      throw new ValidationError(resolveMessage('validation.email.invalid'));
     }
     return normalized;
   }

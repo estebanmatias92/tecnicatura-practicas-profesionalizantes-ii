@@ -1,11 +1,13 @@
 import { randomUUID } from 'crypto';
 import { rm } from 'fs/promises';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { DataSource, In } from 'typeorm';
 import { AppModule } from '../../src/app.module';
 import { Role } from '../../src/model/entities/enums';
+import { setLanguage } from '../../src/model/messages';
+import { createValidationPipe } from '../../src/validation-pipe';
 import { UserService } from '../../src/model/services/user.service';
 import { buildDataSourceOptions } from '../../src/infrastructure/persistence/data-source-options';
 import {
@@ -61,13 +63,7 @@ describe('BiblioTech API (e2e)', () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication();
     app.setGlobalPrefix('api');
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        transform: true,
-        transformOptions: { enableImplicitConversion: false },
-      }),
-    );
+    app.useGlobalPipes(createValidationPipe());
     await app.init();
 
     dataSource = app.get(DataSource);
@@ -140,6 +136,47 @@ describe('BiblioTech API (e2e)', () => {
     expect(me.body.role).toBe(Role.STUDENT);
 
     await dataSource.getRepository(UserOrm).delete({ email });
+  });
+
+  it('localiza el email inválido en registro y login sin exponer defaults de class-validator', async () => {
+    const invalidEmail = 'sin-arroba';
+    const attempt = (path: string) =>
+      request(app.getHttpServer())
+        .post(path)
+        .send({ email: invalidEmail, password });
+
+    const esRegister = await attempt('/api/auth/register').expect(400);
+    expect(esRegister.body).toEqual({
+      statusCode: 400,
+      message: ['El email no tiene un formato válido'],
+      error: 'Bad Request',
+    });
+
+    setLanguage('en');
+    const enRegister = await attempt('/api/auth/register').expect(400);
+    expect(enRegister.body).toEqual({
+      statusCode: 400,
+      message: ['The email address is not valid'],
+      error: 'Bad Request',
+    });
+
+    const enLogin = await attempt('/api/auth/login').expect(400);
+    expect(enLogin.body).toEqual({
+      statusCode: 400,
+      message: ['The email address is not valid'],
+      error: 'Bad Request',
+    });
+
+    setLanguage('es');
+    const esLogin = await attempt('/api/auth/login').expect(400);
+    expect(esLogin.body).toEqual({
+      statusCode: 400,
+      message: ['El email no tiene un formato válido'],
+      error: 'Bad Request',
+    });
+
+    const serialized = JSON.stringify(esRegister.body) + JSON.stringify(enRegister.body);
+    expect(serialized).not.toContain('must be an email');
   });
 
   it('permite al Professor crear, publicar, ocultar, eliminar y al Admin restaurar', async () => {
