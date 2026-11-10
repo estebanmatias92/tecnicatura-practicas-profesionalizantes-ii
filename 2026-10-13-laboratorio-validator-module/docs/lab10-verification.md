@@ -2,7 +2,9 @@
 
 Fecha: 2026-11-10
 Rama: `main`
-Commits de la iteración: `4fd9323` (ticket 01), `3aaa41f` (ticket 02), y el de ticket 03.
+Commits de la iteración: `4fd9323` (ticket 01), `3aaa41f` (ticket 02), `fce3d8f` (ticket 03) y `1514f1b` (fix pass del review).
+
+Actualización 2026-11-10: tras el review (axe Standards + Spec) se aplicó un fix pass (`1514f1b`) con `.env.prod.example`/`compose.yaml` + `APP_LANGUAGE`, path de contraseña vacía (`validation.password.empty`), eliminación de código muerto (`LAST_RESORT_MESSAGE`, `params` del pipe), restauración tras cada test (`afterEach(setLanguage('es'))`), trailing newlines y firma del `resolve` en el diagrama. Re-ejecutados y verdes: `tsc --noEmit`, `npm test` (74/74), `npm run test:cov`, `npm run lint`, `npm run build`, `npm run test:e2e` (7/7).
 
 ## Comandos ejecutados
 
