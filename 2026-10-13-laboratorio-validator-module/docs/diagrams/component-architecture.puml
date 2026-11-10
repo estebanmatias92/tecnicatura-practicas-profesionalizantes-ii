@@ -1,5 +1,5 @@
 @startuml
-title BiblioTech — Arquitectura de contenedores (estado actual)
+title BiblioTech — Arquitectura de contenedores
 
 skinparam componentStyle rectangle
 skinparam shadowing false
@@ -17,6 +17,7 @@ package "Servidor (Docker Compose)" {
   component "API NestJS 11\nController · Model · Infrastructure" as API
   database "MariaDB 11" as DB
   component "Volumen uploads / blobs" as Uploads
+  component "Catálogo + LanguageManager\nbackend/src/model/messages" as Msg
 }
 
 package "Proceso externo" {
@@ -28,21 +29,17 @@ SPA --> Nginx : HTTPS / JSON
 Nginx --> API : proxy /api
 API --> DB : TypeORM · SQL
 API --> Uploads : lectura / escritura
+API --> Msg : mensajes localizados
 Ops --> API : migration:run\nseed-admin · seed-dev
+
+note right of Msg
+  APP_LANGUAGE (es/en) elige el idioma
+  por proceso. Fallback: activo → es → recurso inválido.
+end note
 
 note right of API
   El detalle de sus componentes
   está en component-backend.puml
 end note
-
-legend bottom left
-  **Estado actual**
-
-  No existe un contenedor ni componente de mensajes:
-  los textos de validación están hardcodeados en el
-  dominio y los DTO usan los mensajes por defecto de
-  class-validator (inglés). No hay catálogo, ni
-  LanguageManager, ni idioma seleccionable.
-endlegend
 
 @enduml

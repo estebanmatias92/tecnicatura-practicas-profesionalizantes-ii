@@ -1,50 +1,66 @@
 @startuml
-title Secuencia — Error de validación (estado actual)
+title Secuencia — Error de validación localizado
 
 skinparam shadowing false
 
 actor Usuario
 participant "View (React)" as View
-participant "ValidationPipe" as Pipe
+participant "ValidationPipe\n(exceptionFactory)" as Pipe
 participant "AuthController" as Ctrl
 participant "AuthService" as Auth
 participant "UserValidator" as UVal
 participant "EmailValidator" as EVal
+participant "LanguageManager\n(resolve)" as LM
 participant "DomainExceptionFilter" as Filter
 
 Usuario -> View : email + contraseña
 View -> Pipe : POST /api/auth/register
 
 alt DTO inválido
-  Pipe --> View : 400\n{ message: ["email must be an email"], error: "Bad Request" }
   note right of Pipe
-    Inglés (default de class-validator)
-    message: string[]  ·  error: "Bad Request"
+    exceptionFactory resuelve las claves
+    del catálogo (es/en)
   end note
+  Pipe -> LM : resolve('validation.email.invalid')
+  LM --> Pipe : texto localizado
+  Pipe --> View : 400\n{ message: ["localizado"], error: "Bad Request" }
 
-else dominio inválido (email ya registrado)
+else dominio inválido (email o contraseña)
   Pipe -> Ctrl : dto válido
   Ctrl -> Auth : register(email, password)
   Auth -> UVal : assertValidRegistration(email, password)
   UVal -> EVal : assertValid(email)
+  EVal -> LM : resolve('validation.email.invalid', { … })
+  LM --> EVal : texto localizado
   EVal --> UVal : email normalizado
   UVal --> Auth : ok
   Auth -> Auth : findByEmail(normalized)
   Auth --> Ctrl : ConflictError
   Ctrl --> Filter : propaga DomainError
-  Filter --> View : 409\n{ message: "Ya existe una cuenta con ese email", error: "CONFLICT" }
-  note right of Filter
-    Español (texto en el throw)
-    message: string  ·  error: "CONFLICT"
-  end note
+  Filter --> View : 409\n{ message: "…localizado…", error: "CONFLICT" }
+
+else dominio inválido (formato)
+  Pipe -> Ctrl : dto válido
+  Ctrl -> Auth : register(email, password)
+  Auth -> UVal : assertValidRegistration(email, password)
+  UVal -> EVal : assertValid(email)
+  EVal -> LM : resolve('validation.email.invalid')
+  LM --> EVal : texto localizado
+  EVal --> UVal : ValidationError
+  UVal --> Auth : ValidationError
+  Auth --> Ctrl : ValidationError
+  Ctrl --> Filter : propaga DomainError
+  Filter --> View : 400\n{ message: "localizado", error: "VALIDATION" }
 end
 
 legend bottom
-  **Dos caminos, dos formas de respuesta y dos idiomas**
+  **Una sola resolución para ambos caminos**
 
-  El cliente recibe message como string o como array,
-  y error como código estable o como texto de HTTP.
-  Ninguno de los dos caminos pasa por un catálogo de mensajes.
+  Tanto el DTO (pipe + exceptionFactory) como el
+  dominio (validador) terminan llamando a resolve()
+  del mismo LanguageManager. El cliente recibe
+  siempre message localizado en es o en, con
+  error como código estable.
 endlegend
 
 @enduml

@@ -1,5 +1,5 @@
 @startuml
-title BiblioTech — Validación y mensajes (estado actual)
+title BiblioTech — Validación y mensajes de validación
 
 skinparam classAttributeIconSize 0
 skinparam shadowing false
@@ -32,6 +32,18 @@ package "Model (dominio)" as Model {
     +{static} assertValid(password): void
   }
 
+  class Catalog {
+    +catalog: { es: { key: message }, en: { key: message } }
+    +RESOURCE_INVALID_KEY
+    +SUPPORTED_LOCALES
+  }
+
+  class LanguageManager {
+    +getLanguage(): Locale
+    +setLanguage(locale): boolean
+    +resolve(key, params?): string
+  }
+
   class FileValidator
   class MaterialValidator
 
@@ -41,6 +53,9 @@ package "Model (dominio)" as Model {
   EmailValidator ..> ValidationError : lanza
   PasswordValidator ..> ValidationError : lanza
   UserValidator ..> ValidationError : lanza
+  EmailValidator ..> LanguageManager : resolve
+  PasswordValidator ..> LanguageManager : resolve
+  LanguageManager ..> Catalog : lee claves
 }
 
 package "Controller (REST)" as Controller {
@@ -55,16 +70,10 @@ package "Controller (REST)" as Controller {
     +password: string
   }
 
-  class CreateUserDto {
-    +email: string
-    +password: string
-    +role: Role
-  }
-
   class ValidationPipe {
     +whitelist = true
     +transform = true
-    +exceptionFactory = ninguno
+    +exceptionFactory = localizada
   }
 
   class DomainExceptionFilter {
@@ -74,24 +83,22 @@ package "Controller (REST)" as Controller {
 
 RegisterDto ..> ValidationPipe
 LoginDto ..> ValidationPipe
-CreateUserDto ..> ValidationPipe
+ValidationPipe ..> LanguageManager : resolve
 DomainExceptionFilter ..> DomainError : captura
 
 note bottom of ValidationError
-  El texto viaja en el constructor:
-  new ValidationError('La contraseña debe tener al menos 8 caracteres')
-  No hay clave de catálogo ni idioma activo.
+  El texto ya viene resuelto por el
+  validador desde el catálogo.
+  El cliente puede ramificar por
+  error: "VALIDATION" sin depender
+  del idioma.
 end note
 
 legend right
-  **Hallazgos del estado actual**
-
-  1. Doble validación: CreateUserDto valida email, password y rol;
-     UserValidator repite las tres reglas. Por HTTP gana el DTO,
-     así que el mensaje de rol del dominio no se alcanza nunca.
-  2. Respuestas asimétricas: el DTO devuelve message: string[]
-     y error: "Bad Request"; el dominio devuelve message: string
-     y error: "VALIDATION".
+  **Fallback de mensajes**
+  idioma activo → es → validation.resource.invalid
+  APP_LANGUAGE (es/en) define el activo al iniciar;
+  setLanguage() lo cambia en caliente.
 endlegend
 
 @enduml

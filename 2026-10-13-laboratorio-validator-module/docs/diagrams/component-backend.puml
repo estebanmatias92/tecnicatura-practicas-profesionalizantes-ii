@@ -1,5 +1,5 @@
 @startuml
-title BiblioTech — Componentes del backend (estado actual)
+title BiblioTech — Componentes del backend
 
 skinparam componentStyle rectangle
 skinparam shadowing false
@@ -12,7 +12,8 @@ component "Guards\nJwtAuthGuard · RolesGuard" as Guards #LightBlue
 component "Filtros de excepción\nDomainExceptionFilter\nMulterExceptionFilter" as Filters #LightBlue
 
 component "Servicios de dominio\nAuthService · UserService\nMaterialService" as Svc #LightGreen
-component "Validadores\nUserValidator (email + password)\nFileValidator · MaterialValidator" as Val #LightGreen
+component "Validadores\nUserValidator · EmailValidator · PasswordValidator\nFileValidator · MaterialValidator" as Val #LightGreen
+component "Mensajes · Catálogo + LanguageManager\nbackend/src/model/messages" as Msg #LightGreen
 component "Entidades y reglas\nUser · Material · FileBlob" as Entities #LightGreen
 component "Puertos\nUserRepository · MaterialRepository\nFileStorage · PasswordHasher · TokenService" as Ports #LightGreen
 
@@ -22,9 +23,11 @@ Ctrl --> DTO : valida entrada
 Ctrl --> Guards : autoriza
 Ctrl --> Svc : delega
 Ctrl ..> Filters : propaga errores
+DTO --> Msg : exceptionFactory resuelve claves (es/en)
 Svc --> Val
 Svc --> Entities
 Svc ..> Ports : usa
+Val --> Msg : mensajes localizados
 Infra ..|> Ports
 
 legend right

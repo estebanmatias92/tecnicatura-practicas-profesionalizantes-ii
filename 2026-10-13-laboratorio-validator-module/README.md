@@ -65,6 +65,54 @@ La persistencia vive en `backend/src/infrastructure` detrás de puertos (`UserRe
 - **Catálogo:** solo materiales públicos y no eliminados; búsqueda por título/autor, filtro por materia/año y paginación.
 - **Lectura:** el archivo se descarga autenticado por `fetch`; no hay URL pública. PDF en visor nativo, EPUB con epub.js.
 
+## Mensajes de validación e idiomas
+
+Los mensajes de validación y del DTO de autenticación salen de un **catálogo único** en `backend/src/model/messages/`, resuelto en este orden de fallback:
+
+```text
+idioma activo → es → validation.resource.invalid
+```
+
+### Idiomas soportados
+
+| Clave   | Idioma    |
+| --- | --- |
+| `es` | Español (por defecto) |
+| `en` | Inglés |
+
+El idioma activo se elige por proceso con `APP_LANGUAGE` (valores `es`/`en`, por defecto `es`). Locales no soportados se rechazan al iniciar y `setLanguage` conserva el idioma anterior. No hay idioma por request ni persistencia por usuario en esta iteración.
+
+### Cómo se elige el idioma
+
+1. `APP_LANGUAGE` se valida al arrancar (Joi). Si es inválido, el proceso falla al iniciar.
+2. `getLanguage` reporta el idioma activo; `setLanguage(locale)` lo cambia en caliente sin reiniciar.
+3. `resolve` (vía `LanguageManager`) toma el idioma activo, cae a `es` y luego al mensaje de recurso inválido. Nunca devuelve `undefined`.
+
+### Cómo agregar una clave nueva
+
+1. Agregar la clave en `backend/src/model/messages/catalog.ts` bajo `es` y bajo `en` con el **mismo conjunto de claves**.
+2. Usar la clave en el validador o en el `@Is*Message` del DTO. Ejemplo: `'validation.password.too-short'`.
+3. Si el mensaje necesita valores numéricos, usar marcadores `{param}` e pasarlos desde el validador o desde `context` del decorator, p. ej. `resolveMessage('validation.email.too-long', { max: 255 })`.
+4. El test de paridad `messages.spec.ts` exige el mismo set de claves en `es` y en `en`; si falta una traducción, el test falla.
+
+### Cómo agregar un idioma nuevo
+
+1. Agregar el nuevo locale en `Locale` en `catalog.ts` y su catálogo completo.
+2. Agregarlo a `SUPPORTED_LOCALES` en `catalog.ts`.
+3. Actualizar `APP_LANGUAGE` en `backend/src/config/env.validation.ts` (y el ejemplo de entorno).
+4. Restaurar `setLanguage` antes de salir de cualquier sub-test para no contaminar las aserciones del resto de la suite.
+
+### Contrato de respuesta
+
+- **Dominio**: `{ statusCode: 400, message: "mensaje localizado", error: "VALIDATION" }`.
+- **DTO**: `{ statusCode: 400, message: ["mensaje localizado", ...], error: "Bad Request" }`.
+- El `error` nunca se traduce; `message` sí. Los defaults de `class-validator` no llegan al cliente.
+- Los parámetros `{min}`/`{max}` reemplazan al valor pasado como argumento al lanzar el error o como `context` en el decorator.
+
+### Cobertura
+
+`jest.config.js` incluye `src/model/messages/**` en `collectCoverageFrom`; el umbral global sigue siendo ≥80% líneas.
+
 ## API
 
 Contrato completo en `api/openapi.yaml`.
@@ -144,6 +192,7 @@ Cobertura configurada:
 - `docs/diagrams/` — casos de uso, clases, ER, componentes y secuencias (`.puml` + `.svg`).
 - `api/openapi.yaml` — contrato REST.
 - `docs/agents/` — guías de operación para agentes.
+- `docs/lab10-verification.md` — evidencia de verificación de Lab 10 (comandos y resultados).
 
 ## Estructura
 

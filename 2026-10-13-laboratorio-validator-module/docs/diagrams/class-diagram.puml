@@ -96,6 +96,10 @@ package "Model (dominio)" as Model {
   class MaterialValidator
   class FileValidator
   class UserValidator
+  class EmailValidator
+  class PasswordValidator
+  class LanguageManager
+  class Catalog
 
   User --> Role
   Material --> Visibility
@@ -111,6 +115,11 @@ package "Model (dominio)" as Model {
   AuthService --> UserValidator
   UserService --> UserRepository
   UserService --> UserValidator
+  UserValidator --> EmailValidator
+  UserValidator --> PasswordValidator
+  EmailValidator --> LanguageManager
+  PasswordValidator --> LanguageManager
+  LanguageManager --> Catalog
 }
 
 package "Controller (REST)" as Controller {
