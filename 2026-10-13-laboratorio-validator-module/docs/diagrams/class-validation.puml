@@ -1,0 +1,97 @@
+@startuml
+title BiblioTech — Validación y mensajes (estado actual)
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+package "Model (dominio)" as Model {
+
+  abstract class DomainError {
+    +status: number
+    +code: string
+    #message: string
+  }
+
+  class ValidationError {
+    +status = 400
+    +code = "VALIDATION"
+  }
+
+  class UserValidator {
+    +{static} assertValidRole(role): Role
+    +{static} assertValidRegistration(email, password)
+    +{static} assertValidCreation(email, password, role)
+  }
+
+  class EmailValidator {
+    +{static} normalize(email): string
+    +{static} assertValid(email): string
+  }
+
+  class PasswordValidator {
+    +{static} assertValid(password): void
+  }
+
+  class FileValidator
+  class MaterialValidator
+
+  DomainError <|-- ValidationError
+  UserValidator ..> EmailValidator
+  UserValidator ..> PasswordValidator
+  EmailValidator ..> ValidationError : lanza
+  PasswordValidator ..> ValidationError : lanza
+  UserValidator ..> ValidationError : lanza
+}
+
+package "Controller (REST)" as Controller {
+
+  class RegisterDto {
+    +email: string
+    +password: string
+  }
+
+  class LoginDto {
+    +email: string
+    +password: string
+  }
+
+  class CreateUserDto {
+    +email: string
+    +password: string
+    +role: Role
+  }
+
+  class ValidationPipe {
+    +whitelist = true
+    +transform = true
+    +exceptionFactory = ninguno
+  }
+
+  class DomainExceptionFilter {
+    +catch(exception, host): void
+  }
+}
+
+RegisterDto ..> ValidationPipe
+LoginDto ..> ValidationPipe
+CreateUserDto ..> ValidationPipe
+DomainExceptionFilter ..> DomainError : captura
+
+note bottom of ValidationError
+  El texto viaja en el constructor:
+  new ValidationError('La contraseña debe tener al menos 8 caracteres')
+  No hay clave de catálogo ni idioma activo.
+end note
+
+legend right
+  **Hallazgos del estado actual**
+
+  1. Doble validación: CreateUserDto valida email, password y rol;
+     UserValidator repite las tres reglas. Por HTTP gana el DTO,
+     así que el mensaje de rol del dominio no se alcanza nunca.
+  2. Respuestas asimétricas: el DTO devuelve message: string[]
+     y error: "Bad Request"; el dominio devuelve message: string
+     y error: "VALIDATION".
+endlegend
+
+@enduml

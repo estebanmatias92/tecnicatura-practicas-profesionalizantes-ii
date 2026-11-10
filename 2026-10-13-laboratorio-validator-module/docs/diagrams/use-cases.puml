@@ -1,0 +1,68 @@
+@startuml
+title BiblioTech — Casos de uso
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Visitante" as Visitante
+actor "Student" as Student
+actor "Professor" as Professor
+actor "Admin" as Admin
+
+Admin -up-|> Professor
+Professor -up-|> Student
+
+rectangle "BiblioTech" {
+  usecase "Registrarse" as UC_Register
+  usecase "Iniciar sesión" as UC_Login
+  usecase "Cerrar sesión" as UC_Logout
+  usecase "Ver usuario actual" as UC_Me
+  usecase "Consultar catálogo\n(buscar y filtrar)" as UC_Catalog
+  usecase "Leer material\n(visor embebido)" as UC_Read
+  usecase "Descargar material" as UC_Download
+  usecase "Crear borrador" as UC_Draft
+  usecase "Editar material" as UC_Edit
+  usecase "Adjuntar o reemplazar archivo" as UC_File
+  usecase "Publicar material" as UC_Publish
+  usecase "Ocultar material" as UC_Hide
+  usecase "Eliminar material" as UC_Delete
+  usecase "Listar mis materiales" as UC_Mine
+  usecase "Gestionar usuarios y roles" as UC_Users
+  usecase "Ver papelera" as UC_Trash
+  usecase "Restaurar material" as UC_Restore
+  usecase "Ver material oculto" as UC_Hidden
+}
+
+Visitante --> UC_Register
+Visitante --> UC_Login
+
+Student --> UC_Logout
+Student --> UC_Me
+Student --> UC_Catalog
+Student --> UC_Read
+Student --> UC_Download
+
+Professor --> UC_Draft
+Professor --> UC_Edit
+Professor --> UC_File
+Professor --> UC_Publish
+Professor --> UC_Hide
+Professor --> UC_Delete
+Professor --> UC_Mine
+
+Admin --> UC_Users
+Admin --> UC_Trash
+Admin --> UC_Restore
+Admin --> UC_Hidden
+
+UC_Publish ..> UC_File : <<include>>
+UC_Restore ..> UC_Trash : <<extend>>
+
+legend bottom
+  Admin hereda todo lo de Professor y Professor todo lo de Student.
+  Todo caso de uso sobre material exige una sesión JWT válida.
+  Editar, adjuntar, publicar, ocultar y eliminar requieren ser
+  el propietario o Admin. Student solo accede a material público.
+end legend
+@enduml

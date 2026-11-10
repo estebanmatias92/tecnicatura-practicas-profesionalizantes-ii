@@ -1,0 +1,45 @@
+@startuml
+title Secuencia — Leer en visor y descargar
+
+actor Student
+participant "View (React)" as View
+participant "MaterialsController" as Ctrl
+participant "MaterialService" as Svc
+participant "MaterialRepository" as Repo
+participant "FileStorage" as FS
+database "MariaDB" as DB
+participant "Disco" as Disk
+
+Student -> View : click "Leer material"
+View -> Ctrl : GET /api/materials/:id/file (JWT)
+Ctrl -> Svc : getFileForRead(id, user)
+Svc -> Repo : findById(id)
+Repo -> DB : SELECT material + file_blob
+DB --> Repo : material
+Repo --> Svc : material
+Svc -> Svc : assertVisibleTo(user)
+alt oculto y no propietario/Admin
+  Svc --> Ctrl : NotFoundError
+  Ctrl --> View : 404
+else visible
+  Svc -> FS : read(storageKey)
+  FS -> Disk : lee archivo
+  Disk --> FS : stream
+  FS --> Svc : stream
+  Svc --> Ctrl : stream + mime + nombre
+  Ctrl --> View : 200 application/pdf | application/epub+zip
+  View -> View : object URL
+  alt PDF
+    View -> View : iframe con PDF nativo
+  else EPUB
+    View -> View : epub.js renderiza en el modal
+  end
+end
+
+Student -> View : click "Descargar"
+View -> Ctrl : GET /api/materials/:id/download
+Ctrl -> Svc : getFileForRead(id, user)
+Svc --> Ctrl : stream + nombre saneado
+Ctrl --> View : 200 Content-Disposition attachment
+View -> View : descarga el blob
+@enduml

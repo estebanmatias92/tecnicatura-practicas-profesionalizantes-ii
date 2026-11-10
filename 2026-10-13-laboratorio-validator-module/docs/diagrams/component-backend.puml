@@ -1,0 +1,37 @@
+@startuml
+title BiblioTech — Componentes del backend (estado actual)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam nodesep 40
+skinparam ranksep 45
+
+component "Controller REST\nAuthController · MaterialsController\nUsersController" as Ctrl #LightBlue
+component "Validación de entrada\nDTOs + ValidationPipe" as DTO #LightBlue
+component "Guards\nJwtAuthGuard · RolesGuard" as Guards #LightBlue
+component "Filtros de excepción\nDomainExceptionFilter\nMulterExceptionFilter" as Filters #LightBlue
+
+component "Servicios de dominio\nAuthService · UserService\nMaterialService" as Svc #LightGreen
+component "Validadores\nUserValidator (email + password)\nFileValidator · MaterialValidator" as Val #LightGreen
+component "Entidades y reglas\nUser · Material · FileBlob" as Entities #LightGreen
+component "Puertos\nUserRepository · MaterialRepository\nFileStorage · PasswordHasher · TokenService" as Ports #LightGreen
+
+component "Adaptadores\nTypeORM · bcryptjs · JWT · disco" as Infra #LightGray
+
+Ctrl --> DTO : valida entrada
+Ctrl --> Guards : autoriza
+Ctrl --> Svc : delega
+Ctrl ..> Filters : propaga errores
+Svc --> Val
+Svc --> Entities
+Svc ..> Ports : usa
+Infra ..|> Ports
+
+legend right
+  **Capas**
+  <color:LightBlue>■</color> Controller (REST)
+  <color:LightGreen>■</color> Model (dominio)
+  <color:LightGray>■</color> Infrastructure
+endlegend
+
+@enduml

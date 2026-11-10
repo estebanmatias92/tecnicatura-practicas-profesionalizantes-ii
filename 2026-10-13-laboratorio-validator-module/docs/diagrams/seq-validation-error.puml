@@ -1,0 +1,50 @@
+@startuml
+title Secuencia — Error de validación (estado actual)
+
+skinparam shadowing false
+
+actor Usuario
+participant "View (React)" as View
+participant "ValidationPipe" as Pipe
+participant "AuthController" as Ctrl
+participant "AuthService" as Auth
+participant "UserValidator" as UVal
+participant "EmailValidator" as EVal
+participant "DomainExceptionFilter" as Filter
+
+Usuario -> View : email + contraseña
+View -> Pipe : POST /api/auth/register
+
+alt DTO inválido
+  Pipe --> View : 400\n{ message: ["email must be an email"], error: "Bad Request" }
+  note right of Pipe
+    Inglés (default de class-validator)
+    message: string[]  ·  error: "Bad Request"
+  end note
+
+else dominio inválido (email ya registrado)
+  Pipe -> Ctrl : dto válido
+  Ctrl -> Auth : register(email, password)
+  Auth -> UVal : assertValidRegistration(email, password)
+  UVal -> EVal : assertValid(email)
+  EVal --> UVal : email normalizado
+  UVal --> Auth : ok
+  Auth -> Auth : findByEmail(normalized)
+  Auth --> Ctrl : ConflictError
+  Ctrl --> Filter : propaga DomainError
+  Filter --> View : 409\n{ message: "Ya existe una cuenta con ese email", error: "CONFLICT" }
+  note right of Filter
+    Español (texto en el throw)
+    message: string  ·  error: "CONFLICT"
+  end note
+end
+
+legend bottom
+  **Dos caminos, dos formas de respuesta y dos idiomas**
+
+  El cliente recibe message como string o como array,
+  y error como código estable o como texto de HTTP.
+  Ninguno de los dos caminos pasa por un catálogo de mensajes.
+endlegend
+
+@enduml

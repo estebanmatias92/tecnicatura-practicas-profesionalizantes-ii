@@ -1,0 +1,37 @@
+@startuml
+title Secuencia — Ocultar y volver a publicar
+
+actor Professor
+participant "View (React)" as View
+participant "MaterialsController" as Ctrl
+participant "MaterialService" as Svc
+participant "MaterialRepository" as Repo
+database "MariaDB" as DB
+
+Professor -> View : click "Ocultar"
+View -> Ctrl : POST /api/materials/:id/hide
+Ctrl -> Svc : hide(id, user)
+Svc -> Repo : findById(id)
+Repo -> DB : SELECT material
+DB --> Repo : material
+Repo --> Svc : material
+Svc -> Svc : assertOwnerOrAdmin(user)
+Svc -> Svc : material.hide()
+Svc -> Repo : save(material)
+Repo -> DB : UPDATE visibility = OCULTO
+Svc --> Ctrl : material oculto
+Ctrl --> View : 200
+View -> View : desaparece del catálogo
+
+Professor -> View : click "Publicar"
+View -> Ctrl : POST /api/materials/:id/publish
+Ctrl -> Svc : publish(id, user)
+Svc -> Repo : findById(id)
+Repo -> DB : SELECT material
+Svc -> Svc : conserva publishedAt previo
+Svc -> Repo : save(material público)
+Repo -> DB : UPDATE visibility = PUBLICO
+Svc --> Ctrl : material público
+Ctrl --> View : 200
+View -> View : reaparece en el catálogo
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+title BiblioTech — Arquitectura de contenedores (estado actual)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam nodesep 35
+skinparam ranksep 45
+
+actor "Usuario\n(Student / Professor / Admin)" as User
+
+package "Navegador" {
+  component "SPA React 19\nVite · React Router 7" as SPA
+}
+
+package "Servidor (Docker Compose)" {
+  component "Nginx\n(solo producción)" as Nginx
+  component "API NestJS 11\nController · Model · Infrastructure" as API
+  database "MariaDB 11" as DB
+  component "Volumen uploads / blobs" as Uploads
+}
+
+package "Proceso externo" {
+  component "Scripts de operación\nmigraciones · seeds" as Ops
+}
+
+User --> SPA : usa
+SPA --> Nginx : HTTPS / JSON
+Nginx --> API : proxy /api
+API --> DB : TypeORM · SQL
+API --> Uploads : lectura / escritura
+Ops --> API : migration:run\nseed-admin · seed-dev
+
+note right of API
+  El detalle de sus componentes
+  está en component-backend.puml
+end note
+
+legend bottom left
+  **Estado actual**
+
+  No existe un contenedor ni componente de mensajes:
+  los textos de validación están hardcodeados en el
+  dominio y los DTO usan los mensajes por defecto de
+  class-validator (inglés). No hay catálogo, ni
+  LanguageManager, ni idioma seleccionable.
+endlegend
+
+@enduml
