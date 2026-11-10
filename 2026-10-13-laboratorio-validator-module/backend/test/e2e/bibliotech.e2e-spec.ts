@@ -179,6 +179,104 @@ describe('BiblioTech API (e2e)', () => {
     expect(serialized).not.toContain('must be an email');
   });
 
+  it('localiza las contraseñas inválidas en registro y login en es y en', async () => {
+    const shortPassword = 'short';
+    const tooLongPassword = 'x'.repeat(73);
+    const emptyPassword = ' '.repeat(8);
+    const email = `e2e-pw-${suffix}@bibliotech.local`;
+
+    const esTooShort = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email, password: shortPassword })
+      .expect(400);
+    expect(esTooShort.body).toEqual({
+      statusCode: 400,
+      message: ['La contraseña debe tener al menos 8 caracteres'],
+      error: 'Bad Request',
+    });
+
+    setLanguage('en');
+    const enTooShort = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email, password: shortPassword })
+      .expect(400);
+    expect(enTooShort.body).toEqual({
+      statusCode: 400,
+      message: ['The password must be at least 8 characters long'],
+      error: 'Bad Request',
+    });
+
+    const enTooLong = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email, password: tooLongPassword })
+      .expect(400);
+    expect(enTooLong.body).toEqual({
+      statusCode: 400,
+      message: ['The password cannot exceed 72 characters'],
+      error: 'Bad Request',
+    });
+
+    const enEmpty = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email, password: emptyPassword })
+      .expect(400);
+    expect(enEmpty.body).toEqual({
+      statusCode: 400,
+      message: 'The password must not be empty',
+      error: 'VALIDATION',
+    });
+
+    const enNotString = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email, password: 123 })
+      .expect(400);
+    expect(enNotString.body.statusCode).toBe(400);
+    expect(enNotString.body.error).toBe('Bad Request');
+    expect(enNotString.body.message).toEqual(
+      expect.arrayContaining(['The password must be a string']),
+    );
+
+    const enLoginTooLong = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email, password: tooLongPassword })
+      .expect(400);
+    expect(enLoginTooLong.body).toEqual({
+      statusCode: 400,
+      message: ['The password cannot exceed 72 characters'],
+      error: 'Bad Request',
+    });
+
+    const enLoginNotString = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email, password: 123 })
+      .expect(400);
+    expect(enLoginNotString.body.statusCode).toBe(400);
+    expect(enLoginNotString.body.error).toBe('Bad Request');
+    expect(enLoginNotString.body.message).toEqual(
+      expect.arrayContaining(['The password must be a string']),
+    );
+
+    setLanguage('es');
+    const esNotStringRegister = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email, password: 123 })
+      .expect(400);
+    expect(esNotStringRegister.body.statusCode).toBe(400);
+    expect(esNotStringRegister.body.error).toBe('Bad Request');
+    expect(esNotStringRegister.body.message).toEqual(
+      expect.arrayContaining(['La contraseña debe ser un texto']),
+    );
+
+    const passwordMessages = [
+      JSON.stringify(esTooShort.body),
+      JSON.stringify(enTooLong.body),
+      JSON.stringify(enNotString.body),
+      JSON.stringify(esNotStringRegister.body),
+    ].join(' ');
+    expect(passwordMessages).not.toContain('is too short');
+    expect(passwordMessages).not.toContain('has to be longer');
+  });
+
   it('permite al Professor crear, publicar, ocultar, eliminar y al Admin restaurar', async () => {
     const title = `Material e2e ${suffix}`;
     const created = await request(app.getHttpServer())

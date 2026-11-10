@@ -1,15 +1,20 @@
 import { ValidationError } from '../errors';
+import { resolveMessage } from '../messages';
 
 export class PasswordValidator {
   static assertValid(password: string): void {
     if (typeof password !== 'string' || password.length < 8) {
-      throw new ValidationError('La contraseña debe tener al menos 8 caracteres');
+      throw new ValidationError(
+        resolveMessage('validation.password.too-short', { min: 8 }),
+      );
     }
     if (password.length > 72) {
-      throw new ValidationError('La contraseña no puede superar los 72 caracteres');
+      throw new ValidationError(
+        resolveMessage('validation.password.too-long', { max: 72 }),
+      );
     }
     if (password.trim().length === 0) {
-      throw new ValidationError('La contraseña no puede ser vacía');
+      throw new ValidationError(resolveMessage('validation.password.empty'));
     }
   }
 }

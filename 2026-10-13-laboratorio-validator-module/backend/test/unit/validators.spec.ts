@@ -40,6 +40,17 @@ describe('PasswordValidator', () => {
   it.each(['short', ' '.repeat(8), 'x'.repeat(73)])('rejects %s', (password) => {
     expect(() => PasswordValidator.assertValid(password)).toThrow(ValidationError);
   });
+
+  it('resolves its messages from the catalog in the active language', () => {
+    expect(() => PasswordValidator.assertValid('short')).toThrow('al menos 8');
+
+    setLanguage('en');
+    expect(() => PasswordValidator.assertValid('short')).toThrow('at least 8');
+    expect(() => PasswordValidator.assertValid(' '.repeat(8))).toThrow('must not be empty');
+    expect(() => PasswordValidator.assertValid('x'.repeat(73))).toThrow('cannot exceed 72');
+
+    setLanguage('es');
+  });
 });
 
 describe('UserValidator', () => {
